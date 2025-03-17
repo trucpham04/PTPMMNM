@@ -14,12 +14,12 @@ function DefaultLayout() {
           style={
             {
               "--sidebar-width": "20rem",
-              "--sidebar-width-icon": "5rem",
+              "--sidebar-width-icon": "4rem",
             } as React.CSSProperties
           }
         >
           <AppSidebar className="mt-16 max-h-[calc(100vh-4rem)]" />
-          <SidebarInset className="boder m-2 overflow-auto rounded-md bg-red-500 p-2">
+          <SidebarInset className="boder m-2 overflow-auto rounded-md bg-neutral-900 p-2">
             <Outlet />
           </SidebarInset>
         </SidebarProvider>
