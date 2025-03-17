@@ -6,7 +6,7 @@ import { Button } from "../ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
 
-function GlobalNavbar({ className }: { className?: string }) {
+function AppNavbar({ className }: { className?: string }) {
   return (
     <div className={cn("fixed h-16 w-dvw p-2", className)}>
       <div className="flex h-full items-center justify-between">
@@ -24,7 +24,7 @@ function GlobalNavbar({ className }: { className?: string }) {
 
           {/* Searchbar */}
 
-          <div className="focus:animate-in flex w-fit rounded-full bg-neutral-800 ring-offset-2 delay-75 focus-within:ring-0 hover:bg-neutral-700">
+          <div className="flex w-fit rounded-full bg-neutral-800 ring-offset-2 transition-all delay-75 duration-200 focus-within:ring-0 hover:bg-neutral-700">
             <div className="flex size-12 cursor-pointer items-center justify-center rounded-full bg-transparent pl-1 text-white">
               <Search className="size-6!" />
             </div>
@@ -53,4 +53,4 @@ function GlobalNavbar({ className }: { className?: string }) {
   );
 }
 
-export default GlobalNavbar;
+export default AppNavbar;

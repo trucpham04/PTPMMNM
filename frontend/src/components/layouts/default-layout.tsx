@@ -1,12 +1,12 @@
 import { Outlet } from "react-router-dom";
 import { AppSidebar } from "@/components/app/app-sidebar";
 import { SidebarProvider, SidebarInset } from "../ui/sidebar";
-import GlobalNavbar from "../app/global-navbar";
+import AppNavbar from "../app/app-navbar";
 
 function DefaultLayout() {
   return (
     <div className="flex flex-col">
-      <GlobalNavbar />
+      <AppNavbar />
 
       <div className="mt-16 flex-1">
         <SidebarProvider

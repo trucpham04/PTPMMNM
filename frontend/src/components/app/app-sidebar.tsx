@@ -163,23 +163,30 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       className="bg-zinc-900! group-data-[collapsible=icon]:w-16!"
       {...props}
     >
-      <SidebarHeader className="flex flex-row items-center justify-between p-4 pb-2 text-zinc-500 group-data-[collapsible=icon]:w-fit">
+      <SidebarHeader className="flex flex-row items-center justify-between p-4 pb-2 text-zinc-500 group-data-[collapsible=icon]:w-fit group-data-[collapsible=icon]:flex-col">
         <div
           onClick={toggleSidebar}
-          className="hover:text-primary flex w-fit cursor-pointer items-center gap-2"
+          className="hover:text-primary flex w-fit cursor-pointer items-center gap-2 transition-colors duration-200"
         >
-          <LibraryBig className="size-10! p-1" />
+          <LibraryBig className="size-10! p-1.5" />
           <div className="w-fit min-w-fit font-semibold text-nowrap group-data-[collapsible=icon]:hidden">
             Your Library
           </div>
         </div>
 
         <Button
-          className="w-fit cursor-pointer rounded-full group-data-[collapsible=icon]:hidden"
+          className="hidden items-center justify-center rounded-full group-data-[collapsible=icon]:flex"
+          size={"icon"}
+        >
+          <Plus className="size-6!" />
+        </Button>
+
+        <Button
+          className="w-fit cursor-pointer rounded-full pr-4! group-data-[collapsible=icon]:hidden"
           size="sm"
         >
           <Plus className="size-6!" />
-          <div className="text-md">Create</div>
+          <div className="text-md font-semibold">Create</div>
         </Button>
       </SidebarHeader>
 
