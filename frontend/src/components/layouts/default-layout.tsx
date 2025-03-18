@@ -2,15 +2,16 @@ import { Outlet } from "react-router-dom";
 import { AppSidebar } from "@/components/app/app-sidebar";
 import { SidebarProvider, SidebarInset } from "../ui/sidebar";
 import AppNavbar from "../app/app-navbar";
+import AppFooter from "../app/app-footer";
 
 function DefaultLayout() {
   return (
-    <div className="flex flex-col">
+    <div className="flex h-screen flex-col">
       <AppNavbar />
 
-      <div className="mt-16 flex-1">
+      <main className="mt-16 flex flex-1">
         <SidebarProvider
-          className="min-h-[calc(100vh-4rem)] overflow-hidden"
+          className="min-h-full overflow-hidden"
           style={
             {
               "--sidebar-width": "20rem",
@@ -18,12 +19,14 @@ function DefaultLayout() {
             } as React.CSSProperties
           }
         >
-          <AppSidebar className="mt-16 max-h-[calc(100vh-4rem)]" />
+          <AppSidebar className="mt-16 max-h-[calc(100vh-8rem)]" />
           <SidebarInset className="boder m-2 overflow-auto rounded-md bg-neutral-900 p-2">
             <Outlet />
           </SidebarInset>
         </SidebarProvider>
-      </div>
+      </main>
+
+      <AppFooter className="" />
     </div>
   );
 }
