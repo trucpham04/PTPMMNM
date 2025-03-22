@@ -3,15 +3,25 @@ import { AppSidebar } from "@/components/app/app-sidebar";
 import { SidebarProvider, SidebarInset } from "../ui/sidebar";
 import AppNavbar from "../app/app-navbar";
 import AppFooter from "../app/app-footer";
+import { createContext, useState } from "react";
+
+export const AppSideBarContext = createContext<{
+  sidebarOpen: boolean;
+  setSidebarOpen: (state: boolean) => void;
+}>({
+  sidebarOpen: true,
+  setSidebarOpen: () => {},
+});
 
 function DefaultLayout() {
-  return (
-    <div className="flex h-screen flex-col">
-      <AppNavbar />
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
-      <main className="mt-16 flex flex-1">
+  return (
+    <AppSideBarContext.Provider value={{ sidebarOpen, setSidebarOpen }}>
+      <div className="flex-col">
         <SidebarProvider
-          className="min-h-full overflow-hidden"
+          open={sidebarOpen}
+          className="min-h-[calc(100vh-4rem)]"
           style={
             {
               "--sidebar-width": "20rem",
@@ -19,15 +29,18 @@ function DefaultLayout() {
             } as React.CSSProperties
           }
         >
-          <AppSidebar className="mt-16 max-h-[calc(100vh-8rem)]" />
-          <SidebarInset className="boder m-2 overflow-auto rounded-md bg-neutral-900 p-2">
-            <Outlet />
-          </SidebarInset>
-        </SidebarProvider>
-      </main>
+          <AppNavbar />
 
-      <AppFooter className="" />
-    </div>
+          <main className="mt-16 flex max-h-[calc(100vh-8rem)] flex-1">
+            <AppSidebar className="mt-16 max-h-[calc(100vh-8rem)]" />
+            <SidebarInset className="m-2 overflow-auto rounded-md bg-neutral-900">
+              <Outlet />
+            </SidebarInset>
+          </main>
+        </SidebarProvider>
+        <AppFooter className="" />
+      </div>
+    </AppSideBarContext.Provider>
   );
 }
 

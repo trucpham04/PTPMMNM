@@ -1,15 +1,17 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "@/pages/home";
-import About from "@/pages/about";
+import HomePage from "@/pages/home";
+import ExplorePage from "@/pages/explore";
 import DefaultLayout from "@/components/layouts/default-layout";
+import Album from "@/pages/album";
 
 function routes() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<DefaultLayout />}>
-          <Route path="" element={<Home />} />
-          <Route path="/about" element={<About />} />
+          <Route path="" element={<HomePage />} />
+          <Route path="/explore" element={<ExplorePage />} />
+          <Route path="/album/:album_id" element={<Album />} />
         </Route>
       </Routes>
     </BrowserRouter>

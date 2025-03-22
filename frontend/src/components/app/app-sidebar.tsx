@@ -1,65 +1,61 @@
 "use client";
 
 import * as React from "react";
-import {
-  BookOpen,
-  Bot,
-  Settings2,
-  SquareTerminal,
-  LibraryBig,
-  Plus,
-} from "lucide-react";
+
 import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
-  useSidebar,
 } from "@/components/ui/sidebar";
 import NavAlbums from "@/components/app/nav-albums";
 import { Button } from "../ui/button";
+import Icon from "../ui/icon";
+
+import { AppSideBarContext } from "../layouts/default-layout";
+import { cn } from "@/lib/utils";
 
 const data = {
   albums: [
     {
       title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
+      url: "/album/1",
     },
     {
       title: "Models",
-      url: "#",
-      icon: Bot,
+      url: "/album/2",
     },
     {
       title: "Documentation",
-      url: "#",
-      icon: BookOpen,
+      url: "/album/3",
     },
     {
       title: "Settings",
-      url: "#",
-      icon: Settings2,
+      url: "/album/4",
     },
   ],
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { toggleSidebar } = useSidebar();
+export function AppSidebar({
+  className,
+  ...props
+}: React.ComponentProps<typeof Sidebar>) {
+  const { sidebarOpen, setSidebarOpen } = React.useContext(AppSideBarContext);
 
   return (
     <Sidebar
       collapsible="icon"
       variant="floating"
-      className="bg-zinc-900! group-data-[collapsible=icon]:w-16!"
+      className={cn("group-data-[collapsible=icon]:w-18!", className)}
       {...props}
     >
       <SidebarHeader className="flex flex-row items-center justify-between p-4 pb-2 text-zinc-500 group-data-[collapsible=icon]:w-fit group-data-[collapsible=icon]:flex-col">
         <div
-          onClick={toggleSidebar}
+          onClick={() => setSidebarOpen(!sidebarOpen)}
           className="hover:text-primary flex w-fit cursor-pointer items-center gap-2 transition-colors duration-200"
         >
-          <LibraryBig className="size-10! p-1.5" />
+          <Icon size={"xl"} fill={!sidebarOpen}>
+            folder_copy
+          </Icon>
           <div className="w-fit min-w-fit font-semibold text-nowrap group-data-[collapsible=icon]:hidden">
             Your Library
           </div>
@@ -69,14 +65,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           className="hidden items-center justify-center rounded-full group-data-[collapsible=icon]:flex"
           size={"icon"}
         >
-          <Plus className="size-6!" />
+          <Icon size="lg">add</Icon>
         </Button>
 
         <Button
           className="w-fit cursor-pointer rounded-full pr-4! group-data-[collapsible=icon]:hidden"
           size="sm"
         >
-          <Plus className="size-6!" />
+          <Icon size="lg">add</Icon>
           <div className="text-md font-semibold">Create</div>
         </Button>
       </SidebarHeader>

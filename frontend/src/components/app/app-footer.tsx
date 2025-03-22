@@ -1,16 +1,6 @@
 import { cn } from "@/lib/utils";
-import {
-  PlusCircle,
-  ChevronFirst,
-  ChevronLast,
-  Pause,
-  Volume1,
-  Volume2,
-  VolumeX,
-  Play,
-} from "lucide-react";
-import { Button } from "../ui/button";
 import { Slider } from "../ui/slider";
+import Icon from "../ui/icon";
 
 export default function AppFooter({ className }: { className?: string }) {
   return (
@@ -27,15 +17,13 @@ export default function AppFooter({ className }: { className?: string }) {
             <div>Track name</div>
             <div className="text-xs">artist name</div>
           </div>
-          <PlusCircle className="cursor-pointer" size={20} />
+          <Icon>add_circle</Icon>
         </div>
         <div className="absolute top-1/2 left-1/2 flex w-full -translate-1/2 flex-col items-center justify-center gap-1">
-          {/* <div className="w-fit"> */}
           <div className="flex gap-4">
-            <ChevronFirst />
-            <Play />
-            {/* <Pause /> */}
-            <ChevronLast />
+            <Icon size="xl">skip_previous</Icon>
+            <Icon size="xl">play_arrow</Icon>
+            <Icon size="xl">skip_next</Icon>
           </div>
 
           <div className="flex items-center gap-2 text-xs">
@@ -45,8 +33,8 @@ export default function AppFooter({ className }: { className?: string }) {
           </div>
         </div>
         {/* </div> */}
-        <div className="flex">
-          <Volume1 />
+        <div className="flex gap-2">
+          <Icon size="lg">volume_up</Icon>
           <Slider
             size="small"
             max={100}
