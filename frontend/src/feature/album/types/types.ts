@@ -13,7 +13,6 @@ export type Track = {
 export type Album = {
   id: number;
   name: string;
-  type: string;
   cover_url: string;
   authorName: string;
   authorID: number;

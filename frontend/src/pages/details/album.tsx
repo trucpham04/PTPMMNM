@@ -1,11 +1,10 @@
-import AlbumAction from "@/feature/album/components/action";
-import AlbumHeader from "@/feature/album/components/header";
-import AlbumTracks from "@/feature/album/components/tracks";
+import AlbumAction from "@/feature/details/components/action";
+import { DataTable } from "@/feature/details/components/data-table";
+import AlbumHeader from "@/feature/details/components/header";
 
 const album = {
   id: 1,
   name: "Chilling?",
-  type: "Album type",
   cover_url: "https://placehold.co/400",
   authorName: "Truc Pham????",
   authorID: 1,
@@ -234,13 +233,20 @@ const album = {
   ],
 };
 
-export default function Album() {
+export default function AlbumPage() {
   return (
     <div className="min-h-full">
-      <AlbumHeader album={album} />
+      <AlbumHeader
+        cover_url="https://placehold.co/400"
+        author_type="artist"
+        author_id={1}
+        author_name="Truc"
+        title="This is album"
+        type="Album"
+      />
       <div className="px-4">
         <AlbumAction />
-        <AlbumTracks data={album.tracks} />
+        <DataTable data={album.tracks} />
       </div>
     </div>
   );

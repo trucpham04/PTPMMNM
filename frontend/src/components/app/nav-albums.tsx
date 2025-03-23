@@ -31,7 +31,7 @@ export default function NavAlbums({
                     tooltip={album.title}
                     isActive={isActive}
                   >
-                    <div className="flex size-12 min-w-12 items-center justify-center rounded-md bg-red-100">
+                    <div className="flex size-12 min-w-12 items-center justify-center rounded-md">
                       <img
                         src={album.cover_url}
                         alt=""
