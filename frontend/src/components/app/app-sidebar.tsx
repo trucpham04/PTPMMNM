@@ -17,20 +17,24 @@ import { cn } from "@/lib/utils";
 const data = {
   albums: [
     {
-      title: "Playground",
+      title: "Day",
       url: "/album/1",
+      cover_url: "https://placehold.co/400",
     },
     {
-      title: "Models",
+      title: "La",
       url: "/album/2",
+      cover_url: "https://placehold.co/400",
     },
     {
-      title: "Documentation",
+      title: "Demo",
       url: "/album/3",
+      cover_url: "https://placehold.co/400",
     },
     {
-      title: "Settings",
+      title: "Thoi",
       url: "/album/4",
+      cover_url: "https://placehold.co/400",
     },
   ],
 };

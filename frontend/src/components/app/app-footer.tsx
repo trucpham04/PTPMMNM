@@ -19,7 +19,7 @@ export default function AppFooter({ className }: { className?: string }) {
           </div>
           <Icon>add_circle</Icon>
         </div>
-        <div className="absolute top-1/2 left-1/2 flex w-full -translate-1/2 flex-col items-center justify-center gap-1">
+        <div className="absolute top-2/5 left-1/2 flex w-full -translate-1/2 flex-col items-center justify-center">
           <div className="flex gap-4">
             <Icon size="xl">skip_previous</Icon>
             <Icon size="xl">play_arrow</Icon>

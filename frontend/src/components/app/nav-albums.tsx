@@ -1,8 +1,5 @@
 "use client";
 
-import { type LucideIcon } from "lucide-react";
-import ReactLogo from "@/assets/react.svg";
-
 import {
   SidebarGroup,
   SidebarMenu,
@@ -18,8 +15,7 @@ export default function NavAlbums({
   albums: {
     title: string;
     url: string;
-    icon?: LucideIcon;
-    isActive?: boolean;
+    cover_url: string;
   }[];
 }) {
   return (
@@ -36,7 +32,11 @@ export default function NavAlbums({
                     isActive={isActive}
                   >
                     <div className="flex size-12 min-w-12 items-center justify-center rounded-md bg-red-100">
-                      <img src={ReactLogo} alt="" />
+                      <img
+                        src={album.cover_url}
+                        alt=""
+                        className="rounded-sm"
+                      />
                     </div>
 
                     <div className="space-y-2 text-nowrap group-data-[collapsible=icon]:hidden">
