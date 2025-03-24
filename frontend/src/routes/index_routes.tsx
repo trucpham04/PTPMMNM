@@ -16,18 +16,19 @@ function routes() {
       <Routes>
         <Route path="/" element={<DefaultLayout />}>
           <Route index element={<HomePage />} />
-          <Route path="/home" element={<Navigate to={"/"} />} />
-          <Route path="/explore" element={<ExplorePage />} />
-          <Route path="/album/:album_id" element={<AlbumPage />} />
-          <Route path="/artist/:artist_id" element={<ArtistPage />} />
-          <Route path="/track/:track_id" element={<TrackPage />} />
+          <Route path="home" element={<Navigate to={"/"} />} />
+          <Route path="explore" element={<ExplorePage />} />
+          <Route path="album/:album_id" element={<AlbumPage />} />
+          <Route path="artist/:artist_id" element={<ArtistPage />} />
+          <Route path="track/:track_id" element={<TrackPage />} />
         </Route>
 
-        <Route path="/auth" element={<AuthLayout />}>
+        <Route path="/" element={<AuthLayout />}>
           <Route index element={<Navigate to={"login"} />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
         </Route>
+
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
