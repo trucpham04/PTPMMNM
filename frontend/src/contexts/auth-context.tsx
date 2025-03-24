@@ -1,4 +1,4 @@
-import { loginApi } from "@/feature/auth/auth-services";
+import { loginApi } from "@/services/auth-services";
 import React, { createContext, useContext, useState } from "react";
 
 interface User {
@@ -6,9 +6,23 @@ interface User {
   username: string;
 }
 
+type LoginProps = {
+  username: string;
+  password: string;
+};
+
+type RegisterProps = {
+  username: string;
+  password: string;
+  email: string;
+  dateOfBirth: string;
+  gender: string;
+};
+
 interface AuthContextType {
   user: User | null;
-  login: (username: string, password: string) => void;
+  login: (props: LoginProps) => void;
+  register: (props: RegisterProps) => void;
   logout: () => void;
 }
 
@@ -20,9 +34,19 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
-  const login = async (username: string, password: string) => {
+
+  const login = async (props: LoginProps) => {
     try {
-      const data = await loginApi(username, password);
+      const data = await loginApi(props.username, props.password);
+      setUser(data.user);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const register = async (props: RegisterProps) => {
+    try {
+      const data = await loginApi(props.username, props.password);
       setUser(data.user);
     } catch (error) {
       console.log(error);
@@ -32,7 +56,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setUser(null);
   };
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
