@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Track } from "../types/types";
+import { Track } from "../../album/types/types";
 import columns from "./columns";
 
 export function DataTable({ data }: { data: Track[] }) {
