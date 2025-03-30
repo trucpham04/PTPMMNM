@@ -1,13 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
-
+from cloudinary.models import CloudinaryField
 class User(AbstractUser):
-    profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
+    profile_picture = CloudinaryField('profile_pictures', null=True, blank=True)
     bio = models.TextField(null=True, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
     country = models.CharField(max_length=100, null=True, blank=True)
     
-    # Fix lỗi xung đột
     groups = models.ManyToManyField(Group, related_name="custom_user_groups", blank=True)
     user_permissions = models.ManyToManyField(Permission, related_name="custom_user_permissions", blank=True)
 

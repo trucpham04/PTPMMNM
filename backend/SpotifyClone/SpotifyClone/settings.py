@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -44,7 +46,13 @@ INSTALLED_APPS = [
     'purchase',
     'favorite',
     'comment',
+    'rest_framework',
+    'cloudinary',
+    'cloudinary_storage',
 ]
+
+# Đặt AUTH_USER_MODEL bên ngoài danh sách INSTALLED_APPS
+AUTH_USER_MODEL = 'user.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -131,3 +139,16 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'drybe720w',
+    'API_KEY': '328935211357267',
+    'API_SECRET': 'eaDdEvcb1IkctNIznI34poBW8_k',
+    'MEDIA_TAG': 'media',
+    'INVALID_VIDEO_ERROR_MESSAGE': 'Vui lòng tải lên một file video hợp lệ.',
+    'RESOURCE_TYPES': ['image', 'video', 'raw'],  # Thêm video và raw
+    'SECURE': True  # Sử dụng HTTPS
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
