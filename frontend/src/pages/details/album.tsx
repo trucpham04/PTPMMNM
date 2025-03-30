@@ -1,6 +1,6 @@
-import AlbumAction from "@/feature/details/components/action";
-import { DataTable } from "@/feature/details/components/data-table";
-import AlbumHeader from "@/feature/details/components/header";
+import AlbumAction from "@/components/details/action";
+import { DataTable } from "@/components/details/data-table";
+import AlbumHeader from "@/components/details/header";
 
 const album = {
   id: 1,
