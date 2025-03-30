@@ -1,16 +1,24 @@
-export const loginApi = async (
+import { User } from "@/types/types";
+import { handleAxiosError } from "@/utils/handle-axios-error";
+import axios from "axios";
+
+export async function loginApi(
   username: string,
   password: string,
-): Promise<{ user: { id: number; username: string } }> => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (username === "admin" && password === "1234") {
-        resolve({
-          user: { id: 1, username: "admin" },
-        });
-      } else {
-        reject(new Error("Thông tin đăng nhập không hợp lệ"));
-      }
-    }, 1000);
-  });
-};
+): Promise<{ user: User | null }> {
+  try {
+    const { data } = await axios.post("/api/login", { username, password });
+    return { user: data.user };
+  } catch (error) {
+    handleAxiosError(error);
+    return { user: null };
+  }
+}
+
+export async function logoutApi(): Promise<void> {
+  try {
+    await axios.post("/api/logout");
+  } catch (error) {
+    handleAxiosError(error);
+  }
+}

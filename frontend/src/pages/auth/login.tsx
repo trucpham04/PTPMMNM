@@ -19,8 +19,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/auth-context";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 
 const formSchema = z.object({
@@ -30,6 +31,13 @@ const formSchema = z.object({
 
 export default function LoginPage() {
   const { user, login } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -40,9 +48,13 @@ export default function LoginPage() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    await login({ username: values.username, password: values.password });
-    console.log(user);
+    const loginSuccess = await login({
+      username: values.username,
+      password: values.password,
+    });
+
+    if (loginSuccess) navigate("/");
+    else console.error("Login failed");
   }
 
   return (

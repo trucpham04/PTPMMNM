@@ -1,30 +1,11 @@
-import { loginApi } from "@/services/auth-services";
+import { loginApi, logoutApi } from "@/services/auth-services";
+import {
+  AuthContextType,
+  LoginProps,
+  RegisterProps,
+  User,
+} from "@/types/types";
 import React, { createContext, useContext, useState } from "react";
-
-interface User {
-  id: number;
-  username: string;
-}
-
-type LoginProps = {
-  username: string;
-  password: string;
-};
-
-type RegisterProps = {
-  username: string;
-  password: string;
-  email: string;
-  dateOfBirth: string;
-  gender: string;
-};
-
-interface AuthContextType {
-  user: User | null;
-  login: (props: LoginProps) => void;
-  register: (props: RegisterProps) => void;
-  logout: () => void;
-}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -35,14 +16,28 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
 
-  const login = async (props: LoginProps) => {
+  async function login(props: LoginProps): Promise<boolean> {
     try {
-      const data = await loginApi(props.username, props.password);
-      setUser(data.user);
+      // Destructure user from the response
+      const { user } = await loginApi(props.username, props.password);
+
+      if (user) {
+        setUser(user);
+        localStorage.setItem("user", JSON.stringify(user));
+      } else {
+        // Optionally, handle the case when login fails (e.g., wrong credentials)
+        console.error("Login failed: No user returned");
+        return false;
+        // Show error message to the user, e.g., set a state for error message
+      }
+
+      return true;
     } catch (error) {
-      console.log(error);
+      console.error("An error occurred during login:", error);
+      // Optionally, update error state to display a user-friendly message
+      return false;
     }
-  };
+  }
 
   const register = async (props: RegisterProps) => {
     try {
@@ -52,11 +47,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       console.log(error);
     }
   };
-  const logout = () => {
-    setUser(null);
-  };
+  async function logout() {
+    try {
+      await logoutApi();
+      setUser(null);
+      localStorage.removeItem("user");
+    } catch (error) {
+      console.error("An error occurred during logout:", error);
+    }
+  }
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, login, register, logout, setUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,0 +1,192 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "johndoe",
+      "password": "Admin@123",
+      "email": "john@example.com",
+      "avatar_path": "johndoe.png",
+      "firstname": "John",
+      "lastname": "Doe",
+      "dob": "1985-06-15",
+      "gender": "male",
+      "role": "admin",
+      "createdAt": "2025-03-01 10:23:45",
+      "updatedAt": "2025-03-25 15:16:29",
+      "updatedBy": "trucpham04"
+    },
+    {
+      "id": 2,
+      "username": "janesmith",
+      "password": "Jane@456",
+      "email": "jane@example.com",
+      "firstname": "Jane",
+      "lastname": "Smith",
+      "dob": "1990-09-22",
+      "gender": "female",
+      "role": "user",
+      "createdAt": "2025-03-05 14:18:32",
+      "updatedAt": "2025-03-20 09:45:11",
+      "updatedBy": "trucpham04"
+    },
+    {
+      "id": 3,
+      "username": "bobjohnson",
+      "password": "Bob@789",
+      "email": "bob@example.com",
+      "firstname": "Bob",
+      "lastname": "Johnson",
+      "dob": "1988-12-10",
+      "gender": "male",
+      "role": "user",
+      "createdAt": "2025-03-10 09:32:17",
+      "updatedAt": "2025-03-18 16:22:40",
+      "updatedBy": "trucpham04"
+    },
+    {
+      "id": 4,
+      "username": "emmawilson",
+      "password": "Emma@123",
+      "email": "emma@example.com",
+      "firstname": "Emma",
+      "lastname": "Wilson",
+      "dob": "1992-05-18",
+      "gender": "female",
+      "role": "user",
+      "createdAt": "2025-03-15 11:47:33",
+      "updatedAt": "2025-03-25 15:16:29",
+      "updatedBy": "trucpham04"
+    },
+    {
+      "id": 5,
+      "username": "michaelbrown",
+      "password": "Michael@456",
+      "email": "michael@example.com",
+      "firstname": "Michael",
+      "lastname": "Brown",
+      "dob": "1982-08-30",
+      "gender": "male",
+      "role": "manager",
+      "createdAt": "2025-03-18 13:25:19",
+      "updatedAt": "2025-03-22 10:12:05",
+      "updatedBy": "trucpham04"
+    },
+    {
+      "id": 6,
+      "username": "oliviajones",
+      "password": "Olivia@789",
+      "email": "olivia@example.com",
+      "firstname": "Olivia",
+      "lastname": "Jones",
+      "dob": "1995-11-05",
+      "gender": "female",
+      "role": "user",
+      "createdAt": "2025-03-20 15:36:42",
+      "updatedAt": "2025-03-25 15:16:29",
+      "updatedBy": "trucpham04"
+    },
+    {
+      "id": 7,
+      "username": "williamdavis",
+      "password": "William@123",
+      "email": "william@example.com",
+      "firstname": "William",
+      "lastname": "Davis",
+      "dob": "1989-03-12",
+      "gender": "male",
+      "role": "user",
+      "createdAt": "2025-03-22 09:57:14",
+      "updatedAt": "2025-03-24 16:41:38",
+      "updatedBy": "trucpham04"
+    },
+    {
+      "id": 8,
+      "username": "sophiamiller",
+      "password": "Sophia@456",
+      "email": "sophia@example.com",
+      "firstname": "Sophia",
+      "lastname": "Miller",
+      "dob": "1993-07-27",
+      "gender": "female",
+      "role": "user",
+      "createdAt": "2025-03-23 17:19:53",
+      "updatedAt": "2025-03-25 15:16:29",
+      "updatedBy": "trucpham04"
+    },
+    {
+      "id": 9,
+      "username": "jamesgarcia",
+      "password": "James@789",
+      "email": "james@example.com",
+      "firstname": "James",
+      "lastname": "Garcia",
+      "dob": "1987-04-09",
+      "gender": "male",
+      "role": "user",
+      "createdAt": "2025-03-24 12:08:25",
+      "updatedAt": "2025-03-25 14:31:56",
+      "updatedBy": "trucpham04"
+    },
+    {
+      "id": 10,
+      "username": "trucpham04",
+      "password": "Truc@2023",
+      "email": "truc@example.com",
+      "firstname": "Truc",
+      "lastname": "Pham",
+      "dob": "1994-09-04",
+      "gender": "male",
+      "role": "admin",
+      "createdAt": "2025-03-01 10:23:45",
+      "updatedAt": "2025-03-25 15:16:29",
+      "updatedBy": "trucpham04"
+    }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "name": "iPhone 13",
+      "category": "Electronics",
+      "price": 999,
+      "inStock": true,
+      "image": "https://placehold.co/200x200?text=iPhone"
+    },
+    {
+      "id": 2,
+      "name": "MacBook Pro",
+      "category": "Electronics",
+      "price": 1999,
+      "inStock": true,
+      "image": "https://placehold.co/200x200?text=MacBook"
+    },
+    {
+      "id": 3,
+      "name": "Coffee Maker",
+      "category": "Home",
+      "price": 79,
+      "inStock": false,
+      "image": "https://placehold.co/200x200?text=Coffee+Maker"
+    }
+  ],
+  "orders": [
+    {
+      "id": 1,
+      "userId": 1,
+      "products": [
+        { "productId": 1, "quantity": 1 },
+        { "productId": 2, "quantity": 1 }
+      ],
+      "total": 2998,
+      "status": "delivered",
+      "createdAt": "2025-03-20T10:30:00Z"
+    },
+    {
+      "id": 2,
+      "userId": 2,
+      "products": [{ "productId": 3, "quantity": 2 }],
+      "total": 158,
+      "status": "processing",
+      "createdAt": "2025-03-24T14:15:00Z"
+    }
+  ]
+}

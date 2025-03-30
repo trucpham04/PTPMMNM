@@ -9,6 +9,7 @@ import RegisterPage from "@/pages/auth/register";
 import NotFoundPage from "@/pages/not-found";
 import ArtistPage from "@/pages/details/artist";
 import TrackPage from "@/pages/details/track";
+import { AccountForm } from "@/pages/auth/account";
 
 function routes() {
   return (
@@ -16,6 +17,7 @@ function routes() {
       <Routes>
         <Route path="/" element={<DefaultLayout />}>
           <Route index element={<HomePage />} />
+          <Route path="account" element={<AccountForm />} />
           <Route path="home" element={<Navigate to={"/"} />} />
           <Route path="explore" element={<ExplorePage />} />
           <Route path="album/:album_id" element={<AlbumPage />} />

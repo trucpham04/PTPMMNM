@@ -25,14 +25,6 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import Icon from "@/components/ui/icon";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-// import { toast } from "@/components/ui/use-toast";
 
 const formSchema = z
   .object({
@@ -57,8 +49,6 @@ const formSchema = z
       .string()
       .nonempty({ message: "Email is required." })
       .email({ message: "Invalid email address." }),
-    dob: z.string({ message: "Date of birth is required." }).date(),
-    gender: z.string().nonempty({ message: "Please select a gender." }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -77,7 +67,6 @@ export default function RegisterPage() {
       password: "",
       confirmPassword: "",
       email: "",
-      gender: "",
     },
   });
 
@@ -91,8 +80,6 @@ export default function RegisterPage() {
         username: registrationData.username,
         password: registrationData.password,
         email: registrationData.email,
-        dateOfBirth: registrationData.dob,
-        gender: registrationData.gender,
       });
       navigate("/login");
     } catch (error) {
@@ -192,53 +179,6 @@ export default function RegisterPage() {
                 </FormItem>
               )}
             />
-            <div className="flex w-full items-start gap-3">
-              <FormField
-                control={form.control}
-                name="dob"
-                render={({ field }) => (
-                  <FormItem className="w-3/5">
-                    <FormLabel>Date of birth</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="date"
-                        autoComplete="new-password"
-                        placeholder="Confirm your password"
-                        className="text-sm"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="gender"
-                render={({ field }) => (
-                  <FormItem className="w-2/5">
-                    <FormLabel>Gender</FormLabel>
-                    <Select onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue
-                            defaultValue={"Male"}
-                            placeholder="Gender"
-                            {...field}
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="male">Male</SelectItem>
-                        <SelectItem value="female">Female</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? (

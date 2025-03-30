@@ -6,12 +6,15 @@ import { Separator } from "@/components/ui/separator";
 import { Link, NavLink } from "react-router-dom";
 import Icon from "../ui/icon";
 import { useSidebar } from "../ui/sidebar";
+import { useAuth } from "@/contexts/auth-context";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 function AppNavbar({ className }: { className?: string }) {
   const { openMobile, setOpenMobile } = useSidebar();
+  const { user, logout } = useAuth();
   return (
     <div className={cn("fixed h-16 w-dvw p-2", className)}>
-      <div className="flex h-full items-center justify-between">
+      <div className="relative flex h-full items-center justify-between">
         <Icon
           size={"xl"}
           onClick={() => setOpenMobile(!openMobile)}
@@ -25,7 +28,8 @@ function AppNavbar({ className }: { className?: string }) {
         >
           <Icon size={"xl"}>grid_view</Icon>
         </Link>
-        <div className="flex gap-2">
+
+        <div className="absolute top-1/2 left-1/2 flex -translate-1/2 gap-2">
           <Button className="size-12 cursor-pointer rounded-full bg-neutral-800 text-white hover:bg-neutral-700">
             <NavLink to="/">
               {({ isActive }) => (
@@ -62,14 +66,66 @@ function AppNavbar({ className }: { className?: string }) {
             </div>
           </div>
         </div>
-        <div className="size-12 cursor-pointer">
-          <Avatar className="size-full">
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>
-              <Icon size={"lg"}>person</Icon>
-            </AvatarFallback>
-          </Avatar>
-        </div>
+
+        {user ? (
+          <Popover>
+            <div className="size-12 cursor-pointer">
+              <PopoverTrigger>
+                <Avatar className="size-full cursor-pointer border">
+                  <AvatarImage
+                    src={`http://localhost:3001/avatars/${user.username}.png`}
+                  />
+                  <AvatarFallback>
+                    <Icon size={"lg"}>person</Icon>
+                  </AvatarFallback>
+                </Avatar>
+              </PopoverTrigger>
+              <PopoverContent className="w-40 rounded-sm p-1">
+                <div className="grid gap-1">
+                  <Button
+                    asChild
+                    variant="ghost"
+                    className="cursor-pointer rounded-xs"
+                  >
+                    <Link to="/account" className="justify-start">
+                      Settings
+                    </Link>
+                  </Button>
+
+                  <Separator className="w-full" />
+
+                  <Button
+                    variant="ghost"
+                    onClick={logout}
+                    className="cursor-pointer justify-start! rounded-xs"
+                  >
+                    Log out
+                  </Button>
+                </div>
+              </PopoverContent>
+            </div>
+          </Popover>
+        ) : (
+          <div className="flex gap-2">
+            <Button
+              asChild
+              variant={"outline"}
+              className="cursor-pointer rounded-full px-5 py-5 font-semibold"
+            >
+              <a href="/register" className="inline-flex items-center">
+                Sign Up
+              </a>
+            </Button>
+            <Button
+              asChild
+              className="cursor-pointer rounded-full px-5 py-5 font-semibold"
+            >
+              <a href="/login" className="inline-flex items-center">
+                Log In
+              </a>
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

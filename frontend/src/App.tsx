@@ -1,12 +1,19 @@
 import Routes from "@/routes/index_routes";
-import { AuthProvider } from "./contexts/auth-context";
+import { useAuth } from "./contexts/auth-context";
+import { useEffect } from "react";
 
 function App() {
+  const { setUser } = useAuth();
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    if (user) {
+      setUser(JSON.parse(user));
+    }
+  }, []);
+
   return (
     <>
-      <AuthProvider>
-        <Routes />
-      </AuthProvider>
+      <Routes />
     </>
   );
 }
