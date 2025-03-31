@@ -105,6 +105,8 @@ class Album(models.Model):
             models.Index(fields=['release_date']),
             models.Index(fields=['slug']),
         ]
+
+#------------------------------------------------------------------------------------------------------------------------------------------------------
 video_storage = MediaCloudinaryStorage(resource_type='video')
 audio_storage = MediaCloudinaryStorage(resource_type='raw')
 def custom_validate_video(file):

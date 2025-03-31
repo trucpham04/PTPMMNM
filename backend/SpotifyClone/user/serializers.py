@@ -1,10 +1,12 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import UserFollow
-
+from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth.hashers import make_password
 User = get_user_model()
-
 class UserSerializer(serializers.ModelSerializer):
+    profile_picture = serializers.SerializerMethodField()
+
     password = serializers.CharField(
         write_only=True, required=True, style={'input_type': 'password'}
     )
@@ -28,6 +30,47 @@ class UserSerializer(serializers.ModelSerializer):
             "password", "is_staff", "is_superuser", "user_permissions", "groups"
         ]
 
+    def get_profile_picture(self, obj):
+        if obj.profile_picture:
+            return obj.profile_picture.url  
+        return None
+
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(
+        write_only=True, required=True, style={'input_type': 'password'}
+    )
+
+    class Meta:
+        model = User
+        fields = ["id", "username", "email", "password", "profile_picture", "bio", "date_of_birth", "country"]
+
+    def validate_username(self, value):
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("Username already exists.")
+        return value
+
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Email already exists.")
+        return value
+
+    def create(self, validated_data):
+        password = validated_data.pop("password", None)
+        user = User(**validated_data)
+        if password:
+            user.set_password(password)  # Hash mật khẩu đúng cách
+        user.save()
+        return user
+    
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True, style={'input_type': 'password'})
+
+    def validate(self, data):
+        user = authenticate(username=data["username"], password=data["password"])
+        if not user:
+            raise serializers.ValidationError("Invalid username or password.")
+        return {"user": user}
 class UserFollowSerializer(serializers.ModelSerializer):
     follower = UserSerializer(read_only=True)
     followed = UserSerializer(read_only=True)
