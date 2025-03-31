@@ -19,3 +19,28 @@ export type Album = {
   dateAdded: string;
   tracks: Track[];
 };
+
+export type User = {
+  id: number;
+  username: string;
+  avatar_path: string;
+};
+
+export type LoginProps = {
+  username: string;
+  password: string;
+};
+
+export type RegisterProps = {
+  username: string;
+  password: string;
+  email: string;
+};
+
+export type AuthContextType = {
+  user: User | null;
+  setUser: (user: User) => void;
+  login: (props: LoginProps) => Promise<boolean>;
+  register: (props: RegisterProps) => void;
+  logout: () => void;
+};
