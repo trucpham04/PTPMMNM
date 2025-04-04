@@ -16,13 +16,31 @@ export default function NavAlbums({
     title: string;
     url: string;
     cover_url: string;
+    savedAt: string;
   }[];
 }) {
+  // Get current timestamp for display
+  const currentDate = new Date("2025-04-04T16:38:51Z");
+  const timeAgo = (savedAt: string) => {
+    if (!savedAt) return "Recently added";
+
+    const savedDate = new Date(savedAt);
+    const diffInDays = Math.floor(
+      (currentDate.getTime() - savedDate.getTime()) / (1000 * 60 * 60 * 24),
+    );
+
+    if (diffInDays === 0) return "Today";
+    if (diffInDays === 1) return "Yesterday";
+    if (diffInDays < 7) return `${diffInDays} days ago`;
+    if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`;
+    return `${Math.floor(diffInDays / 30)} months ago`;
+  };
+
   return (
     <SidebarGroup className="w-full px-1">
       <SidebarMenu>
-        {albums.map((album) => (
-          <div className="w-full" key={album.title}>
+        {albums.map((album, index) => (
+          <div className="w-full" key={`${album.title}-${index}`}>
             <SidebarMenuItem className="h-16! gap-2">
               <NavLink to={album.url}>
                 {({ isActive }) => (
@@ -34,17 +52,22 @@ export default function NavAlbums({
                     <div className="flex size-12 min-w-12 items-center justify-center rounded-md">
                       <img
                         src={album.cover_url}
-                        alt=""
-                        className="rounded-sm"
+                        alt={album.title}
+                        className="h-full w-full rounded-sm object-cover"
                       />
                     </div>
 
-                    <div className="space-y-2 text-nowrap group-data-[collapsible=icon]:hidden">
-                      <div className={cn(isActive && "text-green-500")}>
+                    <div className="flex flex-col justify-center space-y-1 text-nowrap group-data-[collapsible=icon]:hidden">
+                      <div
+                        className={cn(
+                          "line-clamp-1 font-medium",
+                          isActive && "text-green-500",
+                        )}
+                      >
                         {album.title}
                       </div>
-                      <div className="text-foreground text-xs">
-                        Type: Artist ? Albums
+                      <div className="text-muted-foreground line-clamp-1 text-xs">
+                        Album • {timeAgo(album.savedAt || "")}
                       </div>
                     </div>
                   </SidebarMenuButton>

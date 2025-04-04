@@ -8,6 +8,8 @@ export type Track = {
   albumID?: number | null;
   dateAdded: string;
   duration: string;
+  has_mv?: boolean;
+  mv_thumbnail?: string;
 };
 
 export type Album = {
@@ -17,7 +19,23 @@ export type Album = {
   authorName: string;
   authorID: number;
   dateAdded: string;
-  tracks: Track[];
+  tracks?: Track[]; // Optional as it will be loaded from API
+};
+
+export type Artist = {
+  id: number;
+  name: string;
+  cover_url: string;
+  followers: number;
+  genres?: string[];
+};
+
+// Player state type for Redux
+export type PlayerState = {
+  currentTrack: Track | null;
+  isPlaying: boolean;
+  queue: Track[];
+  volume: number;
 };
 
 export type User = {

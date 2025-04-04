@@ -1,10 +1,5 @@
 import { loginApi, logoutApi } from "@/services/auth-services";
-import {
-  AuthContextType,
-  LoginProps,
-  RegisterProps,
-  User,
-} from "@/types/types";
+import { AuthContextType, LoginProps, RegisterProps, User } from "@/types";
 import React, { createContext, useContext, useState } from "react";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
