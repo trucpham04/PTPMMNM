@@ -1,4 +1,4 @@
-import { User } from "@/types/types";
+import { User } from "@/types";
 import { handleAxiosError } from "@/utils/handle-axios-error";
 import axios from "axios";
 

@@ -40,9 +40,7 @@ export default function AlbumHeader({
       )}
       <div className="space-y-2">
         <div>{type}</div>
-        <div className="text-7xl font-extrabold">
-          {title} {album_id}
-        </div>
+        <div className="text-7xl font-extrabold">{title}</div>
         <div className="text-lg">
           {author_type === "artist" ? (
             <Link to={`/artist/${author_id}`} className="hover:underline">

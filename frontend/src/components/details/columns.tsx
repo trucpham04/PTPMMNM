@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import { ColumnDef } from "@tanstack/react-table";
-import { Track } from "../../types/types";
+import { Track } from "../../types";
 
 const columns: ColumnDef<Track>[] = [
   {

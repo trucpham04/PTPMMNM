@@ -13,37 +13,25 @@ import Icon from "../ui/icon";
 
 import { AppSideBarContext } from "../layouts/default-layout";
 import { cn } from "@/lib/utils";
-
-const data = {
-  albums: [
-    {
-      title: "Day",
-      url: "/album/1",
-      cover_url: "https://placehold.co/400",
-    },
-    {
-      title: "La",
-      url: "/album/2",
-      cover_url: "https://placehold.co/400",
-    },
-    {
-      title: "Demo",
-      url: "/album/3",
-      cover_url: "https://placehold.co/400",
-    },
-    {
-      title: "Thoi",
-      url: "/album/4",
-      cover_url: "https://placehold.co/400",
-    },
-  ],
-};
+import { useUserAlbums } from "@/hooks/use-user-albums";
+import { useAuth } from "@/contexts/auth-context";
+import { Skeleton } from "../ui/skeleton";
 
 export function AppSidebar({
   className,
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const { sidebarOpen, setSidebarOpen } = React.useContext(AppSideBarContext);
+  const { savedAlbums, loading } = useUserAlbums();
+  const { user } = useAuth();
+
+  // Convert saved albums to the format expected by NavAlbums
+  const formattedAlbums = savedAlbums.map((album) => ({
+    title: album.name,
+    url: `/album/${album.id}`,
+    cover_url: album.cover_url,
+    savedAt: album.dateAdded,
+  }));
 
   return (
     <Sidebar
@@ -82,7 +70,39 @@ export function AppSidebar({
       </SidebarHeader>
 
       <SidebarContent className="w-full">
-        <NavAlbums albums={data.albums} />
+        {loading ? (
+          <div className="space-y-4 p-2">
+            {Array(4)
+              .fill(0)
+              .map((_, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <Skeleton className="h-12 w-12 rounded-sm" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+              ))}
+          </div>
+        ) : user ? (
+          formattedAlbums.length > 0 ? (
+            <NavAlbums albums={formattedAlbums} />
+          ) : sidebarOpen == true ? (
+            <div className="text-muted-foreground flex flex-col items-center justify-center p-6 text-center">
+              <Icon size="xl" className="mb-2">
+                library_music
+              </Icon>
+              <p>No saved albums yet</p>
+              <p className="text-xs">Albums you save will appear here</p>
+            </div>
+          ) : (
+            ""
+          )
+        ) : (
+          <div className="text-muted-foreground flex flex-col items-center justify-center p-6 text-center">
+            <Icon size="xl" className="mb-2">
+              account_circle
+            </Icon>
+            <p>Login to view your saved albums</p>
+          </div>
+        )}
       </SidebarContent>
     </Sidebar>
   );
