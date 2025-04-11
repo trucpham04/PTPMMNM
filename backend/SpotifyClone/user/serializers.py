@@ -5,13 +5,11 @@ from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.hashers import make_password
 User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
-    profile_picture = serializers.SerializerMethodField()
-
     password = serializers.CharField(
         write_only=True, required=True, style={'input_type': 'password'}
     )
-    is_staff = serializers.BooleanField(default=False)  # Truy cập Admin
-    is_superuser = serializers.BooleanField(default=False)  # Toàn quyền Admin
+    is_staff = serializers.BooleanField(default=False)
+    is_superuser = serializers.BooleanField(default=False)
     user_permissions = serializers.PrimaryKeyRelatedField(
         queryset=User.user_permissions.rel.related_model.objects.all(),
         many=True,
@@ -22,6 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
         many=True,
         required=False
     )
+    profile_picture = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         model = User
@@ -29,11 +28,6 @@ class UserSerializer(serializers.ModelSerializer):
             "id", "username", "email", "profile_picture", "bio", "date_of_birth", "country",
             "password", "is_staff", "is_superuser", "user_permissions", "groups"
         ]
-
-    def get_profile_picture(self, obj):
-        if obj.profile_picture:
-            return obj.profile_picture.url  
-        return None
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(

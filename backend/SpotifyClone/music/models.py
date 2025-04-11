@@ -6,7 +6,7 @@ import os
 import mimetypes
 from django.core.exceptions import ValidationError
 from django.utils.text import slugify
-
+from cloudinary.models import CloudinaryField
 def custom_validate_video(file):
     """ Kiểm tra định dạng video và kích thước file """
 
@@ -50,7 +50,7 @@ class Genre(models.Model):
 class Artist(models.Model):
     name = models.CharField(max_length=255)
     bio = models.TextField(null=True, blank=True)
-    image = models.ImageField(upload_to='artist_images/', null=True, blank=True)
+    image = CloudinaryField('artist_images', null=True, blank=True)
     genres = models.ManyToManyField(Genre, related_name='artists')
     slug = models.SlugField(unique=True, max_length=255)
     
@@ -86,7 +86,7 @@ class Album(models.Model):
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name='albums')
     genres = models.ManyToManyField(Genre, related_name='albums')
     release_date = models.DateField()
-    cover_image = models.ImageField(upload_to='album_covers/')
+    cover_image = CloudinaryField('album_covers', null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     slug = models.SlugField(max_length=255)
     
@@ -130,6 +130,7 @@ class Song(models.Model):
     featuring_artists = models.ManyToManyField(Artist, related_name='featured_in', blank=True)
     album = models.ForeignKey(Album, on_delete=models.CASCADE, null=True, blank=True, related_name='songs')
     genres = models.ManyToManyField(Genre, related_name='songs')
+    composers = models.ManyToManyField(Artist, related_name='composed_songs')
 
     audio_file = models.FileField(
         storage=audio_storage,  # Sử dụng storage với resource_type='raw'

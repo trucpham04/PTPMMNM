@@ -13,23 +13,23 @@ def custom_response(ec=0, em="Success", dt=None):
 class PlaylistListCreateView(BaseListCreateView):
     queryset = Playlist.objects.all()
     serializer_class = PlaylistSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
 class PlaylistDetailView(BaseRetrieveUpdateDestroyView):
     queryset = Playlist.objects.all()
     serializer_class = PlaylistSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
 # -------------------- PLAYLIST SONG API --------------------
 class PlaylistSongListCreateView(BaseListCreateView):
     queryset = PlaylistSong.objects.all()
     serializer_class = PlaylistSongSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
 class PlaylistSongDetailView(BaseRetrieveUpdateDestroyView):
     queryset = PlaylistSong.objects.all()
     serializer_class = PlaylistSongSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
 # -------------------- COLLECTION API --------------------
 class CollectionListCreateView(BaseListCreateView):
@@ -46,9 +46,9 @@ class CollectionDetailView(BaseRetrieveUpdateDestroyView):
 class CollectionSongListCreateView(BaseListCreateView):
     queryset = CollectionSong.objects.all()
     serializer_class = CollectionSongSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
 class CollectionSongDetailView(BaseRetrieveUpdateDestroyView):
     queryset = CollectionSong.objects.all()
     serializer_class = CollectionSongSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]

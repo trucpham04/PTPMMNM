@@ -9,8 +9,12 @@ class GenreSerializer(serializers.ModelSerializer):
 
 # Artist Serializer
 class ArtistSerializer(serializers.ModelSerializer):
-    genres = GenreSerializer(many=True, read_only=True)
-    
+    genres = serializers.PrimaryKeyRelatedField(
+        queryset=Genre.objects.all(),
+        many=True
+    )
+    image = serializers.ImageField(required=False, allow_null=True)
+
     class Meta:
         model = Artist
         fields = '__all__'
@@ -23,9 +27,15 @@ class ArtistFollowSerializer(serializers.ModelSerializer):
 
 # Album Serializer
 class AlbumSerializer(serializers.ModelSerializer):
-    artist = ArtistSerializer(read_only=True)
-    genres = GenreSerializer(many=True, read_only=True)
-    
+    artist = serializers.PrimaryKeyRelatedField(
+        queryset=Artist.objects.all()
+    )
+    genres = serializers.PrimaryKeyRelatedField(
+        queryset=Genre.objects.all(),
+        many=True
+    )
+    cover_image = serializers.ImageField(required=False, allow_null=True)
+
     class Meta:
         model = Album
         fields = '__all__'
