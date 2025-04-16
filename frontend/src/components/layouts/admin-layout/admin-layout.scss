@@ -1,0 +1,220 @@
+$highlight-color: #dee2ec;
+.admin-container {
+  //display: flex;
+  overflow: hidden;
+  height: 100vh;
+
+  .admin-header {
+    width: 100%;
+    position: sticky;
+    top: 0;
+    right: 0;
+
+    .toggle-menu-btn {
+      cursor: pointer;
+    }
+
+    .custom-avatar-btn {
+      width: 2.75rem;
+      height: 2.75rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      background: transparent;
+      border: none;
+      transition:
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
+      overflow: hidden;
+    }
+
+    .custom-avatar-btn img {
+      width: 3rem;
+      height: auto;
+      object-fit: cover;
+    }
+
+    .custom-avatar-btn:hover {
+      background-color: rgba(33, 40, 50, 0.1);
+      /* Hiệu ứng hover giống với btn-transparent-dark */
+    }
+
+    .custom-avatar-btn:focus {
+      background-color: rgba(33, 40, 50, 0.1);
+      outline: none;
+      /* Xóa viền mặc định khi focus */
+      box-shadow: 0 0 0 0.2rem rgba(33, 40, 50, 0.25);
+      /* Thêm shadow khi focus */
+    }
+
+    .custom-avatar-btn:active {
+      background-color: rgba(33, 40, 50, 0.2);
+      /* Hiệu ứng khi click giống với btn-transparent-dark */
+      box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    }
+  }
+
+  .admin-content {
+    width: auto;
+    display: flex;
+
+    .admin-sidebar {
+      height: 100vh;
+
+      .pro-sidebar {
+      }
+
+      .sidebar-btn-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .sidebar-btn {
+          transition: width 0.3s;
+          width: 150px;
+          padding: 1px 5px;
+          border-radius: 40px;
+          background: rgba(255, 255, 255, 0.05);
+          color: #adadad;
+          text-decoration: none;
+          margin: 0 auto;
+          height: 35px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-overflow: ellipsis;
+          overflow: hidden;
+
+          span {
+            margin-left: 5px;
+            font-size: 13px;
+          }
+
+          &:hover {
+            color: $highlight-color;
+          }
+        }
+      }
+    }
+
+    .admin-main {
+      height: calc(100vh - 50px);
+      float: left;
+      width: calc(100vw - 240px);
+      padding: 30px;
+      transition: width 0.3s ease;
+      overflow: auto;
+
+      &.collapsed {
+        width: 100vw;
+      }
+
+      .welcome-container {
+        background-color: #0061f2 !important;
+        background-image: linear-gradient(
+          135deg,
+          #0061f2 0%,
+          rgba(105, 0, 199, 0.8) 100%
+        ) !important;
+        padding-bottom: 10rem;
+
+        .welcome-banner {
+          color: rgba(255, 255, 255, 0.5);
+
+          .main-banner {
+            font-weight: 500;
+            line-height: normal;
+            font-size: 2.25rem;
+            margin-bottom: 0;
+          }
+
+          .sub-banner {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.15rem;
+            margin-top: 0.25rem;
+            font-weight: 400;
+          }
+        }
+      }
+    }
+  }
+}
+
+// .card {
+
+//     img {
+//         &:hover {
+//             box-shadow: 0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15);
+//             transform: translateY(-10px);
+//             transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+//         }
+//     }
+// }
+
+.navbar {
+  .container {
+    max-width: 100% !important;
+  }
+}
+
+.navbar-brand-custom {
+  display: flex;
+  align-items: center;
+}
+
+.toggle-menu-btn {
+  margin-right: 20px;
+  cursor: pointer;
+  height: 0.875rem;
+  width: 0.875rem;
+}
+
+.btn {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.btn-icon {
+  height: calc((0.875rem * 1) + (0.875rem * 2) + (2px)) !important;
+  width: calc((0.875rem * 1) + (0.875rem * 2) + (2px)) !important;
+  border-radius: 100% !important;
+  background: none;
+
+  &:hover {
+  }
+}
+
+.btn-transparent-dark {
+  --bs-btn-color: rgba(33, 40, 50, 0.5);
+  --bs-btn-bg: transparent;
+  --bs-btn-border-color: transparent;
+  --bs-btn-hover-color: rgba(33, 40, 50, 0.5);
+  --bs-btn-hover-bg: rgba(33, 40, 50, 0.1);
+  --bs-btn-hover-border-color: transparent;
+  --bs-btn-focus-shadow-rgb: 11, 14, 17;
+  --bs-btn-active-color: rgba(33, 40, 50, 0.5);
+  --bs-btn-active-bg: rgba(33, 40, 50, 0.2);
+  --bs-btn-active-border-color: transparent;
+  --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+  --bs-btn-disabled-color: rgba(33, 40, 50, 0.35);
+  --bs-btn-disabled-bg: rgba(33, 40, 50, 0.1);
+  --bs-btn-disabled-border-color: transparent;
+  color: rgba(33, 40, 50, 0.5) !important;
+}
+
+.mt-n10 {
+  margin-top: -6rem !important;
+}
+
+.card-header {
+  height: 3.5625rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.5625rem !important;
+  padding-bottom: 0.5625rem !important;
+  font-weight: 600;
+  color: #0061f2 !important;
+}

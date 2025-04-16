@@ -10,7 +10,10 @@ import NotFoundPage from "@/pages/not-found";
 import ArtistPage from "@/pages/details/artist";
 import TrackPage from "@/pages/details/track";
 import { AccountForm } from "@/pages/auth/account";
-
+/* ADMIN */
+import AdminPage from "@/pages/admin/adminPage";
+import AdminLayout from "@/components/layouts/admin-layout/admin-layout";
+import ArtistManagement from "@/pages/admin/content/ArtistManagement/ArtistManagement ";
 function routes() {
   return (
     <BrowserRouter>
@@ -23,6 +26,12 @@ function routes() {
           <Route path="album/:album_id" element={<AlbumPage />} />
           <Route path="artist/:artist_id" element={<ArtistPage />} />
           <Route path="track/:track_id" element={<TrackPage />} />
+        </Route>
+
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminPage />} />
+          <Route path="artist" element={<ArtistManagement />} />
+          <Route path="song" element={<ArtistManagement />} />
         </Route>
 
         <Route path="/" element={<AuthLayout />}>

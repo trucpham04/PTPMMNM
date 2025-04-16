@@ -4,6 +4,7 @@ import cloudinary_storage.storage
 import django.core.validators
 import music.models
 from django.db import migrations, models
+from music.models.song import custom_validate_video
 
 
 class Migration(migrations.Migration):
@@ -21,6 +22,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='song',
             name='video_file',
-            field=models.FileField(blank=True, null=True, storage=cloudinary_storage.storage.MediaCloudinaryStorage(resource_type='video'), upload_to='', validators=[music.models.custom_validate_video]),
+            field=models.FileField(blank=True, null=True, storage=cloudinary_storage.storage.MediaCloudinaryStorage(resource_type='video'), upload_to='', validators=[custom_validate_video]),
         ),
     ]
