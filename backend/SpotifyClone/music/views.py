@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from .models import Genre, Artist, ArtistFollow, Album, Song, SongRecommendation, ListeningHistory
 from .serializers import (
     GenreSerializer, ArtistSerializer, AlbumSerializer, SongSerializer, 
-    SongRecommendationSerializer, ListeningHistorySerializer
+    SongRecommendationSerializer, ListeningHistorySerializer, UserLibrarySerializer
 )
 from core.views import BaseListCreateView, BaseRetrieveUpdateDestroyView
 
@@ -60,6 +60,38 @@ class AlbumDetailView(BaseRetrieveUpdateDestroyView):
     queryset = Album.objects.all()
     serializer_class = AlbumSerializer
     permission_classes = [permissions.AllowAny]
+
+class SaveAlbumToLibraryView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, album_id):
+        try:
+            album = Album.objects.get(id=album_id)
+            if UserLibrary.objects.filter(user=request.user, album=album).exists():
+                return Response({"EC": 1, "EM": "Album already in library", "DT": None}, status=400)
+            saved = UserLibrary.objects.create(user=request.user, album=album)
+            return Response({"EC": 0, "EM": "Album saved successfully", "DT": UserLibrarySerializer(saved).data}, status=201)
+        except Album.DoesNotExist:
+            return Response({"EC": 2, "EM": "Album not found", "DT": None}, status=404)
+
+    def delete(self, request, album_id):
+        try:
+            album = Album.objects.get(id=album_id)
+            saved = UserLibrary.objects.filter(user=request.user, album=album)
+            if saved.exists():
+                saved.delete()
+                return Response({"EC": 0, "EM": "Album removed from library", "DT": None}, status=200)
+            return Response({"EC": 1, "EM": "Album not in library", "DT": None}, status=400)
+        except Album.DoesNotExist:
+            return Response({"EC": 2, "EM": "Album not found", "DT": None}, status=404)
+        
+class UserLibraryListView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        albums = UserLibrary.objects.filter(user=request.user)
+        serialized = UserLibrarySerializer(albums, many=True)
+        return Response({"EC": 0, "EM": "Fetched saved albums", "DT": serialized.data}, status=200)
 
 # -------------------- SONG API --------------------
 class SongListCreateView(BaseListCreateView):
