@@ -5,7 +5,7 @@ from .views import (
     AlbumListCreateView, AlbumDetailView,
     SongListCreateView, SongDetailView, IncreasePlayCountView,
     SongRecommendationListView,
-    ListeningHistoryListCreateView, ListeningHistoryDetailView,
+    ListeningHistoryListCreateView, ListeningHistoryDetailView,SmartSearchSongView
 )
 
 urlpatterns = [
@@ -27,7 +27,7 @@ urlpatterns = [
     path('songs/', SongListCreateView.as_view(), name='song-list-create'),
     path('songs/<int:pk>/', SongDetailView.as_view(), name='song-detail'),
     path('songs/<int:song_id>/play/', IncreasePlayCountView.as_view(), name='increase-play-count'),
-
+    path('songs/search/', SmartSearchSongView.as_view(), name='search-songs'),
     # Song Recommendation URLs
     path('recommendations/', SongRecommendationListView.as_view(), name='song-recommendations'),
 

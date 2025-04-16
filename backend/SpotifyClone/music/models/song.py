@@ -63,11 +63,8 @@ class Song(models.Model):
     is_downloadable = models.BooleanField(default=False)
     is_premium = models.BooleanField(default=False)
     play_count = models.PositiveIntegerField(default=0)
-    slug = models.SlugField(max_length=255)
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title)
         if not self.release_date and self.album:
             self.release_date = self.album.release_date
         super().save(*args, **kwargs)
@@ -81,5 +78,5 @@ class Song(models.Model):
             models.Index(fields=['release_date']),
             models.Index(fields=['play_count']),
             models.Index(fields=['is_premium']),
-            models.Index(fields=['slug']),
         ]
+
