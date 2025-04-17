@@ -31,14 +31,14 @@ function DefaultLayout() {
         >
           <AppNavbar />
 
-          <main className="mt-16 flex max-h-[calc(100vh-8rem)] flex-1">
-            <AppSidebar className="mt-16 max-h-[calc(100vh-8rem)]" />
+          <main className="mt-16 flex max-h-[calc(100vh-8rem)] w-full flex-1">
+            {/* <AppSidebar className="mt-16 max-h-[calc(100vh-8rem)]" /> */}
             <SidebarInset className="m-2 ml-0 overflow-auto rounded-md bg-neutral-900 p-2">
               <Outlet />
             </SidebarInset>
           </main>
         </SidebarProvider>
-        <AppFooter className="" />
+        <AppFooter />
       </div>
     </AppSideBarContext.Provider>
   );

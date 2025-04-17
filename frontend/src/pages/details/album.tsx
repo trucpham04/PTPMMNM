@@ -1,30 +1,29 @@
-import React from "react";
 import { useParams } from "react-router-dom";
-import { useAlbum } from "@/hooks/use-albums";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import Icon from "@/components/ui/icon";
 import { DataTable } from "@/components/details/data-table";
 import AlbumHeader from "@/components/details/header";
 import AlbumAction from "@/components/details/action"; // Import the action component
-import { usePlayer } from "@/hooks/use-player";
+import usePlayer from "@/hooks/usePlayer";
+import { useAlbum } from "@/hooks";
 
 export default function AlbumPage() {
   const { album_id } = useParams<{ album_id: string }>();
   const albumId = parseInt(album_id || "0");
 
-  const { album, loading, error } = useAlbum(albumId);
-  const { play, currentTrack, isPlaying, togglePlay, addTrackToQueue } =
+  const { album, loading, error } = useAlbum();
+  const { play, currentSong, isPlaying, togglePlay, addSongToQueue } =
     usePlayer();
 
   const handlePlay = () => {
-    if (album?.tracks && album.tracks.length > 0) {
+    if (album?.songs && album.songs.length > 0) {
       // Play the first track
-      play(album.tracks[0]);
+      play(album.songs[0]);
 
-      // Add remaining tracks to queue
-      album.tracks.slice(1).forEach((track) => {
-        addTrackToQueue(track);
+      // Add remaining songs to queue
+      album.songs.slice(1).forEach((track) => {
+        addSongToQueue(track);
       });
     }
   };
@@ -59,7 +58,7 @@ export default function AlbumPage() {
     );
   }
 
-  if (error || !album || !album.tracks) {
+  if (error || !album || !album.songs) {
     return (
       <div className="container px-[max(2%,16px)] py-8">
         <div className="flex flex-col items-center justify-center py-12">
@@ -73,24 +72,24 @@ export default function AlbumPage() {
     );
   }
 
-  const totalDuration = album.tracks.reduce((acc, track) => {
+  const totalDuration = album.songs.reduce((acc, track) => {
     const [min, sec] = track.duration.split(":").map(Number);
     return acc + (min * 60 + sec);
   }, 0);
 
-  const totalTracks = album.tracks.length;
+  const totalTracks = album.songs.length;
   const durationMinutes = Math.floor(totalDuration / 60);
   const durationText = `${totalTracks} ${totalTracks === 1 ? "song" : "songs"}, ${durationMinutes} ${durationMinutes === 1 ? "minute" : "minutes"}`;
 
   return (
     <div className="container space-y-8">
       <AlbumHeader
-        cover_url={album.cover_url}
+        cover_url={album.cover_image}
         type="Album"
-        title={album.name}
-        author_name={album.authorName}
+        title={album.title}
+        author_name={album.artist?.name}
         author_type="artist"
-        author_id={album.authorID}
+        author_id={album.artist_id}
         subtitle={durationText}
       />
 
@@ -101,11 +100,11 @@ export default function AlbumPage() {
           onClick={handlePlay}
         >
           <Icon size="md">
-            {isPlaying && album.tracks.some((t) => t.id === currentTrack?.id)
+            {isPlaying && album.songs.some((t) => t.id === currentSong?.id)
               ? "pause"
               : "play_arrow"}
           </Icon>
-          {isPlaying && album.tracks.some((t) => t.id === currentTrack?.id)
+          {isPlaying && album.songs.some((t) => t.id === currentSong?.id)
             ? "Pause"
             : "Play"}
         </Button>
@@ -115,7 +114,7 @@ export default function AlbumPage() {
       </div>
 
       <div className="px-[max(2%,16px)] pb-16">
-        <DataTable data={album.tracks} />
+        <DataTable data={album.songs} />
       </div>
     </div>
   );

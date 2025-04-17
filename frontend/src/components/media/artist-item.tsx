@@ -13,7 +13,7 @@ export function ArtistItem({ artist }: ArtistItemProps) {
         <CardContent className="p-0">
           <div className="aspect-square overflow-hidden rounded-full">
             <img
-              src={artist.cover_url}
+              src={artist.image}
               alt={artist.name}
               className="h-full w-full object-cover transition-transform hover:scale-105"
             />

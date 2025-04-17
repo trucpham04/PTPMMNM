@@ -1,5 +1,5 @@
 import Routes from "@/routes/index_routes";
-import { useAuth } from "./contexts/auth-context";
+import { useAuth } from "./contexts/authContext";
 import { useEffect } from "react";
 
 function App() {

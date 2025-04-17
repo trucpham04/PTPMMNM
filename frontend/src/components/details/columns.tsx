@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import { ColumnDef } from "@tanstack/react-table";
-import { Track } from "../../types";
+import { Song } from "../../types";
 
-const columns: ColumnDef<Track>[] = [
+const columns: ColumnDef<Song>[] = [
   {
     id: "index",
     header: () => <div className="text-right">#</div>,
@@ -17,7 +17,7 @@ const columns: ColumnDef<Track>[] = [
         <div className="size-10">
           <img
             className="rounded-sm"
-            src={cell.getContext().row.original.cover_url}
+            src={cell.getContext().row.original.album?.cover_image}
             alt=""
           />
         </div>
@@ -33,9 +33,9 @@ const columns: ColumnDef<Track>[] = [
           <div>
             <Link
               className="text-muted-foreground text-xs hover:underline"
-              to={"/artist/" + cell.getContext().row.original.artistID}
+              to={"/artist/" + cell.getContext().row.original.artist_id}
             >
-              {cell.getContext().row.original.artistName}
+              {cell.getContext().row.original.artist?.name}
             </Link>
           </div>
         </div>
@@ -47,8 +47,8 @@ const columns: ColumnDef<Track>[] = [
     header: "Album",
     cell: ({ cell }) => {
       if (
-        cell.getContext().row.original.albumID === null ||
-        cell.getContext().row.original.albumName === null
+        cell.getContext().row.original.album_id === null ||
+        cell.getContext().row.original.album?.title === null
       ) {
         return <div>-</div>;
       }
@@ -57,9 +57,9 @@ const columns: ColumnDef<Track>[] = [
         <div>
           <Link
             className="hover:underline"
-            to={"/album/" + cell.getContext().row.original.albumID}
+            to={"/album/" + cell.getContext().row.original.album_id}
           >
-            {cell.getContext().row.original.albumName}
+            {cell.getContext().row.original.album?.title}
           </Link>
         </div>
       );

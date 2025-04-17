@@ -6,17 +6,20 @@ import { Separator } from "@/components/ui/separator";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import Icon from "../ui/icon";
 import { useSidebar } from "../ui/sidebar";
-import { useAuth } from "@/contexts/auth-context";
+import { useAuth } from "@/contexts/authContext";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { useState, useRef, useEffect } from "react";
 import { Album, Artist } from "@/types";
-import { getAlbums, getArtists } from "@/services/media-services";
+import { useAlbum, useArtist } from "@/hooks";
 import { debounce } from "lodash";
 
 type SearchResult = {
   albums: Album[];
   artists: Artist[];
 };
+
+// const { getAlbums } = useAlbum();
+// const { getArtists } = useArtist();
 
 function AppNavbar({ className }: { className?: string }) {
   const { openMobile, setOpenMobile } = useSidebar();
@@ -50,32 +53,32 @@ function AppNavbar({ className }: { className?: string }) {
   }, []);
 
   // Debounced search function
-  const debouncedSearch = useRef(
-    debounce(async (query: string) => {
-      if (!query) {
-        setSearchResults({ albums: [], artists: [] });
-        setLoading(false);
-        return;
-      }
+  // const debouncedSearch = useRef(
+  //   debounce(async (query: string) => {
+  //     if (!query) {
+  //       setSearchResults({ albums: [], artists: [] });
+  //       setLoading(false);
+  //       return;
+  //     }
 
-      try {
-        setLoading(true);
-        const [albumsData, artistsData] = await Promise.all([
-          getAlbums(query),
-          getArtists(query),
-        ]);
+  //     try {
+  //       setLoading(true);
+  //       const [albumsData, artistsData] = await Promise.all([
+  //         getAlbums(query),
+  //         getArtists(query),
+  //       ]);
 
-        setSearchResults({
-          albums: albumsData.slice(0, 3), // Limit results
-          artists: artistsData.slice(0, 3),
-        });
-      } catch (error) {
-        console.error("Search error:", error);
-      } finally {
-        setLoading(false);
-      }
-    }, 300),
-  ).current;
+  //       setSearchResults({
+  //         albums: albumsData.slice(0, 3), // Limit results
+  //         artists: artistsData.slice(0, 3),
+  //       });
+  //     } catch (error) {
+  //       console.error("Search error:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   }, 300),
+  // ).current;
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -84,7 +87,7 @@ function AppNavbar({ className }: { className?: string }) {
     if (query) {
       setShowResults(true);
       setLoading(true);
-      debouncedSearch(query);
+      // debouncedSearch(query);
     } else {
       setShowResults(false);
       setSearchResults({ albums: [], artists: [] });
@@ -145,8 +148,8 @@ function AppNavbar({ className }: { className?: string }) {
               <div className="flex size-12 cursor-pointer items-center justify-center rounded-full bg-transparent pr-1 text-white">
                 <NavLink to="/explore">
                   {({ isActive }) => (
-                    <Icon size={"lg"} fill={isActive}>
-                      explore
+                    <Icon size={"md"} fill={isActive}>
+                      chat
                     </Icon>
                   )}
                 </NavLink>
@@ -154,7 +157,7 @@ function AppNavbar({ className }: { className?: string }) {
             </div>
 
             {/* Search Results Dropdown */}
-            {showResults &&
+            {/* {showResults &&
               (searchResults.albums.length > 0 ||
                 searchResults.artists.length > 0 ||
                 loading) && (
@@ -242,7 +245,7 @@ function AppNavbar({ className }: { className?: string }) {
                     </>
                   )}
                 </div>
-              )}
+              )} */}
           </div>
         </div>
 
