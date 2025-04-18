@@ -57,7 +57,7 @@ const columns: ColumnDef<Song>[] = [
         <div>
           <Link
             className="hover:underline"
-            to={"/album/" + cell.getContext().row.original.album_id}
+            to={"/album/" + cell.getContext().row.original.album?.id}
           >
             {cell.getContext().row.original.album?.title}
           </Link>
@@ -66,14 +66,16 @@ const columns: ColumnDef<Song>[] = [
     },
   },
   {
-    accessorKey: "dateAdded",
+    accessorKey: "release_date",
     header: "Date added",
-    cell: ({ row }) => <div>{row.getValue("dateAdded")}</div>,
+    cell: ({ row }) => <div>{row.getValue("release_date")}</div>,
   },
   {
     accessorKey: "duration",
     header: () => <Icon size="sm">schedule</Icon>,
-    cell: ({ row }) => <div>{row.getValue("duration")}</div>,
+    cell: ({ row }) => {
+      <div>{row.getValue("duration")}</div>;
+    },
   },
 ];
 

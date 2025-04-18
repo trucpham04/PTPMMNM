@@ -146,7 +146,7 @@ function AppNavbar({ className }: { className?: string }) {
                 <Separator orientation="vertical" className="h-3/5!" />
               </div>
               <div className="flex size-12 cursor-pointer items-center justify-center rounded-full bg-transparent pr-1 text-white">
-                <NavLink to="/explore">
+                <NavLink to="/ai-chat">
                   {({ isActive }) => (
                     <Icon size={"md"} fill={isActive}>
                       chat

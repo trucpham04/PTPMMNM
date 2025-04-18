@@ -1,5 +1,5 @@
 import { apiClient, ApiResponse } from "./apiClient";
-import { Album } from "../types";
+import { Album, Song } from "../types";
 
 interface CreateAlbumRequest {
   title: string;
@@ -25,6 +25,13 @@ class AlbumService {
    */
   async getAlbums(): Promise<ApiResponse<Album[]>> {
     return apiClient.get<Album[]>("/albums/");
+  }
+
+  /**
+   * Get all album songs
+   */
+  async getAlbumSongs(album_id: number): Promise<ApiResponse<Song[]>> {
+    return apiClient.get<Song[]>(`/albums/${album_id}/songs/`);
   }
 
   /**

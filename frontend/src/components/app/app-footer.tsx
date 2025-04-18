@@ -116,7 +116,7 @@ export default function AppFooter({ className }: { className?: string }) {
       {/* Hidden audio element */}
       <audio
         ref={audioRef}
-        src={`/api/stream/${currentSong.id}`} // Replace with your actual streaming endpoint
+        src={`${currentSong.audio_file}`} // Replace with your actual streaming endpoint
         onEnded={playNextSong}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}

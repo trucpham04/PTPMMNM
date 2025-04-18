@@ -19,11 +19,13 @@ export function ArtistItem({ artist }: ArtistItemProps) {
             />
           </div>
         </CardContent>
-        <CardFooter className="flex flex-col items-start p-0">
+        <CardFooter className="flex flex-col items-center justify-center p-0 text-center">
           <h3 className="w-full truncate font-semibold">{artist.name}</h3>
-          <p className="text-muted-foreground w-full truncate text-sm">
-            {artist.followers.toLocaleString()} followers
-          </p>
+          {(artist.followers?.length && artist.followers?.length != 0) ?? (
+            <p className="text-muted-foreground w-full truncate text-sm">
+              {artist.followers?.length} followers
+            </p>
+          )}
         </CardFooter>
       </Card>
     </Link>

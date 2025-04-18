@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { albumService } from "../services";
-import { Album } from "../types";
+import { Album, Song } from "../types";
 
 interface CreateAlbumRequest {
   title: string;
@@ -25,6 +25,7 @@ export const useAlbum = () => {
   const [error, setError] = useState<string | null>(null);
   const [albums, setAlbums] = useState<Album[]>([]);
   const [album, setAlbum] = useState<Album | null>(null);
+  const [albumSongs, setAlbumSongs] = useState<Song[]>([]);
 
   // Get all albums
   const getAlbums = useCallback(async () => {
@@ -36,6 +37,31 @@ export const useAlbum = () => {
 
       if (response.EC === 0 && response.DT) {
         setAlbums(response.DT);
+        return response.DT;
+      } else {
+        setError(response.EM || "Failed to fetch albums");
+        return [];
+      }
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch albums";
+      setError(errorMessage);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Get album songs
+  const getAlbumSongs = useCallback(async (album_id: number) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await albumService.getAlbumSongs(album_id);
+
+      if (response.EC === 0 && response.DT) {
+        setAlbumSongs(response.DT);
         return response.DT;
       } else {
         setError(response.EM || "Failed to fetch albums");
@@ -167,8 +193,10 @@ export const useAlbum = () => {
     loading,
     error,
     albums,
+    albumSongs,
     album,
     getAlbums,
+    getAlbumSongs,
     createAlbum,
     getAlbumById,
     updateAlbum,
