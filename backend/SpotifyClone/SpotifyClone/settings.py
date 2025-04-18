@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'user',
     'music',
     'playlist',
@@ -56,6 +57,7 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = 'user.User'
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -64,6 +66,14 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",     # React dev server
+    "http://127.0.0.1:3000",
+]
+
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'SpotifyClone.urls'
 
@@ -93,10 +103,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'spotifyclone',
-        'USER': 'root',              # Thay bằng username của bạn
-        'PASSWORD': '', # Thay bằng mật khẩu của bạn
-        'HOST': 'localhost',
-        'PORT': '3310',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'db',  # Use the service name in Docker
+        'PORT': '3306', # Standard MySQL port inside Docker
     }
 }
 

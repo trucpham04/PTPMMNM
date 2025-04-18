@@ -2,8 +2,9 @@ from rest_framework import permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from ..models import Artist, ArtistFollow
+from ..models import Artist, ArtistFollow, Song
 from ..serializers.artist_serializer import ArtistSerializer
+from ..serializers.song_serializer import SongSerializer
 from core.views import BaseListCreateView, BaseRetrieveUpdateDestroyView
 from utils.custom_response import custom_response
 
@@ -66,3 +67,12 @@ class FollowArtistView(APIView):
             follow.delete()
             return custom_response(em="Unfollowed successfully!")
         return custom_response(ec=1, em="You have not followed this artist!")
+
+class ArtistSongsView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, artist_id):
+        artist = get_object_or_404(Artist, pk=artist_id)
+        songs = Song.objects.filter(artist=artist)
+        serializer = SongSerializer(songs, many=True)
+        return custom_response(em=f"Fetched songs by artist {artist.name}", dt=serializer.data)

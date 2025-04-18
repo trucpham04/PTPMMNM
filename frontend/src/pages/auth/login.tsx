@@ -17,12 +17,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@/contexts/auth-context";
+import { useAuth } from "@/hooks"; // Updated to use our custom hook
+import { Alert, AlertDescription } from "@/components/ui/alert"; // Add Alert for error display
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
+import Icon from "@/components/ui/icon";
 
 const formSchema = z.object({
   username: z.string().nonempty({ message: "Username is required" }),
@@ -30,14 +32,16 @@ const formSchema = z.object({
 });
 
 export default function LoginPage() {
-  const { user, login } = useAuth();
+  // Use our custom hook instead of context
+  const { isAuthenticated, login, loading, error } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user) {
+    // Check for authentication using the hook's state
+    if (isAuthenticated) {
       navigate("/");
     }
-  });
+  }, [isAuthenticated, navigate]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,24 +52,31 @@ export default function LoginPage() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const loginSuccess = await login({
+    // Call login from our hook - it handles loading/error states internally
+    await login({
       username: values.username,
       password: values.password,
     });
 
-    if (loginSuccess) navigate("/");
-    else console.error("Login failed");
+    // Navigation is handled by the useEffect above when isAuthenticated changes
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-2xl">Log in to Spotify</CardTitle>
+        <CardTitle className="text-2xl">Log in to Music Social</CardTitle>
         <CardDescription>
           Enter your username below to login to your account
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {/* Display error alert if there is an error */}
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -94,8 +105,21 @@ export default function LoginPage() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full cursor-pointer">
-              Submit
+            <Button
+              type="submit"
+              className="w-full cursor-pointer"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Icon className="mr-2 h-4 w-4 animate-spin">
+                    progress_activity
+                  </Icon>
+                  Please wait
+                </>
+              ) : (
+                "Login"
+              )}
             </Button>
             <div className="text-muted-foreground text-center text-sm">
               Don't have an account?{" "}

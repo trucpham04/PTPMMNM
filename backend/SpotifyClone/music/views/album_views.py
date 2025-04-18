@@ -1,8 +1,9 @@
 from rest_framework import permissions
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
-from ..models import Album
+from ..models import Album, Song
 from ..serializers.album_serializer import AlbumSerializer
+from ..serializers.song_serializer import SongSerializer
 from core.views import BaseListCreateView, BaseRetrieveUpdateDestroyView
 from utils.custom_response import custom_response
 
@@ -49,3 +50,20 @@ class AlbumDetailView(BaseRetrieveUpdateDestroyView):
         instance = self.get_object()
         instance.delete()
         return custom_response(em="Album deleted successfully")
+
+class AlbumSongsView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, album_id):
+        album = get_object_or_404(Album, pk=album_id)
+        songs = Song.objects.filter(album=album)
+        serializer = SongSerializer(songs, many=True)
+        song_data = serializer.data
+        
+        for song in song_data:
+            song['album'] = {
+                "id": album.id,
+                "title": album.title
+            }
+
+        return custom_response(em="Fetched songs in album", dt=song_data)

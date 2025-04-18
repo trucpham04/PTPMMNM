@@ -15,7 +15,7 @@ export default defineConfig({
     proxy: {
       // Proxy all /api requests to JSON Server
       "/api": {
-        target: "http://localhost:3001",
+        target: "http://localhost:8000",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },

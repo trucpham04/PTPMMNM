@@ -1,18 +1,18 @@
 import { cn } from "@/lib/utils";
 import { Slider } from "../ui/slider";
 import Icon from "../ui/icon";
-import { usePlayer } from "@/hooks/use-player";
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { formatTime } from "@/utils/format-time";
+import usePlayer from "@/hooks/usePlayer";
 
 export default function AppFooter({ className }: { className?: string }) {
   const {
-    currentTrack,
+    currentSong,
     isPlaying,
     volume,
     togglePlay,
-    playNextTrack,
+    playNextSong,
     changeVolume,
   } = usePlayer();
 
@@ -30,7 +30,7 @@ export default function AppFooter({ className }: { className?: string }) {
         audioRef.current.pause();
       }
     }
-  }, [isPlaying, currentTrack]);
+  }, [isPlaying, currentSong]);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -57,7 +57,7 @@ export default function AppFooter({ className }: { className?: string }) {
     }
   };
 
-  if (!currentTrack) {
+  if (!currentSong) {
     return (
       <div
         className={cn(
@@ -116,29 +116,29 @@ export default function AppFooter({ className }: { className?: string }) {
       {/* Hidden audio element */}
       <audio
         ref={audioRef}
-        src={`/api/stream/${currentTrack.id}`} // Replace with your actual streaming endpoint
-        onEnded={playNextTrack}
+        src={`${currentSong.audio_file}`} // Replace with your actual streaming endpoint
+        onEnded={playNextSong}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
       />
 
       <div className="flex items-center gap-3">
-        <Link to={`/album/${currentTrack.albumID}`}>
+        <Link to={`/album/${currentSong.album_id}`}>
           <img
-            src={currentTrack.cover_url}
-            alt={currentTrack.title}
+            src={currentSong.album?.cover_image}
+            alt={currentSong.title}
             className="size-14 rounded-md object-cover"
           />
         </Link>
         <div className="space-y-">
-          <Link to={`/track/${currentTrack.id}`} className="hover:underline">
-            {currentTrack.title}
+          <Link to={`/track/${currentSong.id}`} className="hover:underline">
+            {currentSong.title}
           </Link>
           <Link
-            to={`/artist/${currentTrack.artistID}`}
+            to={`/artist/${currentSong.artist_id}`}
             className="block text-xs hover:underline"
           >
-            {currentTrack.artistName}
+            {currentSong.artist?.name}
           </Link>
         </div>
         <Icon className="cursor-pointer" onClick={() => {}}>
@@ -154,7 +154,7 @@ export default function AppFooter({ className }: { className?: string }) {
           <Icon size="xl" className="cursor-pointer" onClick={togglePlay}>
             {isPlaying ? "pause" : "play_arrow"}
           </Icon>
-          <Icon size="xl" className="cursor-pointer" onClick={playNextTrack}>
+          <Icon size="xl" className="cursor-pointer" onClick={playNextSong}>
             skip_next
           </Icon>
         </div>

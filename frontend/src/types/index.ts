@@ -1,64 +1,43 @@
-export type Track = {
-  id: number;
-  title: string;
-  cover_url: string;
-  artistName: string;
-  artistID: number;
-  albumName?: string | null;
-  albumID?: number | null;
-  dateAdded: string;
-  duration: string;
-  has_mv?: boolean;
-  mv_thumbnail?: string;
-};
+// Import all types from individual files
+import type { User, Group, Permission, UserFollow } from "./user";
 
-export type Album = {
-  id: number;
-  name: string;
-  cover_url: string;
-  authorName: string;
-  authorID: number;
-  dateAdded: string;
-  tracks?: Track[]; // Optional as it will be loaded from API
-};
+import type {
+  Genre,
+  Artist,
+  ArtistFollow,
+  Album,
+  Song,
+  SongRecommendation,
+  ListeningHistory,
+} from "./music";
 
-export type Artist = {
-  id: number;
-  name: string;
-  cover_url: string;
-  followers: number;
-  genres?: string[];
-};
+import type {
+  Playlist,
+  PlaylistSong,
+  Collection,
+  CollectionSong,
+} from "./playlist";
 
-// Player state type for Redux
-export type PlayerState = {
-  currentTrack: Track | null;
-  isPlaying: boolean;
-  queue: Track[];
-  volume: number;
-};
+// Export all types using 'export type' syntax
+export type {
+  // User types
+  User,
+  Group,
+  Permission,
+  UserFollow,
 
-export type User = {
-  id: number;
-  username: string;
-  avatar_path: string;
-};
+  // Music types
+  Genre,
+  Artist,
+  ArtistFollow,
+  Album,
+  Song,
+  SongRecommendation,
+  ListeningHistory,
 
-export type LoginProps = {
-  username: string;
-  password: string;
-};
-
-export type RegisterProps = {
-  username: string;
-  password: string;
-  email: string;
-};
-
-export type AuthContextType = {
-  user: User | null;
-  setUser: (user: User) => void;
-  login: (props: LoginProps) => Promise<boolean>;
-  register: (props: RegisterProps) => void;
-  logout: () => void;
+  // Playlist types
+  Playlist,
+  PlaylistSong,
+  Collection,
+  CollectionSong,
 };

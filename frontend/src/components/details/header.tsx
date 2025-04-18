@@ -22,6 +22,7 @@ export default function AlbumHeader({
   author_id,
 }: AlbumHeaderPropsInterface) {
   const { album_id } = useParams();
+
   return (
     <div
       className={cn(

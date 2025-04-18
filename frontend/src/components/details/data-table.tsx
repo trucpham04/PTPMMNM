@@ -14,10 +14,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Track } from "../../types";
+import { Song } from "../../types";
 import columns from "./columns";
 
-export function DataTable({ data }: { data: Track[] }) {
+export function DataTable({ data }: { data: Song[] }) {
   const table = useReactTable({
     data,
     columns,

@@ -1,68 +1,35 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useArtist } from "@/hooks/use-artists";
-import { getAlbums } from "@/services/media-services";
-import { useArtistTracks } from "@/hooks/use-tracks";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import Icon from "@/components/ui/icon";
 import { AlbumItem } from "@/components/media/album-item";
 import { DataTable } from "@/components/details/data-table";
 import { Album } from "@/types";
-import { usePlayer } from "@/hooks/use-player";
 import AlbumHeader from "@/components/details/header";
 import { MediaGrid } from "@/components/media/media-grid";
-import { AlbumSkeleton } from "@/components/media/album-skeleton";
+import { SectionSkeleton } from "@/components/media/section-skeleton";
+import usePlayer from "@/hooks/usePlayer";
+import { useArtist } from "@/hooks";
 
 export default function ArtistPage() {
+  const { artist, loading, error } = useArtist();
   const { artist_id } = useParams<{ artist_id: string }>();
-  const artistId = parseInt(artist_id || "0");
 
-  const {
-    artist,
-    loading: artistLoading,
-    error: artistError,
-  } = useArtist(artistId);
-  const { tracks, loading: tracksLoading } = useArtistTracks(artistId);
-  const [artistAlbums, setArtistAlbums] = useState<Album[]>([]);
-  const [albumsLoading, setAlbumsLoading] = useState<boolean>(true);
+  // const [artistAlbums, setArtistAlbums] = useState<Album[]>([]);
+  // const [albumsLoading, setAlbumsLoading] = useState<boolean>(true);
 
-  const { play, currentTrack, isPlaying, togglePlay, addTrackToQueue } =
+  const { play, currentSong, isPlaying, togglePlay, addSongToQueue } =
     usePlayer();
 
-  // Fetch artist's albums
-  useEffect(() => {
-    const fetchArtistAlbums = async () => {
-      if (artistId) {
-        try {
-          setAlbumsLoading(true);
-          const allAlbums = await getAlbums();
-          const filtered = allAlbums.filter(
-            (album) => album.authorID === artistId,
-          );
-          setArtistAlbums(filtered);
-        } catch (err) {
-          console.error("Failed to fetch artist albums:", err);
-        } finally {
-          setAlbumsLoading(false);
-        }
-      }
-    };
-
-    fetchArtistAlbums();
-  }, [artistId]);
-
-  // Overall loading state
-  const loading = artistLoading || tracksLoading;
-
   const handlePlay = () => {
-    if (tracks && tracks.length > 0) {
+    if (artist?.songs && artist?.songs.length > 0) {
       // Play the first track
-      play(tracks[0]);
+      play(artist?.songs[0]);
 
       // Queue up the rest
-      tracks.slice(1).forEach((track) => {
-        addTrackToQueue(track);
+      artist?.songs.slice(1).forEach((track) => {
+        addSongToQueue(track);
       });
     }
   };
@@ -92,7 +59,7 @@ export default function ArtistPage() {
             {Array(6)
               .fill(0)
               .map((_, i) => (
-                <AlbumSkeleton key={i} />
+                <SectionSkeleton key={i} />
               ))}
           </div>
         </div>
@@ -112,7 +79,7 @@ export default function ArtistPage() {
     );
   }
 
-  if (artistError || !artist) {
+  if (error || !artist) {
     return (
       <div className="container px-[max(2%,16px)] py-8">
         <div className="flex flex-col items-center justify-center py-12">
@@ -128,15 +95,17 @@ export default function ArtistPage() {
 
   // Determine if any tracks from this artist are currently playing
   const isArtistPlaying =
-    isPlaying && currentTrack && tracks.some((t) => t.id === currentTrack.id);
+    isPlaying &&
+    currentSong &&
+    artist?.songs.some((t) => t.id === currentSong.id);
 
   return (
     <div className="container space-y-8">
       <AlbumHeader
-        cover_url={artist.cover_url}
+        cover_url={artist.image}
         type="Artist"
         title={artist.name}
-        subtitle={`${artist.followers.toLocaleString()} followers`}
+        subtitle={`${artist?.followers.toLocaleString()} followers`}
       />
 
       <div className="flex flex-wrap items-center gap-4 px-[max(2%,16px)]">
@@ -144,7 +113,7 @@ export default function ArtistPage() {
           size="lg"
           className="flex items-center gap-2 rounded-full"
           onClick={handlePlay}
-          disabled={tracks.length === 0}
+          disabled={artist?.songs.length === 0}
         >
           <Icon size="md">{isArtistPlaying ? "pause" : "play_arrow"}</Icon>
           {isArtistPlaying ? "Pause" : "Play"}
@@ -154,10 +123,10 @@ export default function ArtistPage() {
           <div className="flex flex-wrap gap-2">
             {artist.genres.map((genre) => (
               <span
-                key={genre}
+                key={genre.id}
                 className="bg-accent rounded-full px-3 py-1 text-sm"
               >
-                {genre}
+                {genre.name}
               </span>
             ))}
           </div>
@@ -189,8 +158,8 @@ export default function ArtistPage() {
       {/* Popular Tracks Section */}
       <div className="px-[max(2%,16px)] pb-16">
         <h2 className="mb-4 text-2xl font-semibold">Popular Tracks</h2>
-        {tracks.length > 0 ? (
-          <DataTable data={tracks} />
+        {artist.songs.length > 0 ? (
+          <DataTable data={artist.songs} />
         ) : (
           <div className="text-muted-foreground py-4">No tracks found</div>
         )}
