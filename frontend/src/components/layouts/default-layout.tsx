@@ -32,8 +32,8 @@ function DefaultLayout() {
           <AppNavbar />
 
           <main className="mt-16 flex max-h-[calc(100vh-8rem)] w-full flex-1">
-            {/* <AppSidebar className="mt-16 max-h-[calc(100vh-8rem)]" /> */}
-            <SidebarInset className="m-2 ml-0 overflow-auto rounded-md bg-neutral-900 p-2">
+            <AppSidebar className="mt-16 max-h-[calc(100vh-8rem)]" />
+            <SidebarInset className="m-2 ml-0 flex-1 overflow-auto rounded-md bg-neutral-900">
               <Outlet />
             </SidebarInset>
           </main>

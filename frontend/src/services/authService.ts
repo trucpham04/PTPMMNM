@@ -64,6 +64,9 @@ class AuthService {
    */
   logout(): void {
     apiClient.clearAuthToken();
+    apiClient.post("/logout/").then(() => {
+      localStorage.removeItem("auth_token");
+    });
   }
 
   /**

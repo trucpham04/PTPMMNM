@@ -48,7 +48,7 @@ class ApiClient {
         if (error.response?.status === 401) {
           // Handle unauthorized - clear token and redirect to login
           localStorage.removeItem("auth_token");
-          window.location.href = "/login";
+          // window.location.href = "/login";
         }
         return Promise.reject(error);
       },

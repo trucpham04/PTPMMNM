@@ -17,7 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@/hooks"; // Updated to use our custom hook
+import { useAuth } from "@/contexts/authContext"; // Updated to use our custom hook
 import { Alert, AlertDescription } from "@/components/ui/alert"; // Add Alert for error display
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
@@ -33,7 +33,7 @@ const formSchema = z.object({
 
 export default function LoginPage() {
   // Use our custom hook instead of context
-  const { isAuthenticated, login, loading, error } = useAuth();
+  const { isAuthenticated, login, loading, error, logout } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {

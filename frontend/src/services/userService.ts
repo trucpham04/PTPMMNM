@@ -39,6 +39,13 @@ class UserService {
   }
 
   /**
+   * Get current user
+   */
+  async getCurrentUser(): Promise<ApiResponse<User>> {
+    return apiClient.get<User>("/users/me/");
+  }
+
+  /**
    * Update user
    */
   async updateUser(

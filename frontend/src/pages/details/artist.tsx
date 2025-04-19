@@ -9,7 +9,7 @@ import { Album } from "@/types";
 import AlbumHeader from "@/components/details/header";
 import { MediaGrid } from "@/components/media/media-grid";
 import { SectionSkeleton } from "@/components/media/section-skeleton";
-import usePlayer from "@/hooks/usePlayer";
+import { usePlayer } from "@/contexts/playerContext";
 import { useArtist } from "@/hooks";
 
 export default function ArtistPage() {
@@ -36,7 +36,7 @@ export default function ArtistPage() {
 
   if (loading) {
     return (
-      <div className="container space-y-8">
+      <div className="space-y-8">
         {/* Skeleton for Header */}
         <div className="bg-muted flex aspect-[4] max-h-80 w-full items-end gap-4 px-[max(2%,16px)] pt-12 pb-[max(2%,16px)]">
           <Skeleton className="aspect-square w-1/5 max-w-64 min-w-32 rounded-full" />

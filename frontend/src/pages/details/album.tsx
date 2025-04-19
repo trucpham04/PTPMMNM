@@ -5,9 +5,9 @@ import Icon from "@/components/ui/icon";
 import { DataTable } from "@/components/details/data-table";
 import AlbumHeader from "@/components/details/header";
 import AlbumAction from "@/components/details/action"; // Import the action component
-import usePlayer from "@/hooks/usePlayer";
+import { usePlayer } from "@/contexts/playerContext";
 import { useAlbum } from "@/hooks";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 
 export default function AlbumPage() {
   const { album_id } = useParams<{ album_id: string }>();
@@ -15,25 +15,61 @@ export default function AlbumPage() {
 
   const { albumSongs, loading, error, album, getAlbumById, getAlbumSongs } =
     useAlbum();
-  const { play, currentSong, isPlaying, togglePlay, addSongToQueue } =
-    usePlayer();
+  const {
+    play,
+    currentSong,
+    isPlaying,
+    isLoading,
+    togglePlay,
+    addSongToQueue,
+  } = usePlayer();
 
   useEffect(() => {
-    getAlbumSongs(albumId);
-    getAlbumById(albumId);
-  }, []);
+    // Load album data when component mounts or albumId changes
+    if (albumId > 0) {
+      getAlbumSongs(albumId);
+      getAlbumById(albumId);
+    }
+  }, [albumId, getAlbumSongs, getAlbumById]); // Add dependencies to prevent unnecessary re-fetching
 
-  const handlePlay = () => {
-    if (albumSongs && albumSongs.length > 0) {
+  // Memoize handlePlay to avoid recreating this function on every render
+  const handlePlay = useCallback(() => {
+    if (!albumSongs || albumSongs.length === 0) {
+      console.warn("No songs available to play");
+      return;
+    }
+
+    // Check if we're already playing from this album
+    const isPlayingThisAlbum = albumSongs.some(
+      (track) => track.id === currentSong?.id,
+    );
+
+    console.log("Is playing this album:", isPlayingThisAlbum);
+
+    if (isPlayingThisAlbum) {
+      togglePlay();
+    } else {
+      // Make sure the first track has an audio_file property
+      const firstTrack = albumSongs[0];
+      if (!firstTrack.audio_file) {
+        console.warn("First track has no audio file:", firstTrack);
+        return;
+      }
+
       // Play the first track
-      play(albumSongs[0]);
+      play(firstTrack);
 
       // Add remaining songs to queue
-      albumSongs.slice(1).forEach((track) => {
-        addSongToQueue(track);
-      });
+      if (albumSongs.length > 1) {
+        albumSongs
+          .slice(1)
+          .filter((track) => track.audio_file) // Only add tracks with audio files
+          .forEach((track) => {
+            addSongToQueue(track);
+          });
+      }
     }
-  };
+  }, [albumSongs, currentSong, isPlaying, play, addSongToQueue, togglePlay]);
 
   if (loading) {
     return (
@@ -87,9 +123,11 @@ export default function AlbumPage() {
   const totalTracks = albumSongs.length;
   const durationMinutes = Math.floor(totalDuration / 60);
   const durationText = `${totalTracks} ${totalTracks === 1 ? "song" : "songs"}, ${durationMinutes} ${durationMinutes === 1 ? "minute" : "minutes"}`;
+  const isAlbumPlaying =
+    isPlaying && albumSongs.some((track) => track.id === currentSong?.id);
 
   return (
-    <div className="container space-y-8">
+    <div className="space-y-8">
       <AlbumHeader
         cover_url={album?.cover_image}
         type="Album"
@@ -105,15 +143,12 @@ export default function AlbumPage() {
           size="lg"
           className="flex items-center gap-2 rounded-full"
           onClick={handlePlay}
+          disabled={isLoading}
         >
           <Icon size="md">
-            {isPlaying && albumSongs.some((t) => t.id === currentSong?.id)
-              ? "pause"
-              : "play_arrow"}
+            {isLoading ? "sync" : isAlbumPlaying ? "pause" : "play_arrow"}
           </Icon>
-          {isPlaying && albumSongs.some((t) => t.id === currentSong?.id)
-            ? "Pause"
-            : "Play"}
+          {isLoading ? "Loading..." : isAlbumPlaying ? "Pause" : "Play"}
         </Button>
 
         {/* Add the album action button */}

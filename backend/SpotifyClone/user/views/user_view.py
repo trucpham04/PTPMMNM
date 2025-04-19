@@ -1,4 +1,4 @@
-from django.contrib.auth import get_user_model, login, authenticate 
+from django.contrib.auth import get_user_model, login, authenticate, logout
 from django.contrib.auth.hashers import make_password
 from rest_framework import permissions, status
 from rest_framework.views import APIView
@@ -52,6 +52,18 @@ class LoginView(APIView):
             })
 
         return custom_response(ec=1, em="Validation error", dt=serializer.errors)
+    
+@method_decorator(csrf_exempt, name="dispatch")
+class LogoutView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        try:
+            request.user.auth_token.delete()
+            logout(request)
+            return custom_response(em="Logout successful")
+        except Exception as e:
+            return custom_response(ec=1, em=f"Logout failed: {str(e)}")
 
 
 class UserListCreateView(BaseListCreateView):
@@ -100,4 +112,14 @@ class UserDetailByIDView(APIView):
         except User.DoesNotExist:
             return custom_response(ec=1, em="User not found")
 
+class GetCurrentUserView(APIView):
+    """ permission_classes = [permissions.AllowAny] """
+
+    def get(self, request):
+        user = request.user
+        if user.is_authenticated:
+            serializer = UserSerializer(user)
+            return custom_response(em="User found", dt=serializer.data)
+        else:
+            return custom_response(ec=1, em="User not authenticated")
 

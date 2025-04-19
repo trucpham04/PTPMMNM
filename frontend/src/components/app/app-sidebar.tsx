@@ -15,21 +15,22 @@ import { AppSideBarContext } from "../layouts/default-layout";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/authContext";
 import { Skeleton } from "../ui/skeleton";
+import { useAlbum } from "@/hooks";
 
 export function AppSidebar({
   className,
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const { sidebarOpen, setSidebarOpen } = React.useContext(AppSideBarContext);
-  const { savedAlbums, loading } = useUserAlbums();
+  const { albums, loading } = useAlbum();
   const { user } = useAuth();
 
   // Convert saved albums to the format expected by NavAlbums
-  const formattedAlbums = savedAlbums.map((album) => ({
-    title: album.name,
+  const formattedAlbums = albums.map((album) => ({
+    title: album.title,
     url: `/album/${album.id}`,
-    cover_url: album.cover_url,
-    savedAt: album.dateAdded,
+    cover_url: album.cover_image,
+    // savedAt: album.,
   }));
 
   return (

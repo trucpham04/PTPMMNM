@@ -1,14 +1,18 @@
 import Routes from "@/routes/index_routes";
 import { useAuth } from "./contexts/authContext";
 import { useEffect } from "react";
+import { useUser } from "./hooks";
 
 function App() {
   const { setUser } = useAuth();
+  const { getCurrentUser } = useUser();
   useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      setUser(JSON.parse(user));
-    }
+    const currentUser = async () => {
+      const user = await getCurrentUser();
+      setUser(user);
+    };
+
+    currentUser();
   }, []);
 
   return (

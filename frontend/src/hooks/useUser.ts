@@ -60,6 +60,28 @@ export const useUser = () => {
     }
   }, []);
 
+  const getCurrentUser = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await userService.getCurrentUser();
+      if (response.EC === 0 && response.DT) {
+        setUser(response.DT);
+        return response.DT;
+      } else {
+        setError(response.EM || "Failed to fetch current user");
+        return null;
+      }
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch current user";
+      setError(errorMessage);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   // Create user
   const createUser = useCallback(
     async (userData: Partial<User>, profilePicture?: File) => {
@@ -259,6 +281,7 @@ export const useUser = () => {
     following,
     getUsers,
     getUserById,
+    getCurrentUser,
     createUser,
     updateUser,
     deleteUser,

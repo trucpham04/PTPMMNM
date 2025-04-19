@@ -85,11 +85,11 @@ class AlbumSongsView(APIView):
         serializer = SongSerializer(songs, many=True)
         song_data = serializer.data
         
-        for song in song_data:
-            song['album'] = {
-                "id": album.id,
-                "title": album.title
-            }
+        # for song in song_data:
+        #     song['album'] = {
+        #         "id": album.id,
+        #         "title": album.title
+        #     }
 
         return custom_response(em="Fetched songs in album", dt=song_data)
 

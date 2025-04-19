@@ -8,8 +8,8 @@ import magic  # Thêm thư viện magic để kiểm tra loại file
 class SongSerializer(serializers.ModelSerializer):
     artist = serializers.PrimaryKeyRelatedField(queryset=Artist.objects.all())  # Cho phép nhập ID của Artist
     genres = serializers.PrimaryKeyRelatedField(queryset=Genre.objects.all(), many=True)  # Nhận danh sách ID của Genre
-    album = serializers.PrimaryKeyRelatedField(queryset=Album.objects.all(), required=False, allow_null=True)
-
+    album = AlbumSerializer(read_only=True)
+    
     class Meta:
         model = Song
         fields = '__all__'
@@ -21,3 +21,5 @@ class SongSerializer(serializers.ModelSerializer):
         if not mime.startswith(('audio/', 'video/')):
             raise serializers.ValidationError("Chỉ chấp nhận file âm thanh hoặc video!")
         return value
+    
+    
