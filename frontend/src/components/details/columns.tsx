@@ -74,7 +74,8 @@ const columns: ColumnDef<Song>[] = [
     accessorKey: "duration",
     header: () => <Icon size="sm">schedule</Icon>,
     cell: ({ row }) => {
-      <div>{row.getValue("duration")}</div>;
+      const duration = row.getValue("duration");
+      return <div>{duration ? duration : "-"}</div>;
     },
   },
 ];

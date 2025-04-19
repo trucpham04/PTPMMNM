@@ -1,5 +1,7 @@
 import { useState, useCallback } from "react";
 import { authService } from "../services";
+import { User } from "@/types";
+import useUser from "./useUser";
 
 // Types
 interface AuthResponse {
@@ -24,11 +26,10 @@ interface LoginRequest {
 }
 
 export const useAuth = () => {
+  const { getUserById } = useUser();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [user, setUser] = useState<{ id: number; username: string } | null>(
-    null,
-  );
+  const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
     authService.isAuthenticated(),
   );
@@ -43,10 +44,8 @@ export const useAuth = () => {
         const response = await authService.register(userData);
 
         if (response.EC === 0 && response.DT) {
-          setUser({
-            id: response.DT.user_id,
-            username: response.DT.username,
-          });
+          const userResponse = await getUserById(response.DT.user_id);
+          setUser(userResponse);
           setIsAuthenticated(true);
           return true;
         } else {
@@ -75,10 +74,8 @@ export const useAuth = () => {
         const response = await authService.login(credentials);
 
         if (response.EC === 0 && response.DT) {
-          setUser({
-            id: response.DT.user_id,
-            username: response.DT.username,
-          });
+          const userResponse = await getUserById(response.DT.user_id);
+          setUser(userResponse);
           setIsAuthenticated(true);
           return true;
         } else {

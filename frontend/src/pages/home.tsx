@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { AlbumsSection } from "@/components/media/albums-section";
 import { ArtistsSection } from "@/components/media/artists-section";
 import { useAlbum, useArtist } from "@/hooks";
-// import { SearchInput } from "@/components/media/search-input";
 
 function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,15 +25,7 @@ function HomePage() {
   };
 
   return (
-    <div className="container w-full px-4">
-      <div className="mx-auto max-w-md">
-        {/* <SearchInput
-          onSearch={handleSearch}
-          placeholder="Search albums or artists..."
-          className="mb-8"
-        /> */}
-      </div>
-
+    <div className="w-full px-4">
       <AlbumsSection
         title={searchQuery ? "Album Results" : "Popular Albums"}
         albums={albums.slice(0, 5)}

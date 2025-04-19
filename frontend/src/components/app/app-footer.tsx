@@ -2,9 +2,8 @@ import { cn } from "@/lib/utils";
 import { Slider } from "../ui/slider";
 import Icon from "../ui/icon";
 import { Link } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
 import { formatTime } from "@/utils/format-time";
-import usePlayer from "@/hooks/usePlayer";
+import { usePlayer } from "@/contexts/playerContext";
 
 export default function AppFooter({ className }: { className?: string }) {
   const {
@@ -13,60 +12,24 @@ export default function AppFooter({ className }: { className?: string }) {
     volume,
     togglePlay,
     playNextSong,
+    playPreviousSong,
     changeVolume,
+    audioRef,
+    currentTime,
+    duration,
   } = usePlayer();
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-
-  useEffect(() => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.play().catch((error) => {
-          console.error("Failed to play:", error);
-        });
-      } else {
-        audioRef.current.pause();
-      }
-    }
-  }, [isPlaying, currentSong]);
-
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume / 100;
-    }
-  }, [volume]);
-
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime);
-    }
-  };
-
-  const handleLoadedMetadata = () => {
-    if (audioRef.current) {
-      setDuration(audioRef.current.duration);
-    }
-  };
-
-  const handleSeek = (values: number[]) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = values[0];
-      setCurrentTime(values[0]);
-    }
-  };
-
+  // Render placeholder if no song
   if (!currentSong) {
     return (
       <div
         className={cn(
-          "bg--100 relative flex h-16 items-center justify-between p-2",
+          "bg--100 relative flex h-16 items-center justify-between p-2 pt-1",
           className,
         )}
       >
         <div className="flex items-center gap-3">
-          <div className="size-14 rounded-md bg-white/10"></div>
+          <div className="size-14 rounded-md bg-white/10" />
           <div className="space-y-">
             <div className="text-muted-foreground">No track playing</div>
           </div>
@@ -83,7 +46,6 @@ export default function AppFooter({ className }: { className?: string }) {
               skip_next
             </Icon>
           </div>
-
           <div className="flex items-center gap-2 text-xs">
             <div className="text-muted-foreground">0:00</div>
             <Slider className="w-1/4 min-w-80" disabled />
@@ -113,21 +75,13 @@ export default function AppFooter({ className }: { className?: string }) {
         className,
       )}
     >
-      {/* Hidden audio element */}
-      <audio
-        ref={audioRef}
-        src={`${currentSong.audio_file}`} // Replace with your actual streaming endpoint
-        onEnded={playNextSong}
-        onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={handleLoadedMetadata}
-      />
-
+      {/* Track info */}
       <div className="flex items-center gap-3">
         <Link to={`/album/${currentSong.album_id}`}>
           <img
             src={currentSong.album?.cover_image}
             alt={currentSong.title}
-            className="size-14 rounded-md object-cover"
+            className="size-12 rounded-md object-cover"
           />
         </Link>
         <div className="space-y-">
@@ -146,9 +100,10 @@ export default function AppFooter({ className }: { className?: string }) {
         </Icon>
       </div>
 
+      {/* Controls */}
       <div className="absolute top-2/5 left-1/2 flex w-full -translate-1/2 flex-col items-center justify-center">
         <div className="flex gap-4">
-          <Icon size="xl" className="cursor-pointer">
+          <Icon size="xl" className="cursor-pointer" onClick={playPreviousSong}>
             skip_previous
           </Icon>
           <Icon size="xl" className="cursor-pointer" onClick={togglePlay}>
@@ -165,12 +120,17 @@ export default function AppFooter({ className }: { className?: string }) {
             className="w-1/4 min-w-80"
             max={duration}
             value={[currentTime]}
-            onValueChange={handleSeek}
+            onValueChange={(values) => {
+              if (audioRef.current) {
+                audioRef.current.currentTime = values[0];
+              }
+            }}
           />
           <div>{formatTime(duration)}</div>
         </div>
       </div>
 
+      {/* Volume */}
       <div className="flex gap-2">
         <Icon size="lg">
           {volume === 0

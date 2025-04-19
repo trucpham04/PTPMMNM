@@ -254,10 +254,8 @@ function AppNavbar({ className }: { className?: string }) {
             <div className="size-12 cursor-pointer">
               <PopoverTrigger>
                 <Avatar className="size-full cursor-pointer border">
-                  <AvatarImage
-                    src={`http://localhost:3001/avatars/${user.username}.png`}
-                  />
-                  <AvatarFallback>
+                  <AvatarImage src={user.profile_picture} />
+                  <AvatarFallback className="size-12">
                     <Icon size={"lg"}>person</Icon>
                   </AvatarFallback>
                 </Avatar>
