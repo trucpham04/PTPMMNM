@@ -66,3 +66,25 @@ class FollowArtistView(APIView):
             follow.delete()
             return custom_response(em="Unfollowed successfully!")
         return custom_response(ec=1, em="You have not followed this artist!")
+class ArtistSearchByIdView(APIView):
+    permission_classes = [permissions.AllowAny]
+    def post(self, request):
+        artist_id = request.data.get("id")
+        if not artist_id:
+            return custom_response(ec=1, em="Missing artist ID")
+        # Tìm kiếm artist theo ID
+        artist = get_object_or_404(Artist, id=artist_id)
+        serializer = ArtistSerializer(artist)
+        return custom_response(em="Fetched artist by ID", dt=serializer.data)
+class ArtistSearchByNameView(APIView):
+    permission_classes = [permissions.AllowAny]
+    def post(self, request):
+        name = request.data.get("name")
+        if not name:
+            return custom_response(ec=1, em="Missing artist name")
+        # Tìm kiếm artist theo tên
+        artists = Artist.objects.filter(name__icontains=name)
+        if not artists.exists():
+            return custom_response(ec=1, em="No artists found matching the name")
+        serializer = ArtistSerializer(artists, many=True)
+        return custom_response(em="Fetched artists by name", dt=serializer.data)

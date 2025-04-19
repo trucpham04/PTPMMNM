@@ -49,3 +49,27 @@ class AlbumDetailView(BaseRetrieveUpdateDestroyView):
         instance = self.get_object()
         instance.delete()
         return custom_response(em="Album deleted successfully")
+class AlbumGetByIdView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, pk):
+        album = get_object_or_404(Album, pk=pk)
+        serializer = AlbumSerializer(album)
+        return custom_response(em="Fetched album by ID", dt=serializer.data)
+class AlbumSearchByNameView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        title = request.data.get("title")
+        if not title:
+            return custom_response(ec=1, em="Missing album title")
+        
+        # Sử dụng 'title' thay vì 'name' để tìm kiếm
+        albums = Album.objects.filter(title__icontains=title)
+        
+        if not albums.exists():
+            return custom_response(ec=1, em="No albums found matching the title")
+
+        serializer = AlbumSerializer(albums, many=True)
+        return custom_response(em="Fetched albums by title", dt=serializer.data)
+
