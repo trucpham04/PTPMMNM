@@ -1,0 +1,81 @@
+services:
+  backend:
+    build:
+      context: ./backend/SpotifyClone
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - MYSQL_DATABASE=spotifyclone
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=
+      - MYSQL_HOST=db
+      - MYSQL_PORT=3306
+    volumes:
+      - ./backend/SpotifyClone:/app
+    depends_on:
+      - db
+    networks:
+      - app-network
+    restart: unless-stopped
+    # Use a script to wait for the database before starting
+    command: >
+      sh -c "
+        echo 'Waiting for MySQL to be ready...'
+        while ! nc -z db 3306; do
+          sleep 1
+        done
+        echo 'MySQL is ready!'
+        python manage.py migrate
+        python manage.py runserver 0.0.0.0:8000
+      "
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:5173"
+    volumes:
+      - ./frontend:/app
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    networks:
+      - app-network
+        # Add restart policy to retry if it fails initially
+
+  db:
+    image: mysql:lts
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_DATABASE=spotifyclone
+    ports:
+      - "3310:3306" # Map host port 3310 to container port 3306
+    networks:
+      - app-network
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    ports:
+      - "8080:80"
+    environment:
+      - PMA_HOST=db
+      - PMA_PORT=3306
+      - PMA_USER=root
+      - PMA_PASSWORD=
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql_data:

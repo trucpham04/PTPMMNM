@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Album } from "@/types";
 import Icon from "@/components/ui/icon";
-import { useUserAlbums } from "@/hooks/use-user-albums";
-import { useAuth } from "@/contexts/auth-context";
+import { useAuth } from "@/contexts/authContext";
 
 interface AlbumActionProps {
   album: Album;
@@ -11,7 +10,6 @@ interface AlbumActionProps {
 
 export default function AlbumAction({ album }: AlbumActionProps) {
   const { user } = useAuth();
-  const { saveAlbum, removeAlbum, isAlbumSaved } = useUserAlbums();
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -19,14 +17,12 @@ export default function AlbumAction({ album }: AlbumActionProps) {
     const checkSavedStatus = async () => {
       if (user && album) {
         setLoading(true);
-        const status = await isAlbumSaved(album.id);
-        setSaved(status);
         setLoading(false);
       }
     };
 
     checkSavedStatus();
-  }, [user, album, isAlbumSaved]);
+  }, [user, album]);
 
   const handleToggleSave = async () => {
     if (!user || loading) return;
@@ -34,10 +30,8 @@ export default function AlbumAction({ album }: AlbumActionProps) {
     setLoading(true);
     try {
       if (saved) {
-        await removeAlbum(album.id);
         setSaved(false);
       } else {
-        await saveAlbum(album.id);
         setSaved(true);
       }
     } finally {

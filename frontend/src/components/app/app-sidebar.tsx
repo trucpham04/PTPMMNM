@@ -13,8 +13,7 @@ import Icon from "../ui/icon";
 
 import { AppSideBarContext } from "../layouts/default-layout";
 import { cn } from "@/lib/utils";
-import { useUserAlbums } from "@/hooks/use-user-albums";
-import { useAuth } from "@/contexts/auth-context";
+import { useAuth } from "@/contexts/authContext";
 import { Skeleton } from "../ui/skeleton";
 
 export function AppSidebar({

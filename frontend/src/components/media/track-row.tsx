@@ -1,19 +1,19 @@
 import React from "react";
-import { Track } from "@/types";
-import { usePlayer } from "@/hooks/use-player";
 import { cn } from "@/lib/utils";
 import Icon from "../ui/icon";
+import usePlayer from "@/hooks/usePlayer";
+import { Song } from "@/types";
 
 interface TrackRowProps {
-  track: Track;
+  track: Song;
   index: number;
 }
 
 export function TrackRow({ track, index }: TrackRowProps) {
-  const { play, currentTrack, isPlaying, togglePlay, addTrackToQueue } =
+  const { play, currentSong, isPlaying, togglePlay, addSongToQueue } =
     usePlayer();
 
-  const isCurrentTrack = currentTrack?.id === track.id;
+  const isCurrentTrack = currentSong?.id === track.id;
 
   const handlePlayPause = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -29,7 +29,7 @@ export function TrackRow({ track, index }: TrackRowProps) {
   const handleAddToQueue = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addTrackToQueue(track);
+    addSongToQueue(track);
   };
 
   return (
@@ -57,7 +57,7 @@ export function TrackRow({ track, index }: TrackRowProps) {
           <p className={cn("font-medium", isCurrentTrack && "text-primary")}>
             {track.title}
           </p>
-          <p className="text-muted-foreground text-sm">{track.artistName}</p>
+          <p className="text-muted-foreground text-sm">{track.artist?.name}</p>
         </div>
       </div>
       <div className="flex items-center gap-4">
