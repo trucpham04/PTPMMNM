@@ -7,6 +7,7 @@ from ..serializers.favorite_album_serializer import FavoriteAlbumSerializer
 from music.serializers.album_serializer import AlbumSerializer
 from utils.custom_response import custom_response
 from user.models import User
+from rapidfuzz import fuzz
 class FavoriteAlbumView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -95,3 +96,31 @@ class FavoriteAlbumCountView(APIView):
 
         count = FavoriteAlbum.objects.filter(album__id=album_id).count()
         return custom_response(em="Fetched favorite count", dt={"album_id": album_id, "favorite_count": count})
+class SearchFavoriteAlbumByNameView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        user_id = request.data.get("user_id")
+        query = request.data.get("query", "").strip()
+
+        if not user_id or not query:
+            return custom_response(ec=1, em="Missing user_id or query")
+
+        favorites = FavoriteAlbum.objects.filter(user__id=user_id)
+        matched_albums = []
+
+        for fav in favorites:
+            album = fav.album
+            if fuzz.partial_ratio(query.lower(), album.title.lower()) > 70:
+                matched_albums.append(album)
+
+        serializer = AlbumSerializer(matched_albums, many=True)
+        return custom_response(em="Fetched matched favorite albums", dt=serializer.data)
+class FavoriteAlbumGetByIdView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, pk):
+        favorite = get_object_or_404(FavoriteAlbum, id=pk)
+        album = favorite.album
+        serializer = AlbumSerializer(album)
+        return custom_response(em="Fetched favorite album by ID", dt=serializer.data)
