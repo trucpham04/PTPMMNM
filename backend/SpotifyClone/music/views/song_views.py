@@ -60,7 +60,7 @@ class SongDetailView(BaseRetrieveUpdateDestroyView):
 
 
 class IncreasePlayCountView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request, song_id):
         song = get_object_or_404(Song, id=song_id)
