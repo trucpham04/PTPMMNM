@@ -4,6 +4,11 @@ import Icon from "../ui/icon";
 import { Link } from "react-router-dom";
 import { formatTime } from "@/utils/format-time";
 import { usePlayer } from "@/contexts/playerContext";
+import { Button } from "../ui/button";
+import { useFavorite } from "@/hooks";
+import { useEffect } from "react";
+import { useAuth } from "@/contexts/authContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function AppFooter({ className }: { className?: string }) {
   const {
@@ -18,6 +23,31 @@ export default function AppFooter({ className }: { className?: string }) {
     currentTime,
     duration,
   } = usePlayer();
+
+  const { user } = useAuth();
+
+  const isMobile = useIsMobile();
+
+  const {
+    isFavorited,
+    getIsSongFavorited,
+    addSongToFavorites,
+    removeSongFromFavorites,
+  } = useFavorite();
+
+  useEffect(() => {
+    if (currentSong && user) {
+      getIsSongFavorited(user?.id, currentSong.id);
+    }
+  }, [currentSong]);
+
+  const toggleFavorite = () => {
+    if (!currentSong || !user) {
+      return;
+    }
+    if (isFavorited) removeSongFromFavorites(user?.id, currentSong.id);
+    else addSongToFavorites(user?.id, currentSong.id);
+  };
 
   // Render placeholder if no song
   if (!currentSong) {
@@ -72,12 +102,13 @@ export default function AppFooter({ className }: { className?: string }) {
     <div
       className={cn(
         "bg--100 relative flex h-16 items-center justify-between p-2",
+        { "pb-14": isMobile },
         className,
       )}
     >
       {/* Track info */}
-      <div className="flex items-center gap-3">
-        <Link to={`/album/${currentSong.album_id}`}>
+      <div className="z-10 flex items-center gap-3">
+        <Link to={`/album/${currentSong.album?.id}`}>
           <img
             src={currentSong.album?.cover_image}
             alt={currentSong.title}
@@ -95,8 +126,11 @@ export default function AppFooter({ className }: { className?: string }) {
             {currentSong.artist?.name}
           </Link>
         </div>
-        <Icon className="cursor-pointer" onClick={() => {}}>
-          add_circle
+        <Icon
+          className={cn("cursor-pointer", { fill: isFavorited })}
+          onClick={toggleFavorite}
+        >
+          favorite
         </Icon>
       </div>
 
@@ -131,21 +165,40 @@ export default function AppFooter({ className }: { className?: string }) {
       </div>
 
       {/* Volume */}
-      <div className="flex gap-2">
-        <Icon size="lg">
-          {volume === 0
-            ? "volume_off"
-            : volume < 50
-              ? "volume_down"
-              : "volume_up"}
-        </Icon>
-        <Slider
-          size="small"
-          max={100}
-          value={[volume]}
-          className="w-20"
-          onValueChange={(values) => changeVolume(values[0])}
-        />
+      <div className="z-10 flex gap-2">
+        <Button
+          variant={"ghost"}
+          className="hover:bg-primary-foreground size-12 cursor-pointer rounded-full"
+          asChild
+        >
+          <Link to="/queue">
+            <Icon>queue_music</Icon>
+          </Link>
+        </Button>
+
+        <div className="flex gap-2">
+          <Icon
+            size="lg"
+            className="cursor-pointer"
+            onClick={() => {
+              changeVolume(volume === 0 ? 70 : 0);
+            }}
+          >
+            {volume === 0
+              ? "volume_off"
+              : volume < 50
+                ? "volume_down"
+                : "volume_up"}
+          </Icon>
+
+          <Slider
+            size="small"
+            max={100}
+            value={[volume]}
+            className="w-20"
+            onValueChange={(values) => changeVolume(values[0])}
+          />
+        </div>
       </div>
     </div>
   );

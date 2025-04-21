@@ -123,7 +123,7 @@ class SmartSearchSongView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        query = request.data.get("q", "").strip()
+        query = request.query_params.get("q", "").strip()
         if not query:
             return custom_response(ec=1, em="Missing search query")
 
@@ -184,3 +184,18 @@ class SmartSearchSongView(APIView):
             return custom_response(ec=0, em=f"Found songs by artist '{top_artist.name}'", dt=serializer.data)
 
         return custom_response(ec=0, em="No matching songs found", dt=[])
+
+class SongSearchView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        query = request.query_params.get("q", "").strip()
+        if not query:
+            return custom_response(ec=1, em="Missing search query")
+
+        songs = Song.objects.filter(
+            title__icontains=query
+        ).select_related("artist", "album").prefetch_related("genres", "featuring_artists", "composers")
+
+        serializer = SongSerializer(songs, many=True)
+        return custom_response(ec=0, em="Search results", dt=serializer.data)

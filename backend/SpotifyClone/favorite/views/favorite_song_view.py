@@ -33,6 +33,26 @@ class FavoriteSongByUserView(APIView):
         serializer = SongSerializer(favorite_songs, many=True)
         return custom_response(em=f"Fetched favorite songs of user {user_id}", dt=serializer.data)
 
+    def post(self, request, user_id):
+        serializer = FavoriteSongSerializer(data=request.data, context={'user_id': user_id})
+        if serializer.is_valid():
+            serializer.save()
+            return custom_response(em="Favorite song added", dt=serializer.data)
+        return custom_response(ec=1, em="Validation failed", dt=serializer.errors)
+  
+    def delete(self, request, user_id):
+        song_id = request.data.get("song_id")
+        if not song_id:
+            return custom_response(ec=1, em="Missing song_id in request body")
+
+        try:
+            favorite = FavoriteSong.objects.get(user__id=user_id, song__id=song_id)
+            favorite.delete()
+            return custom_response(em="Favorite song removed successfully")
+        except FavoriteSong.DoesNotExist:
+            return custom_response(ec=1, em="Favorite song not found")
+
+       
 class IsSongFavoritedView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -43,6 +63,7 @@ class IsSongFavoritedView(APIView):
             em="Checked favorite status",
             dt={"song_id": song_id, "user_id": user_id, "is_favorited": is_favorited}
         )
+     
 
 class FavoriteSongBySongView(APIView):
     permission_classes = [permissions.AllowAny]

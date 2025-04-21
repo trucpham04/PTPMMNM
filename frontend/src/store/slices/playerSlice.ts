@@ -6,6 +6,7 @@ interface PlayerState {
   isPlaying: boolean;
   queue: Song[];
   volume: number;
+  history: Song[];
 }
 
 const initialState: PlayerState = {
@@ -13,6 +14,7 @@ const initialState: PlayerState = {
   isPlaying: false,
   queue: [],
   volume: 70,
+  history: [],
 };
 
 export const playerSlice = createSlice({
@@ -43,14 +45,23 @@ export const playerSlice = createSlice({
     },
     nextSong: (state) => {
       if (state.queue.length > 0) {
+        if (state.currentSong) {
+          state.history.push(state.currentSong);
+        }
         state.currentSong = state.queue[0];
         state.queue = state.queue.slice(1);
         state.isPlaying = true;
       }
     },
     previousSong: (state) => {
-      // You might want to implement this based on your needs
-      // This is just a placeholder
+      if (state.history.length > 0) {
+        const prevSong = state.history.pop(); // lấy bài trước
+        if (state.currentSong) {
+          state.queue.unshift(state.currentSong); // đưa bài hiện tại vào đầu queue
+        }
+        state.currentSong = prevSong ?? null;
+        state.isPlaying = true;
+      }
     },
     updatePlayCount: (state) => {
       // This will be used to trigger the API call to increment play count

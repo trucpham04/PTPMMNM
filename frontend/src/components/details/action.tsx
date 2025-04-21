@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Album } from "@/types";
 import Icon from "@/components/ui/icon";
 import { useAuth } from "@/contexts/authContext";
+import { useFavorite } from "@/hooks";
+import { cn } from "@/lib/utils";
 
 interface AlbumActionProps {
   album: Album;
@@ -10,32 +12,27 @@ interface AlbumActionProps {
 
 export default function AlbumAction({ album }: AlbumActionProps) {
   const { user } = useAuth();
-  const [saved, setSaved] = useState(false);
-  const [loading, setLoading] = useState(false);
+
+  const {
+    getIsAlbumFavorited,
+    isAlbumFavorited,
+    addAlbumToFavorites,
+    removeAlbumFromFavorites,
+  } = useFavorite();
 
   useEffect(() => {
-    const checkSavedStatus = async () => {
-      if (user && album) {
-        setLoading(true);
-        setLoading(false);
-      }
-    };
-
-    checkSavedStatus();
+    if (user && album) {
+      getIsAlbumFavorited(user.id, album.id);
+    }
   }, [user, album]);
 
-  const handleToggleSave = async () => {
-    if (!user || loading) return;
+  const handleToggleFavorite = async () => {
+    if (!user || !album) return;
 
-    setLoading(true);
-    try {
-      if (saved) {
-        setSaved(false);
-      } else {
-        setSaved(true);
-      }
-    } finally {
-      setLoading(false);
+    if (isAlbumFavorited) {
+      await removeAlbumFromFavorites(user.id, album.id);
+    } else {
+      await addAlbumToFavorites(user.id, album.id);
     }
   };
 
@@ -45,21 +42,12 @@ export default function AlbumAction({ album }: AlbumActionProps) {
     <Button
       variant="ghost"
       size="icon"
-      className="cursor-pointer rounded-full"
-      onClick={handleToggleSave}
-      disabled={loading}
+      className="size-12 cursor-pointer rounded-full"
+      onClick={handleToggleFavorite}
     >
-      {loading ? (
-        <Icon size="md" className="animate-spin">
-          autorenew
-        </Icon>
-      ) : saved ? (
-        <Icon size="md" className="fill text-green-500">
-          favorite
-        </Icon>
-      ) : (
-        <Icon size="md">favorite_border</Icon>
-      )}
+      <Icon size="md" className={cn({ fill: isAlbumFavorited })}>
+        favorite
+      </Icon>
     </Button>
   );
 }

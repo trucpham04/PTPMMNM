@@ -19,6 +19,7 @@ import artistService from "./artistService";
 import albumService from "./albumService";
 import songService from "./songService";
 import favoriteService from "./favoriteService";
+import searchService from "./searchService";
 
 export {
   apiClient,
@@ -31,4 +32,5 @@ export {
   albumService,
   songService,
   favoriteService,
+  searchService,
 };

@@ -82,8 +82,8 @@ class ArtistSearchByIdView(APIView):
 
 class ArtistSearchByNameView(APIView):
     permission_classes = [permissions.AllowAny]
-    def post(self, request):
-        name = request.data.get("name")
+    def get(self, request):
+        name = request.query_params.get("q").strip()
         if not name:
             return custom_response(ec=1, em="Missing artist name")
         # Tìm kiếm artist theo tên

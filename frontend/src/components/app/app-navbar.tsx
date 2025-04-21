@@ -18,9 +18,6 @@ type SearchResult = {
   artists: Artist[];
 };
 
-// const { getAlbums } = useAlbum();
-// const { getArtists } = useArtist();
-
 function AppNavbar({ className }: { className?: string }) {
   const { openMobile, setOpenMobile } = useSidebar();
   const { user, logout } = useAuth();
@@ -52,34 +49,6 @@ function AppNavbar({ className }: { className?: string }) {
     };
   }, []);
 
-  // Debounced search function
-  // const debouncedSearch = useRef(
-  //   debounce(async (query: string) => {
-  //     if (!query) {
-  //       setSearchResults({ albums: [], artists: [] });
-  //       setLoading(false);
-  //       return;
-  //     }
-
-  //     try {
-  //       setLoading(true);
-  //       const [albumsData, artistsData] = await Promise.all([
-  //         getAlbums(query),
-  //         getArtists(query),
-  //       ]);
-
-  //       setSearchResults({
-  //         albums: albumsData.slice(0, 3), // Limit results
-  //         artists: artistsData.slice(0, 3),
-  //       });
-  //     } catch (error) {
-  //       console.error("Search error:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   }, 300),
-  // ).current;
-
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
@@ -92,11 +61,6 @@ function AppNavbar({ className }: { className?: string }) {
       setShowResults(false);
       setSearchResults({ albums: [], artists: [] });
     }
-  };
-
-  const handleViewAllResults = () => {
-    navigate(`/explore?q=${encodeURIComponent(searchQuery)}`);
-    setShowResults(false);
   };
 
   return (
@@ -141,6 +105,14 @@ function AppNavbar({ className }: { className?: string }) {
                 className="h-12 w-md border-0 bg-transparent! pl-0! focus-visible:ring-0"
                 value={searchQuery}
                 onChange={handleSearchChange}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && searchQuery.trim()) {
+                    navigate(
+                      `/search?q=${encodeURIComponent(searchQuery.trim())}`,
+                    );
+                    setShowResults(false);
+                  }
+                }}
               />
               <div className="flex items-center">
                 <Separator orientation="vertical" className="h-3/5!" />
