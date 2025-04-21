@@ -33,6 +33,16 @@ class FavoriteSongByUserView(APIView):
         serializer = SongSerializer(favorite_songs, many=True)
         return custom_response(em=f"Fetched favorite songs of user {user_id}", dt=serializer.data)
 
+class IsSongFavoritedView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, user_id, song_id):
+        is_favorited = Song.objects.filter(id=song_id, favorited_by__user__id=user_id).exists()
+        return custom_response(
+            ec=0,
+            em="Checked favorite status",
+            dt={"song_id": song_id, "user_id": user_id, "is_favorited": is_favorited}
+        )
 
 class FavoriteSongBySongView(APIView):
     permission_classes = [permissions.AllowAny]

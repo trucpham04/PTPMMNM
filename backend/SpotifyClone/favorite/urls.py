@@ -8,7 +8,8 @@ from .views import (
     FavoriteSongByUserView,
     FavoriteSongBySongView,
     SearchFavoriteAlbumByNameView,
-    FavoriteAlbumGetByIdView
+    FavoriteAlbumGetByIdView,
+    IsSongFavoritedView
 )
 
 urlpatterns = [
@@ -19,8 +20,8 @@ urlpatterns = [
     path('favorite-albums/search/', SearchFavoriteAlbumByNameView.as_view(), name='search-favorite-album-by-name'),
     path('favorite-albums/<int:pk>/', FavoriteAlbumGetByIdView.as_view(), name='get-favorite-album-by-id'),
 
-
     path("favorites/songs/", FavoriteSongListCreateView.as_view(), name="favorite-song-list-create"),
     path("favorites/songs/user/<int:user_id>/", FavoriteSongByUserView.as_view(), name="favorite-song-by-user"),
+    path("favorites/songs/user/<int:user_id>/song/<int:song_id>", IsSongFavoritedView.as_view(), name="favorite-song-by-user"),
     path("favorites/songs/song/<int:song_id>/", FavoriteSongBySongView.as_view(), name="favorite-song-by-song"),
 ]
