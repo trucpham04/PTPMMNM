@@ -99,7 +99,7 @@ WSGI_APPLICATION = 'SpotifyClone.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
+""" DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'spotifyclone',
@@ -107,6 +107,16 @@ DATABASES = {
         'PASSWORD': '',
         'HOST': 'db',  # Use the service name in Docker
         'PORT': '3306', # Standard MySQL port inside Docker
+    }
+} """
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'spotifyclone',
+        'USER': 'root',              # Thay bằng username của bạn
+        'PASSWORD': '', # Thay bằng mật khẩu của bạn
+        'HOST': 'localhost',
+        'PORT': '3310',
     }
 }
 

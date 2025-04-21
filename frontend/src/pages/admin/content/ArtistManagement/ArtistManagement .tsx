@@ -1,43 +1,43 @@
-import React, { useState } from "react";
-import DataTable from "react-data-table-component";
+import React, { useState, useEffect } from "react";
+import DataTable, { TableColumn } from "react-data-table-component";
 import { FaEllipsisV, FaTrashAlt } from "react-icons/fa";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { Card } from "react-bootstrap";
 import { toast } from "react-toastify";
 import "./ArtistManagement.scss";
+import { useArtist } from "../../../../hooks/useArtist";
+import { Artist as ImportedArtist } from "../../../../types/music"; // Rename the imported Artist type
 
-// Định nghĩa kiểu dữ liệu cho Artist
-interface Artist {
+// LocalArtist type definition if necessary
+interface LocalArtist {
   id: number;
   name: string;
-  genre: string;
-  country: string;
+  genres: number[]; // Now using number[] for genre IDs
+  image: string;
+  bio: string;
+  slug: string;
 }
 
-const ArtistManagement: React.FC = () => {
+const ArtistManagement = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [data, setData] = useState<LocalArtist[]>([]); // Use LocalArtist type for local state
 
-  const [data, setData] = useState<Artist[]>([
-    {
-      id: 1,
-      name: "Taylor Swift",
-      genre: "Pop",
-      country: "USA",
-    },
-    {
-      id: 2,
-      name: "Sơn Tùng M-TP",
-      genre: "V-Pop",
-      country: "Vietnam",
-    },
-    {
-      id: 3,
-      name: "Ed Sheeran",
-      genre: "Pop",
-      country: "UK",
-    },
-  ]);
+  const { artists, loading, getArtists } = useArtist();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await getArtists();
+    };
+    fetchData();
+  }, [getArtists]);
+
+  useEffect(() => {
+    if (!loading && artists) {
+      setData(artists); // Copy the fetched artists into the state
+      console.log("Artists data copied into state:", artists);
+    }
+  }, [artists, loading]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -53,8 +53,8 @@ const ArtistManagement: React.FC = () => {
   const handleEdit = (id: number) => {
     const artist = data.find((item) => item.id === id);
     if (artist) {
-      // Hiện modal chỉnh sửa tại đây
       console.log("Edit Artist:", artist);
+      setShowModal(true); // Show modal for editing
     }
   };
 
@@ -69,39 +69,48 @@ const ArtistManagement: React.FC = () => {
     </div>
   );
 
-  const columns = [
+  const columns: TableColumn<LocalArtist>[] = [
     {
       name: "ID",
-      selector: (row: Artist) => row.id,
+      selector: (row) => row.id,
       sortable: true,
       width: "80px",
     },
     {
       name: "Name",
-      selector: (row: Artist) => row.name,
+      selector: (row) => row.name,
       sortable: true,
     },
     {
-      name: "Genre",
-      selector: (row: Artist) => row.genre,
+      name: "Genres",
+      selector: (row) => row.genres.join(", "), // Display genre IDs, you can map them later to actual genre names
       sortable: true,
     },
     {
-      name: "Country",
-      selector: (row: Artist) => row.country,
-      sortable: true,
+      name: "Bio",
+      selector: (row) => row.bio,
+    },
+    {
+      name: "Image",
+      cell: (row) =>
+        row.image ? (
+          <img src={row.image} alt={row.name} width={50} height={50} />
+        ) : (
+          <span>No image</span>
+        ),
     },
     {
       name: "Actions",
-      cell: (row: Artist) => <ActionButtons id={row.id} />,
+      cell: (row) => <ActionButtons id={row.id} />,
+      button: true,
     },
   ];
 
-  const filteredData = data.filter(
-    (artist) =>
-      artist.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      artist.genre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      artist.country.toLowerCase().includes(searchTerm.toLowerCase()),
+  const filteredData = data.filter((artist) =>
+    [artist.name, artist.bio]
+      .join(" ")
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase()),
   );
 
   return (
@@ -134,8 +143,6 @@ const ArtistManagement: React.FC = () => {
           />
         </Card.Body>
       </Card>
-
-      {/* Modal thêm/sửa nghệ sĩ nếu có thể tạo sau */}
     </div>
   );
 };
