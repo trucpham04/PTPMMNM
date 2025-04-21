@@ -85,7 +85,7 @@ export default function AppFooter({ className }: { className?: string }) {
           />
         </Link>
         <div className="space-y-">
-          <Link to={`/track/${currentSong.id}`} className="hover:underline">
+          <Link to={`/song/${currentSong.id}`} className="hover:underline">
             {currentSong.title}
           </Link>
           <Link

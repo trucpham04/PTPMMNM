@@ -82,19 +82,7 @@ export function AppSidebar({
               ))}
           </div>
         ) : user ? (
-          formattedAlbums.length > 0 ? (
-            <NavAlbums albums={formattedAlbums} />
-          ) : sidebarOpen == true ? (
-            <div className="text-muted-foreground flex flex-col items-center justify-center p-6 text-center">
-              <Icon size="xl" className="mb-2">
-                library_music
-              </Icon>
-              <p>No saved albums yet</p>
-              <p className="text-xs">Albums you save will appear here</p>
-            </div>
-          ) : (
-            ""
-          )
+          <NavAlbums albums={formattedAlbums} />
         ) : (
           <div className="text-muted-foreground flex flex-col items-center justify-center p-6 text-center">
             <Icon size="xl" className="mb-2">

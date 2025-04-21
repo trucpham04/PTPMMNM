@@ -7,6 +7,8 @@ from utils.custom_response import custom_response
 from music.models import Song
 from user.models import User
 
+from music.serializers.song_serializer import SongSerializer
+
 class FavoriteSongListCreateView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -27,8 +29,8 @@ class FavoriteSongByUserView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request, user_id):
-        favorites = FavoriteSong.objects.filter(user__id=user_id)
-        serializer = FavoriteSongSerializer(favorites, many=True)
+        favorite_songs = Song.objects.filter(favorited_by__user__id=user_id).distinct()
+        serializer = SongSerializer(favorite_songs, many=True)
         return custom_response(em=f"Fetched favorite songs of user {user_id}", dt=serializer.data)
 
 

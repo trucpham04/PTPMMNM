@@ -56,7 +56,7 @@ class Song(models.Model):
         null=True, blank=True
     )
 
-    duration = models.DurationField()
+    duration = models.BigIntegerField()
     lyrics = models.TextField(null=True, blank=True)
     release_date = models.DateField(null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
