@@ -70,6 +70,7 @@ export interface Album {
   // Optional expanded relation
   artist?: Artist;
   songs?: Song[];
+  songs_count?: number; // Number of songs in the album
 }
 
 // Song Model
@@ -135,4 +136,11 @@ export interface ListeningHistory {
   // Optional expanded relations
   user?: User;
   song?: Song;
+}
+
+export interface FavoriteSong {
+  id: number;
+  user: number; // hoặc: User nếu bạn muốn nested object
+  song: number; // hoặc: Song nếu bạn muốn nested object
+  favorited_at: string; // ISO 8601 datetime string
 }

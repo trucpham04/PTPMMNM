@@ -1,33 +1,44 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import Icon from "@/components/ui/icon";
 import AlbumHeader from "@/components/details/header";
-import { useMusicVideo } from "@/hooks/old/use-music-video";
 import { VideoPlayer } from "@/components/player/video-player";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePlayer } from "@/contexts/playerContext";
 import { useAlbum, useArtist, useSong } from "@/hooks";
+import { get } from "lodash";
 
 export default function TrackPage() {
   const { song_id } = useParams<{ song_id: string }>();
   const songId = parseInt(song_id || "0");
 
-  const { song, loading: songLoading, error: songError } = useSong();
-  const { play, currentSong, isPlaying, togglePlay } = usePlayer();
   const {
-    mvData,
-    loading: mvLoading,
-    error: mvError,
-    downloadMV,
-  } = useMusicVideo(songId);
+    song,
+    loading: songLoading,
+    error: songError,
+    getSongById,
+    downloadMusicVideo,
+  } = useSong();
+
+  const { play, currentSong, isPlaying, togglePlay } = usePlayer();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const songData = await getSongById(songId);
+      if (songData) {
+        getAlbumById(songData.album?.id);
+        getArtistById(songData.artist?.id);
+      }
+    };
+
+    fetchData();
+  }, [songId]);
 
   // Load album and artist data if song is loaded
-  const albumId = song?.album_id ? song.album_id : 0;
-  const artistId = song?.artist_id ? song.artist_id : 0;
-  const { album, loading: albumLoading } = useAlbum();
-  const { artist, loading: artistLoading } = useArtist();
+  const { album, loading: albumLoading, getAlbumById } = useAlbum();
+  const { artist, loading: artistLoading, getArtistById } = useArtist();
 
   // Overall loading state
   const loading = songLoading || (song && (albumLoading || artistLoading));
@@ -44,9 +55,8 @@ export default function TrackPage() {
   };
 
   const handleDownload = () => {
-    if (mvData) {
-      downloadMV(songId);
-    }
+    if (!song?.video_file) return;
+    downloadMusicVideo(song?.video_file, song?.title);
   };
 
   if (loading) {
@@ -201,17 +211,16 @@ export default function TrackPage() {
                     <div>
                       <div className="font-medium">{album.title}</div>
                       <div className="text-muted-foreground text-sm">
-                        By {album.artist?.name} • {album.songs?.length || 0}{" "}
-                        songs
+                        By {album.artist?.name} • {album.songs_count || 0} songs
                       </div>
                     </div>
                   </Link>
 
-                  {artist && artist.genres && artist.genres.length > 0 && (
+                  {song && song.genres && song.genres.length > 0 && (
                     <div className="mt-8">
                       <h2 className="mb-2 text-xl font-semibold">Genres</h2>
                       <div className="flex flex-wrap gap-2">
-                        {artist.genres.map((genre) => (
+                        {song.genres.map((genre) => (
                           <div
                             key={genre.id}
                             className="bg-accent rounded-full px-3 py-1 text-sm"
@@ -227,71 +236,41 @@ export default function TrackPage() {
             </div>
           </TabsContent>
 
-          {song.video_file && (
+          {song.video_file ? (
             <TabsContent value="mv" className="space-y-8">
-              {mvLoading ? (
-                <div className="bg-muted flex aspect-video items-center justify-center rounded-md">
-                  <div className="flex flex-col items-center">
-                    <Icon size="xl" className="animate-spin">
-                      autorenew
-                    </Icon>
-                    <p className="mt-2">Loading music video...</p>
-                  </div>
-                </div>
-              ) : mvError || !mvData ? (
-                <div className="bg-muted flex aspect-video items-center justify-center rounded-md">
-                  <div className="flex flex-col items-center text-center">
-                    <Icon size="xl" className="text-muted-foreground">
-                      error_outline
-                    </Icon>
-                    <p className="mt-2">Could not load music video</p>
-                    <Button
-                      variant="outline"
-                      className="mt-4"
-                      onClick={() => setActiveTab("details")}
-                    >
-                      Back to Track Details
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <VideoPlayer
-                    src={mvData.stream_url}
-                    poster={mvData.thumbnail}
-                    title={`${mvData.artist} - ${mvData.title}`}
-                  />
+              <div className="space-y-4">
+                <VideoPlayer
+                  src={song.video_file}
+                  poster={song.album?.cover_image}
+                  title={`${song.artist?.name} - ${song.title}`}
+                />
 
-                  <div className="flex justify-end">
-                    <Button
-                      variant="outline"
-                      onClick={handleDownload}
-                      className="flex items-center gap-2"
-                    >
-                      <Icon size="sm">download</Icon>
-                      Download MV
-                    </Button>
-                  </div>
-
-                  <div className="mt-8">
-                    <h2 className="mb-4 text-xl font-semibold">
-                      About this Music Video
-                    </h2>
-                    <p className="text-muted-foreground">
-                      Official music video for "{song.title}" by{" "}
-                      {song.artist?.name}. This music video was added to our
-                      platform on {dateAdded} and is available for streaming and
-                      download.
-                    </p>
-                    <p className="text-muted-foreground mt-4">
-                      Last updated by{" "}
-                      <span className="font-medium">trucpham04</span> on
-                      2025-04-04 16:52:22.
-                    </p>
-                  </div>
+                <div className="flex justify-end">
+                  <Button
+                    variant="outline"
+                    onClick={handleDownload}
+                    className="flex items-center gap-2"
+                  >
+                    <Icon size="sm">download</Icon>
+                    Download MV
+                  </Button>
                 </div>
-              )}
+
+                <div className="mt-8">
+                  <h2 className="mb-4 text-xl font-semibold">
+                    About this Music Video
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Official music video for "{song.title}" by{" "}
+                    {song.artist?.name}. This music video was added to our
+                    platform on {dateAdded} and is available for streaming and
+                    download.
+                  </p>
+                </div>
+              </div>
             </TabsContent>
+          ) : (
+            ""
           )}
         </Tabs>
       </div>

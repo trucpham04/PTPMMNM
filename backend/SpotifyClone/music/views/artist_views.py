@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from ..models import Artist, ArtistFollow, Song
 from ..serializers.artist_serializer import ArtistSerializer
+from ..serializers.album_serializer import AlbumSerializer
 from ..serializers.song_serializer import SongSerializer
 from core.views import BaseListCreateView, BaseRetrieveUpdateDestroyView
 from utils.custom_response import custom_response
@@ -98,4 +99,11 @@ class ArtistSongsView(APIView):
         songs = Song.objects.filter(artist=artist)
         serializer = SongSerializer(songs, many=True)
         return custom_response(em=f"Fetched songs by artist {artist.name}", dt=serializer.data)
+class ArtistAlbumsView(APIView):
+    permission_classes = [permissions.AllowAny]
 
+    def get(self, request, artist_id):
+        artist = get_object_or_404(Artist, pk=artist_id)
+        albums = artist.albums.all()
+        serializer = AlbumSerializer(albums, many=True)
+        return custom_response(em=f"Fetched albums by artist {artist.name}", dt=serializer.data)

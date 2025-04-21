@@ -1,4 +1,3 @@
-import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import Icon from "@/components/ui/icon";
@@ -6,15 +5,11 @@ import { DataTable } from "@/components/details/data-table";
 import AlbumHeader from "@/components/details/header";
 import AlbumAction from "@/components/details/action"; // Import the action component
 import { usePlayer } from "@/contexts/playerContext";
-import { useAlbum } from "@/hooks";
+import { useFavorite } from "@/hooks";
 import { useCallback, useEffect } from "react";
 
-export default function AlbumPage() {
-  const { album_id } = useParams<{ album_id: string }>();
-  const albumId = parseInt(album_id || "0");
-
-  const { albumSongs, loading, error, album, getAlbumById, getAlbumSongs } =
-    useAlbum();
+export default function FavoritePage() {
+  const { favorites, getFavoriteSongsByUser, loading, error } = useFavorite();
   const {
     play,
     currentSong,
@@ -25,22 +20,23 @@ export default function AlbumPage() {
   } = usePlayer();
 
   useEffect(() => {
-    // Load album data when component mounts or albumId changes
-    if (albumId > 0) {
-      getAlbumSongs(albumId);
-      getAlbumById(albumId);
-    }
-  }, [albumId, getAlbumSongs, getAlbumById]); // Add dependencies to prevent unnecessary re-fetching
+    const fetchFavorites = async () => {
+      if (favorites.length === 0) {
+        await getFavoriteSongsByUser(1); // Replace with actual user ID
+      }
+    };
 
-  // Memoize handlePlay to avoid recreating this function on every render
+    fetchFavorites();
+  }, []);
+
   const handlePlay = useCallback(() => {
-    if (!albumSongs || albumSongs.length === 0) {
+    if (!favorites || favorites.length === 0) {
       console.warn("No songs available to play");
       return;
     }
 
     // Check if we're already playing from this album
-    const isPlayingThisAlbum = albumSongs.some(
+    const isPlayingThisAlbum = favorites.some(
       (track) => track.id === currentSong?.id,
     );
 
@@ -50,7 +46,7 @@ export default function AlbumPage() {
       togglePlay();
     } else {
       // Make sure the first track has an audio_file property
-      const firstTrack = albumSongs[0];
+      const firstTrack = favorites[0];
       if (!firstTrack.audio_file) {
         console.warn("First track has no audio file:", firstTrack);
         return;
@@ -60,8 +56,8 @@ export default function AlbumPage() {
       play(firstTrack);
 
       // Add remaining songs to queue
-      if (albumSongs.length > 1) {
-        albumSongs
+      if (favorites.length > 1) {
+        favorites
           .slice(1)
           .filter((track) => track.audio_file) // Only add tracks with audio files
           .forEach((track) => {
@@ -69,7 +65,7 @@ export default function AlbumPage() {
           });
       }
     }
-  }, [albumSongs, currentSong, isPlaying, play, addSongToQueue, togglePlay]);
+  }, [favorites, currentSong, isPlaying, play, addSongToQueue, togglePlay]);
 
   if (loading) {
     return (
@@ -101,7 +97,7 @@ export default function AlbumPage() {
     );
   }
 
-  if (error || !albumSongs || !albumSongs) {
+  if (error || !favorites || !favorites) {
     return (
       <div className="container px-[max(2%,16px)] py-8">
         <div className="flex flex-col items-center justify-center py-12">
@@ -115,30 +111,12 @@ export default function AlbumPage() {
     );
   }
 
-  const totalDuration = albumSongs.reduce((acc, track) => {
-    return acc + track.duration; // duration là số giây
-  }, 0);
-
-  const totalTracks = albumSongs.length;
-  const durationMinutes = Math.floor(totalDuration / 60);
-  const durationText = `${totalTracks} ${totalTracks === 1 ? "song" : "songs"}, ${durationMinutes} ${durationMinutes === 1 ? "minute" : "minutes"}`;
-
   const isAlbumPlaying =
-    isPlaying && albumSongs.some((track) => track.id === currentSong?.id);
+    isPlaying && favorites.some((track) => track.id === currentSong?.id);
 
   return (
     <div className="space-y-8">
-      <AlbumHeader
-        cover_url={album?.cover_image}
-        type="Album"
-        title={album?.title}
-        author_name={album?.artist?.name}
-        author_type="artist"
-        author_id={album?.artist_id}
-        subtitle={durationText}
-      />
-
-      <div className="flex items-center gap-4 px-[max(2%,16px)]">
+      <div className="flex items-center gap-4 px-[max(2%,16px)] pt-10">
         <Button
           size="lg"
           className="flex items-center gap-2 rounded-full"
@@ -152,11 +130,11 @@ export default function AlbumPage() {
         </Button>
 
         {/* Add the album action button */}
-        <AlbumAction album={album} />
+        {/* <AlbumAction album={album} /> */}
       </div>
 
       <div className="px-[max(2%,16px)] pb-16">
-        <DataTable data={albumSongs} />
+        <DataTable data={favorites} />
       </div>
     </div>
   );

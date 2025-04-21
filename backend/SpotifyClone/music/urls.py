@@ -5,6 +5,7 @@ from .views import (
     AlbumListCreateView, AlbumDetailView,
     SongListCreateView, SongDetailView, IncreasePlayCountView,
     SongRecommendationListView,
+    ArtistAlbumsView,
     ListeningHistoryListCreateView, ListeningHistoryDetailView,
     SmartSearchSongView, GenreSearchView, GenreGetByIDView,
     AlbumSearchByNameView, AlbumGetByIdView,
@@ -24,6 +25,7 @@ urlpatterns = [
     path('artists/<int:pk>/', ArtistDetailView.as_view(), name='artist-detail'),
     path('artists/<int:artist_id>/follow/', FollowArtistView.as_view(), name='artist-follow'),
     path('artists/<int:artist_id>/songs/', ArtistSongsView.as_view(), name='artist-songs'),
+    path('artists/<int:artist_id>/albums/', ArtistAlbumsView.as_view(), name='artist-albums'),
     path('artists/search-by-name/', ArtistSearchByNameView.as_view(), name='artist-search-by-name'),
     path('artists/<int:pk>/search-by-id/', ArtistSearchByIdView.as_view(), name='artist-search-by-id'),  
 

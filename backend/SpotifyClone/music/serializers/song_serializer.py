@@ -6,13 +6,29 @@ from .album_serializer import AlbumSerializer
 import magic  # Thêm thư viện magic để kiểm tra loại file
 
 class SongSerializer(serializers.ModelSerializer):
-    artist = serializers.PrimaryKeyRelatedField(queryset=Artist.objects.all())  # Cho phép nhập ID của Artist
-    genres = serializers.PrimaryKeyRelatedField(queryset=Genre.objects.all(), many=True)  # Nhận danh sách ID của Genre
-    album = AlbumSerializer(read_only=True)
-    
+    # artist = serializers.PrimaryKeyRelatedField(queryset=Artist.objects.all())  # Cho phép nhập ID của Artist
+    # genres = serializers.PrimaryKeyRelatedField(queryset=Genre.objects.all(), many=True)  # Nhận danh sách ID của Genre
+    album = serializers.SerializerMethodField()
+    artist = ArtistSerializer(read_only=True)
+    genres = serializers.SerializerMethodField()
+
     class Meta:
         model = Song
         fields = '__all__'
+
+    def get_genres(self, obj):
+        return [{"id": genre.id, "name": genre.name} for genre in obj.genres.all()]
+    
+    def get_album(self, obj):
+        album = obj.album
+        if album:
+            return {
+                "id": album.id,
+                "title": album.title,
+                "cover_image": album.cover_image.url if album.cover_image else None,
+            }
+        return None
+
 
     def validate_file(self, value):
         """ Kiểm tra nếu là video/audio thì cho phép """

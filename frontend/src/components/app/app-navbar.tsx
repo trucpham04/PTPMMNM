@@ -262,16 +262,19 @@ function AppNavbar({ className }: { className?: string }) {
               </PopoverTrigger>
               <PopoverContent className="w-40 rounded-sm p-1">
                 <div className="grid gap-1">
-                  <Button
-                    asChild
-                    variant="ghost"
-                    className="cursor-pointer rounded-xs"
-                  >
-                    <Link to="/account" className="justify-start">
-                      Settings
-                    </Link>
-                  </Button>
-
+                  {user.is_staff ? (
+                    <Button
+                      asChild
+                      variant="ghost"
+                      className="cursor-pointer rounded-xs"
+                    >
+                      <Link to="/admin" className="justify-start">
+                        Admin
+                      </Link>
+                    </Button>
+                  ) : (
+                    ""
+                  )}
                   <Separator className="w-full" />
 
                   <Button
