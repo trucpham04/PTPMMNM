@@ -15,6 +15,8 @@ import { AccountForm } from "@/pages/auth/account";
 import AdminPage from "@/pages/admin/adminPage";
 import AdminLayout from "@/components/layouts/admin-layout/admin-layout";
 import ArtistManagement from "@/pages/admin/content/ArtistManagement/ArtistManagement ";
+import SearchPage from "@/pages/search";
+import QueuePage from "@/pages/queue";
 function routes() {
   return (
     <BrowserRouter>
@@ -28,6 +30,8 @@ function routes() {
           <Route path="artist/:artist_id" element={<ArtistPage />} />
           <Route path="song/:song_id" element={<TrackPage />} />
           <Route path="favorites" element={<FavoritePage />} />
+          <Route path="search" element={<SearchPage />} />
+          <Route path="queue" element={<QueuePage />} />
         </Route>
 
         <Route path="/admin" element={<AdminLayout />}>

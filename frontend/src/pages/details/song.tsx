@@ -7,10 +7,12 @@ import AlbumHeader from "@/components/details/header";
 import { VideoPlayer } from "@/components/player/video-player";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePlayer } from "@/contexts/playerContext";
-import { useAlbum, useArtist, useSong } from "@/hooks";
-import { get } from "lodash";
+import { useAlbum, useArtist, useFavorite, useSong } from "@/hooks";
+import { useAuth } from "@/contexts/authContext";
+import { formatTime } from "@/utils/format-time";
 
 export default function TrackPage() {
+  const { user } = useAuth();
   const { song_id } = useParams<{ song_id: string }>();
   const songId = parseInt(song_id || "0");
 
@@ -24,17 +26,30 @@ export default function TrackPage() {
 
   const { play, currentSong, isPlaying, togglePlay } = usePlayer();
 
+  const {
+    isFavorited,
+    getIsSongFavorited,
+    loading: favoriteLoading,
+    addSongToFavorites,
+    removeSongFromFavorites,
+  } = useFavorite();
+
   useEffect(() => {
     const fetchData = async () => {
+      console.log(user);
+
       const songData = await getSongById(songId);
       if (songData) {
         getAlbumById(songData.album?.id);
         getArtistById(songData.artist?.id);
+        if (user?.id) {
+          getIsSongFavorited(user.id, songId);
+        }
       }
     };
 
     fetchData();
-  }, [songId]);
+  }, [songId, user?.id]);
 
   // Load album and artist data if song is loaded
   const { album, loading: albumLoading, getAlbumById } = useAlbum();
@@ -57,6 +72,20 @@ export default function TrackPage() {
   const handleDownload = () => {
     if (!song?.video_file) return;
     downloadMusicVideo(song?.video_file, song?.title);
+  };
+
+  const handleToggleFavorite = async () => {
+    if (!user?.id) {
+      console.warn("User not logged in");
+      return;
+    }
+    if (isFavorited) {
+      removeSongFromFavorites(user.id, songId);
+    } else {
+      addSongToFavorites(user.id, songId);
+    }
+    // Update local state
+    // setIsFavorited(!isFavorited);
   };
 
   if (loading) {
@@ -100,12 +129,6 @@ export default function TrackPage() {
     );
   }
 
-  // const dateAdded = new Date(song.release_date).toLocaleDateString("en-US", {
-  //   year: "numeric",
-  //   month: "long",
-  //   day: "numeric",
-  // });
-
   const dateAdded = song.release_date;
 
   return (
@@ -116,8 +139,7 @@ export default function TrackPage() {
         title={song.title}
         author_name={song.artist?.name}
         author_type="artist"
-        author_id={song.artist_id}
-        subtitle={`Duration: ${song.duration}`}
+        author_id={song.artist?.id}
       />
 
       <div className="flex items-center gap-4 px-[max(2%,16px)]">
@@ -143,6 +165,22 @@ export default function TrackPage() {
             Watch MV
           </Button>
         )}
+
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-12 cursor-pointer rounded-full"
+          onClick={handleToggleFavorite}
+          // disabled={loading}
+        >
+          {isFavorited ? (
+            <Icon size="md" className="fill text-green-500">
+              favorite
+            </Icon>
+          ) : (
+            <Icon size="md">favorite_border</Icon>
+          )}
+        </Button>
       </div>
 
       <div className="px-[max(2%,16px)] pb-16">
@@ -165,7 +203,7 @@ export default function TrackPage() {
                   </div>
                   <div className="flex justify-between border-b py-2">
                     <span className="text-muted-foreground">Duration</span>
-                    <span>{song.duration}</span>
+                    <span>{formatTime(parseInt(song.duration))}</span>
                   </div>
                   {song.album?.title && song.album_id && (
                     <div className="flex justify-between border-b py-2">

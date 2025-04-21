@@ -21,11 +21,11 @@ export function ArtistItem({ artist }: ArtistItemProps) {
         </CardContent>
         <CardFooter className="flex flex-col items-center justify-center p-0 text-center">
           <h3 className="w-full truncate font-semibold">{artist.name}</h3>
-          {(artist.followers?.length && artist.followers?.length != 0) ?? (
+          {/* {(artist.followers?.length && artist.followers?.length != 0) ?? (
             <p className="text-muted-foreground w-full truncate text-sm">
               {artist.followers?.length} followers
             </p>
-          )}
+          )} */}
         </CardFooter>
       </Card>
     </Link>

@@ -15,6 +15,7 @@ export default function AlbumPage() {
 
   const { albumSongs, loading, error, album, getAlbumById, getAlbumSongs } =
     useAlbum();
+
   const {
     play,
     currentSong,
@@ -115,14 +116,6 @@ export default function AlbumPage() {
     );
   }
 
-  const totalDuration = albumSongs.reduce((acc, track) => {
-    return acc + track.duration; // duration là số giây
-  }, 0);
-
-  const totalTracks = albumSongs.length;
-  const durationMinutes = Math.floor(totalDuration / 60);
-  const durationText = `${totalTracks} ${totalTracks === 1 ? "song" : "songs"}, ${durationMinutes} ${durationMinutes === 1 ? "minute" : "minutes"}`;
-
   const isAlbumPlaying =
     isPlaying && albumSongs.some((track) => track.id === currentSong?.id);
 
@@ -135,7 +128,6 @@ export default function AlbumPage() {
         author_name={album?.artist?.name}
         author_type="artist"
         author_id={album?.artist_id}
-        subtitle={durationText}
       />
 
       <div className="flex items-center gap-4 px-[max(2%,16px)]">
