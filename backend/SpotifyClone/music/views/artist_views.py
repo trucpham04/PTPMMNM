@@ -68,6 +68,7 @@ class FollowArtistView(APIView):
             follow.delete()
             return custom_response(em="Unfollowed successfully!")
         return custom_response(ec=1, em="You have not followed this artist!")
+
 class ArtistSearchByIdView(APIView):
     permission_classes = [permissions.AllowAny]
     def post(self, request):
@@ -78,6 +79,7 @@ class ArtistSearchByIdView(APIView):
         artist = get_object_or_404(Artist, id=artist_id)
         serializer = ArtistSerializer(artist)
         return custom_response(em="Fetched artist by ID", dt=serializer.data)
+
 class ArtistSearchByNameView(APIView):
     permission_classes = [permissions.AllowAny]
     def post(self, request):
