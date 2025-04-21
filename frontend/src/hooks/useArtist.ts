@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { artistService } from "../services";
-import { Artist, ArtistFollow } from "../types";
+import { Album, Artist, ArtistFollow, Song } from "../types";
 
 interface CreateArtistRequest {
   name: string;
@@ -23,7 +23,9 @@ export const useArtist = () => {
   const [error, setError] = useState<string | null>(null);
   const [artists, setArtists] = useState<Artist[]>([]);
   const [artist, setArtist] = useState<Artist | null>(null);
-
+  const [artistFollow, setArtistFollow] = useState<ArtistFollow | null>(null);
+  const [artistSongs, setArtistSongs] = useState<Song[]>([]);
+  const [artistAlbums, setArtistAlbums] = useState<Album[]>([]);
   // Get all artists
   const getArtists = useCallback(async () => {
     setLoading(true);
@@ -209,11 +211,59 @@ export const useArtist = () => {
     }
   }, []);
 
+  const getArtistSongs = useCallback(async (artistId: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await artistService.getArtistSongs(artistId);
+      if (response.EC === 0 && response.DT) {
+        setArtistSongs(response.DT);
+        return response.DT;
+      } else {
+        setError(response.EM || "Failed to fetch artist songs");
+        return [];
+      }
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch artist songs";
+      setError(errorMessage);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const getArtistAlbums = useCallback(async (artistId: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await artistService.getArtistAlbums(artistId);
+      if (response.EC === 0 && response.DT) {
+        setArtistAlbums(response.DT);
+        return response.DT;
+      } else {
+        setError(response.EM || "Failed to fetch artist albums");
+        return [];
+      }
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch artist albums";
+      setError(errorMessage);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return {
     loading,
     error,
     artists,
     artist,
+    artistSongs,
+    artistAlbums,
+    getArtistAlbums,
+    artistFollow,
     getArtists,
     createArtist,
     getArtistById,
@@ -221,6 +271,7 @@ export const useArtist = () => {
     deleteArtist,
     followArtist,
     unfollowArtist,
+    getArtistSongs,
   };
 };
 

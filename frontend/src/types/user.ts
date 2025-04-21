@@ -3,14 +3,14 @@ export interface User {
   id: number;
   username: string;
   email: string;
-  password: string;
-  first_name: string;
-  last_name: string;
-  is_active: boolean;
+  // password: string;
+  // first_name: string;
+  // last_name: string;
+  // is_active: boolean;
   is_staff: boolean;
   is_superuser: boolean;
-  date_joined: string; // ISO date string
-  last_login: string | null; // ISO date string
+  // date_joined: string; // ISO date string
+  // last_login: string | null; // ISO date string
 
   // Custom fields
   profile_picture?: string; // URL from Cloudinary
@@ -19,12 +19,12 @@ export interface User {
   country?: string;
 
   // Related fields
-  groups: Group[];
-  user_permissions: Permission[];
+  // groups: Group[];
+  // user_permissions: Permission[];
 
-  // Virtual fields from related models
-  following: UserFollow[];
-  followers: UserFollow[];
+  // // Virtual fields from related models
+  // following: UserFollow[];
+  // followers: UserFollow[];
 }
 
 // Group type (simplified)

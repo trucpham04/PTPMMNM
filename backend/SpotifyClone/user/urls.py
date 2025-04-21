@@ -2,7 +2,7 @@ from django.urls import path, include
 
 from .views import (
     UserListCreateView, UserDetailUpdateDeleteView,
-    FollowUserView, UserFollowersListView, UserFollowingListView,RegisterView,LoginView,UserDetailByIDView
+    FollowUserView, UserFollowersListView, UserFollowingListView,RegisterView,LoginView,UserDetailByIDView, GetCurrentUserView, LogoutView
 )
 
 urlpatterns = [
@@ -11,6 +11,8 @@ urlpatterns = [
 
     #  API lấy thông tin chi tiết user theo ID, cập nhật, xóa
     path('users/<int:pk>/', UserDetailUpdateDeleteView.as_view(), name='user-detail-update-delete'),
+    
+    path('users/me/', GetCurrentUserView.as_view(), name='get-current-user'),
 
     #  API Follow / Unfollow user theo ID
     path('follow/<int:user_id>/', FollowUserView.as_view(), name='follow-user'),
@@ -23,6 +25,8 @@ urlpatterns = [
 
     path("register/", RegisterView.as_view(), name="register"),
     path("login/", LoginView.as_view(), name="login"),
-    path('api/users/<int:user_id>/', UserDetailByIDView.as_view(), name='user-detail-by-id'),
+    path("logout/", LogoutView.as_view(), name="logout"),
+
+    path('users/<int:user_id>/', UserDetailByIDView.as_view(), name='user-detail-by-id'),
 
 ]

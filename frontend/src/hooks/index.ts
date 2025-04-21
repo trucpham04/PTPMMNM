@@ -6,3 +6,5 @@ export { default as useGenre } from "./useGenre";
 export { default as useArtist } from "./useArtist";
 export { default as useAlbum } from "./useAlbum";
 export { default as useSong } from "./useSong";
+export { default as usePlayer } from "./usePlayer";
+export { default as useFavorite } from "./useFavorite";

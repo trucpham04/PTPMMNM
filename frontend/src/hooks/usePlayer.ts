@@ -12,118 +12,131 @@ import {
   previousSong,
   updatePlayCount,
 } from "@/store/slices/playerSlice";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Song } from "@/types/music";
 import { songService } from "@/services";
 
 /**
  * Custom hook for music player functionality
  * Integrates with Redux store and provides methods for controlling playback
- * Added: playUrl for playing a raw mp3 URL directly
  */
 export function usePlayer() {
   const dispatch = useDispatch<AppDispatch>();
-  const playerState = useSelector((state: RootState) => state.player);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { currentSong, isPlaying, queue, volume } = useSelector(
+    (state: RootState) => state.player,
+  );
+  const audioRef = useRef<HTMLAudioElement>(new Audio());
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Initialize audio element
   useEffect(() => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
-      audioRef.current.volume = playerState.volume / 100;
-    }
+    const audio = audioRef.current;
+
+    console.log("Audio element created:", audio);
+
+    const onTimeUpdate = () => setCurrentTime(audio.currentTime);
+    const onLoaded = () => setDuration(audio.duration || 0);
+
+    audio.addEventListener("timeupdate", onTimeUpdate);
+    audio.addEventListener("loadedmetadata", onLoaded);
+
     return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = "";
-      }
+      audio.removeEventListener("timeupdate", onTimeUpdate);
+      audio.removeEventListener("loadedmetadata", onLoaded);
     };
   }, []);
 
-  // Update source when currentSong changes
+  // Volume synchronization
   useEffect(() => {
-    if (audioRef.current && playerState.currentSong) {
-      audioRef.current.src = playerState.currentSong.audio_file;
-      if (playerState.isPlaying) {
-        audioRef.current.play().catch((e) => {
-          console.error("Error playing audio:", e);
-          dispatch(setPlaying(false));
-        });
-      }
-    }
-  }, [playerState.currentSong, dispatch]);
+    audioRef.current.volume = volume / 100;
+  }, [volume]);
 
-  // React to play/pause
-  useEffect(() => {
-    if (!audioRef.current) return;
-    if (playerState.isPlaying) {
-      audioRef.current.play().catch((e) => {
-        console.error("Error playing audio:", e);
-        dispatch(setPlaying(false));
-      });
-    } else {
-      audioRef.current.pause();
-    }
-  }, [playerState.isPlaying, dispatch]);
-
-  // Volume changes
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = playerState.volume / 100;
-    }
-  }, [playerState.volume]);
-
-  // On track end
+  // Handle track changes
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio) return;
-    const handleEnded = () => {
-      if (playerState.currentSong) {
-        songService
-          .incrementPlayCount(playerState.currentSong.id)
-          .then(() => dispatch(updatePlayCount()))
-          .catch((e) => console.error("Error updating play count:", e));
-      }
-      dispatch(nextSong());
-    };
-    audio.addEventListener("ended", handleEnded);
-    return () => {
-      audio.removeEventListener("ended", handleEnded);
-    };
-  }, [playerState.currentSong, dispatch]);
 
-  // Play a Song object
+    if (!currentSong || !currentSong.audio_file) {
+      audio.src = "";
+      return;
+    }
+
+    // Cập nhật src mới
+    audio.src = currentSong.audio_file;
+    audio.currentTime = 0;
+
+    const onTimeUpdate = () => setCurrentTime(audio.currentTime);
+    const onLoaded = () => setDuration(audio.duration || 0);
+
+    audio.addEventListener("timeupdate", onTimeUpdate);
+    audio.addEventListener("loadedmetadata", onLoaded);
+
+    return () => {
+      audio.removeEventListener("timeupdate", onTimeUpdate);
+      audio.removeEventListener("loadedmetadata", onLoaded);
+    };
+  }, [currentSong]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+
+    if (!currentSong || !currentSong.audio_file) return;
+
+    setIsLoading(true);
+
+    if (isPlaying) {
+      setTimeout(() => {
+        audio
+          .play()
+          .then(() => {
+            setIsLoading(false);
+          })
+          .catch((e) => {
+            console.error("Error playing audio:", e);
+            dispatch(setPlaying(false));
+            setIsLoading(false);
+          });
+      }, 100);
+    } else {
+      audio.pause();
+      setIsLoading(false);
+    }
+  }, [isPlaying, currentSong, dispatch]);
+
+  // Playback controls
   const play = useCallback(
     (song: Song) => {
-      dispatch(setCurrentSong(song));
-    },
-    [dispatch],
-  );
+      console.log("Playing song:", song);
 
-  // Play a raw mp3 URL directly
-  const playUrl = useCallback(
-    (url: string) => {
-      if (!audioRef.current) return;
-      // Clear any queued songs
-      dispatch(clearQueue());
-      // Set src and play
-      audioRef.current.src = url;
-      audioRef.current
-        .play()
-        .catch((e) => console.error("Error playing URL:", e));
-      // Update state
+      if (!song || !song.audio_file) {
+        console.warn("Attempted to play a song with no audio file:", song);
+        return;
+      }
+      dispatch(setCurrentSong(song));
       dispatch(setPlaying(true));
-      // Optionally reset currentSong if needed
-      dispatch(setCurrentSong({ id: -1, audio_file: url } as Song));
     },
     [dispatch],
   );
 
   const togglePlay = useCallback(() => dispatch(togglePlayPause()), [dispatch]);
-  const setIsPlaying = useCallback(
-    (playing: boolean) => dispatch(setPlaying(playing)),
+
+  const playUrl = useCallback(
+    (url: string) => {
+      dispatch(clearQueue());
+      const audio = audioRef.current;
+      audio.pause();
+      audio.currentTime = 0;
+      audio.src = url;
+      audio
+        .play()
+        .then(() => dispatch(setPlaying(true)))
+        .catch((e) => console.error("Error playing URL:", e));
+      dispatch(setCurrentSong({ id: -1, audio_file: url } as Song));
+    },
     [dispatch],
   );
+
+  // Queue controls
   const addSongToQueue = useCallback(
     (song: Song) => dispatch(addToQueue(song)),
     [dispatch],
@@ -132,55 +145,63 @@ export function usePlayer() {
     (id: number) => dispatch(removeFromQueue(id)),
     [dispatch],
   );
-  const emptyQueue = useCallback(() => dispatch(clearQueue()), [dispatch]);
+  const clearSongQueue = useCallback(() => dispatch(clearQueue()), [dispatch]);
+
+  // Volume control
   const changeVolume = useCallback(
     (vol: number) => dispatch(setVolume(vol)),
     [dispatch],
   );
+
+  // Skip controls
   const playNextSong = useCallback(() => dispatch(nextSong()), [dispatch]);
   const playPreviousSong = useCallback(
     () => dispatch(previousSong()),
     [dispatch],
   );
 
+  // Seek controls
+  const seekTo = useCallback((time: number) => {
+    const audio = audioRef.current;
+    if (audio.duration) audio.currentTime = time;
+  }, []);
+
+  const seekByPercentage = useCallback((pct: number) => {
+    const audio = audioRef.current;
+    if (audio.duration) audio.currentTime = (pct / 100) * audio.duration;
+  }, []);
+
+  // Expose current playback state
   const getPlaybackInfo = useCallback(() => {
-    if (!audioRef.current) return { currentTime: 0, duration: 0, progress: 0 };
-    const currentTime = audioRef.current.currentTime;
-    const duration = audioRef.current.duration || 0;
+    const audio = audioRef.current;
     return {
-      currentTime,
-      duration,
-      progress: duration ? (currentTime / duration) * 100 : 0,
+      currentTime: audio.currentTime,
+      duration: audio.duration || 0,
+      progress: audio.duration ? (audio.currentTime / audio.duration) * 100 : 0,
     };
   }, []);
 
-  const seekTo = useCallback((time: number) => {
-    if (audioRef.current) audioRef.current.currentTime = time;
-  }, []);
-  const seekByPercentage = useCallback((pct: number) => {
-    if (audioRef.current?.duration)
-      audioRef.current.currentTime = (pct / 100) * audioRef.current.duration;
-  }, []);
-
   return {
-    currentSong: playerState.currentSong,
-    isPlaying: playerState.isPlaying,
-    queue: playerState.queue,
-    volume: playerState.volume,
+    currentSong,
+    isPlaying,
+    isLoading,
+    queue,
+    volume,
     audioRef,
+    currentTime,
+    duration,
     play,
     playUrl,
     togglePlay,
-    setIsPlaying,
     addSongToQueue,
     removeSongFromQueue,
-    emptyQueue,
+    clearSongQueue,
     changeVolume,
     playNextSong,
     playPreviousSong,
-    getPlaybackInfo,
     seekTo,
     seekByPercentage,
+    getPlaybackInfo,
   };
 }
 

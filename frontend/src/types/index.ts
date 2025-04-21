@@ -9,6 +9,7 @@ import type {
   Song,
   SongRecommendation,
   ListeningHistory,
+  FavoriteSong,
 } from "./music";
 
 import type {
@@ -40,4 +41,5 @@ export type {
   PlaylistSong,
   Collection,
   CollectionSong,
+  FavoriteSong,
 };

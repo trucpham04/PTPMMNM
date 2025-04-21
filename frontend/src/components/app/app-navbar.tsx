@@ -254,26 +254,27 @@ function AppNavbar({ className }: { className?: string }) {
             <div className="size-12 cursor-pointer">
               <PopoverTrigger>
                 <Avatar className="size-full cursor-pointer border">
-                  <AvatarImage
-                    src={`http://localhost:3001/avatars/${user.username}.png`}
-                  />
-                  <AvatarFallback>
+                  <AvatarImage src={user.profile_picture} />
+                  <AvatarFallback className="size-12">
                     <Icon size={"lg"}>person</Icon>
                   </AvatarFallback>
                 </Avatar>
               </PopoverTrigger>
               <PopoverContent className="w-40 rounded-sm p-1">
                 <div className="grid gap-1">
-                  <Button
-                    asChild
-                    variant="ghost"
-                    className="cursor-pointer rounded-xs"
-                  >
-                    <Link to="/account" className="justify-start">
-                      Settings
-                    </Link>
-                  </Button>
-
+                  {user.is_staff ? (
+                    <Button
+                      asChild
+                      variant="ghost"
+                      className="cursor-pointer rounded-xs"
+                    >
+                      <Link to="/admin" className="justify-start">
+                        Admin
+                      </Link>
+                    </Button>
+                  ) : (
+                    ""
+                  )}
                   <Separator className="w-full" />
 
                   <Button

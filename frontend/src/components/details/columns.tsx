@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import { ColumnDef } from "@tanstack/react-table";
 import { Song } from "../../types";
+import { formatTime } from "@/utils/format-time";
 
 const columns: ColumnDef<Song>[] = [
   {
@@ -25,7 +26,7 @@ const columns: ColumnDef<Song>[] = [
           <div>
             <Link
               className="hover:underline"
-              to={"/track/" + cell.getContext().row.original.id}
+              to={"/song/" + cell.getContext().row.original.id}
             >
               {cell.getContext().row.original.title}
             </Link>
@@ -67,14 +68,15 @@ const columns: ColumnDef<Song>[] = [
   },
   {
     accessorKey: "release_date",
-    header: "Date added",
+    header: "Release Date",
     cell: ({ row }) => <div>{row.getValue("release_date")}</div>,
   },
   {
     accessorKey: "duration",
     header: () => <Icon size="sm">schedule</Icon>,
     cell: ({ row }) => {
-      <div>{row.getValue("duration")}</div>;
+      const duration = row.getValue("duration");
+      return <div>{formatTime(duration)}</div>;
     },
   },
 ];

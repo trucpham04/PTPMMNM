@@ -1,5 +1,5 @@
 import { apiClient, ApiResponse } from "./apiClient";
-import { Artist, ArtistFollow } from "../types";
+import { Album, Artist, ArtistFollow, Song } from "../types";
 
 interface CreateArtistRequest {
   name: string;
@@ -98,6 +98,20 @@ class ArtistService {
    */
   async unfollowArtist(artistId: number): Promise<ApiResponse<null>> {
     return apiClient.delete<null>(`/artists/${artistId}/follow/`);
+  }
+
+  /**
+   * Get artist songs
+   */
+  async getArtistSongs(artistId: number): Promise<ApiResponse<Song[]>> {
+    return apiClient.get<Song[]>(`/artists/${artistId}/songs/`);
+  }
+
+  /**
+   * Get artist albums
+   */
+  async getArtistAlbums(artistId: number): Promise<ApiResponse<Album[]>> {
+    return apiClient.get<Album[]>(`/artists/${artistId}/albums/`);
   }
 }
 

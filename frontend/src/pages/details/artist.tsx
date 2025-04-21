@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,34 +9,75 @@ import { Album } from "@/types";
 import AlbumHeader from "@/components/details/header";
 import { MediaGrid } from "@/components/media/media-grid";
 import { SectionSkeleton } from "@/components/media/section-skeleton";
-import usePlayer from "@/hooks/usePlayer";
+import { usePlayer } from "@/contexts/playerContext";
 import { useArtist } from "@/hooks";
 
 export default function ArtistPage() {
-  const { artist, loading, error } = useArtist();
+  const {
+    artistAlbums,
+    artistSongs,
+    artist,
+    loading,
+    error,
+    getArtistById,
+    getArtistSongs,
+    getArtistAlbums,
+  } = useArtist();
   const { artist_id } = useParams<{ artist_id: string }>();
-
-  // const [artistAlbums, setArtistAlbums] = useState<Album[]>([]);
-  // const [albumsLoading, setAlbumsLoading] = useState<boolean>(true);
+  const artistId = parseInt(artist_id || "0");
 
   const { play, currentSong, isPlaying, togglePlay, addSongToQueue } =
     usePlayer();
 
-  const handlePlay = () => {
-    if (artist?.songs && artist?.songs.length > 0) {
-      // Play the first track
-      play(artist?.songs[0]);
-
-      // Queue up the rest
-      artist?.songs.slice(1).forEach((track) => {
-        addSongToQueue(track);
-      });
+  useEffect(() => {
+    if (artistId > 0) {
+      getArtistSongs(artistId);
+      getArtistById(artistId);
+      getArtistAlbums(artistId);
     }
-  };
+  }, [artistId, getArtistById, getArtistSongs]);
+
+  const handlePlay = useCallback(() => {
+    if (!artistSongs || artistSongs.length === 0) {
+      console.warn("No songs available to play");
+      return;
+    }
+
+    // Check if we're already playing from this album
+    const isPlayingThisAlbum = artistSongs.some(
+      (track) => track.id === currentSong?.id,
+    );
+
+    console.log("Is playing this album:", isPlayingThisAlbum);
+
+    if (isPlayingThisAlbum) {
+      togglePlay();
+    } else {
+      // Make sure the first track has an audio_file property
+      const firstTrack = artistSongs[0];
+      if (!firstTrack.audio_file) {
+        console.warn("First track has no audio file:", firstTrack);
+        return;
+      }
+
+      // Play the first track
+      play(firstTrack);
+
+      // Add remaining songs to queue
+      if (artistSongs.length > 1) {
+        artistSongs
+          .slice(1)
+          .filter((track) => track.audio_file) // Only add tracks with audio files
+          .forEach((track) => {
+            addSongToQueue(track);
+          });
+      }
+    }
+  }, [artistSongs, currentSong, isPlaying, play, addSongToQueue, togglePlay]);
 
   if (loading) {
     return (
-      <div className="container space-y-8">
+      <div className="space-y-8">
         {/* Skeleton for Header */}
         <div className="bg-muted flex aspect-[4] max-h-80 w-full items-end gap-4 px-[max(2%,16px)] pt-12 pb-[max(2%,16px)]">
           <Skeleton className="aspect-square w-1/5 max-w-64 min-w-32 rounded-full" />
@@ -97,23 +138,18 @@ export default function ArtistPage() {
   const isArtistPlaying =
     isPlaying &&
     currentSong &&
-    artist?.songs.some((t) => t.id === currentSong.id);
+    artistSongs.some((t) => t.id === currentSong.id);
 
   return (
     <div className="container space-y-8">
-      <AlbumHeader
-        cover_url={artist.image}
-        type="Artist"
-        title={artist.name}
-        subtitle={`${artist?.followers.toLocaleString()} followers`}
-      />
+      <AlbumHeader cover_url={artist.image} type="Artist" title={artist.name} />
 
       <div className="flex flex-wrap items-center gap-4 px-[max(2%,16px)]">
         <Button
           size="lg"
           className="flex items-center gap-2 rounded-full"
           onClick={handlePlay}
-          disabled={artist?.songs.length === 0}
+          disabled={artistSongs.length === 0}
         >
           <Icon size="md">{isArtistPlaying ? "pause" : "play_arrow"}</Icon>
           {isArtistPlaying ? "Pause" : "Play"}
@@ -136,12 +172,12 @@ export default function ArtistPage() {
       {/* Albums Section */}
       <div className="px-[max(2%,16px)]">
         <h2 className="mb-4 text-2xl font-semibold">Albums</h2>
-        {albumsLoading ? (
+        {loading ? (
           <MediaGrid>
             {Array(4)
               .fill(0)
               .map((_, i) => (
-                <AlbumSkeleton key={i} />
+                <Skeleton key={i} />
               ))}
           </MediaGrid>
         ) : artistAlbums.length > 0 ? (
@@ -158,8 +194,8 @@ export default function ArtistPage() {
       {/* Popular Tracks Section */}
       <div className="px-[max(2%,16px)] pb-16">
         <h2 className="mb-4 text-2xl font-semibold">Popular Tracks</h2>
-        {artist.songs.length > 0 ? (
-          <DataTable data={artist.songs} />
+        {artistSongs.length > 0 ? (
+          <DataTable data={artistSongs} />
         ) : (
           <div className="text-muted-foreground py-4">No tracks found</div>
         )}

@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useAuth } from "@/hooks"; // Updated to use our custom hook
+import { useAuth } from "@/contexts/authContext"; // Updated to use our custom hook
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
@@ -40,9 +40,6 @@ const formSchema = z
       })
       .refine((val) => /[0-9]/.test(val), {
         message: "Password must contain at least one number.",
-      })
-      .refine((val) => /[!@#$%^&*(),.?":{}|<>]/.test(val), {
-        message: "Password must contain at least one special character.",
       }),
     confirmPassword: z.string(),
     email: z

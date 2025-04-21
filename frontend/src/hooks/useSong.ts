@@ -77,6 +77,39 @@ export const useSong = () => {
     }
   }, []);
 
+  // Download music video
+  const downloadMusicVideo = useCallback(
+    async (url: string, filename: string) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch video: ${response.statusText}`);
+        }
+
+        const blob = await response.blob();
+        const objectUrl = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = objectUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        URL.revokeObjectURL(objectUrl);
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to download music video";
+        setError(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
   // Create song
   const createSong = useCallback(async (songData: CreateSongRequest) => {
     setLoading(true);
@@ -319,6 +352,7 @@ export const useSong = () => {
     error,
     songs,
     song,
+    downloadMusicVideo,
     recommendations,
     listeningHistory,
     getSongs,
