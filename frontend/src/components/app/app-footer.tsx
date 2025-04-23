@@ -68,7 +68,7 @@ export default function AppFooter({ className }: { className?: string }) {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/chat-history", {
+        const res = await fetch("http://localhost:3000/api/chat-history", {
           headers: {
             "Content-Type": "application/json",
             // Authorization: `Bearer ${yourToken}` nếu có auth
@@ -167,7 +167,7 @@ export default function AppFooter({ className }: { className?: string }) {
       }
     }
     try {
-      const res = await fetch("http://localhost:8000/api/chat", {
+      const res = await fetch("http://localhost:3000/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
