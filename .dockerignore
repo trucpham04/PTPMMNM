@@ -1,0 +1,44 @@
+# General
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.sqlite3
+*.log
+.env
+.env.*
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Node (Vite)
+node_modules/
+dist/
+.vite/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Python (Django)
+venv/
+.env/
+*.db
+*.egg-info/
+.eggs/
+Pipfile.lock
+poetry.lock
+
+# OS/Editor files
+.DS_Store
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore

@@ -1,20 +1,53 @@
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Album } from "@/types";
 import Icon from "@/components/ui/icon";
+import { useAuth } from "@/contexts/authContext";
+import { useFavorite } from "@/hooks";
+import { cn } from "@/lib/utils";
 
-export default function AlbumAction() {
+interface AlbumActionProps {
+  album: Album;
+}
+
+export default function AlbumAction({ album }: AlbumActionProps) {
+  const { user } = useAuth();
+
+  const {
+    getIsAlbumFavorited,
+    isAlbumFavorited,
+    addAlbumToFavorites,
+    removeAlbumFromFavorites,
+  } = useFavorite();
+
+  useEffect(() => {
+    if (user && album) {
+      getIsAlbumFavorited(user.id, album.id);
+    }
+  }, [user, album]);
+
+  const handleToggleFavorite = async () => {
+    if (!user || !album) return;
+
+    if (isAlbumFavorited) {
+      await removeAlbumFromFavorites(user.id, album.id);
+    } else {
+      await addAlbumToFavorites(user.id, album.id);
+    }
+  };
+
+  if (!user) return null;
+
   return (
-    <>
-      <div className="m-4 flex items-center gap-4">
-        <Button className="size-15 rounded-full">
-          <Icon size="xl" fill>
-            play_arrow
-          </Icon>
-        </Button>
-
-        <Button className="size-8 rounded-full">
-          <Icon>add</Icon>
-        </Button>
-      </div>
-    </>
+    <Button
+      variant="ghost"
+      size="icon"
+      className="size-12 cursor-pointer rounded-full"
+      onClick={handleToggleFavorite}
+    >
+      <Icon size="md" className={cn({ fill: isAlbumFavorited })}>
+        favorite
+      </Icon>
+    </Button>
   );
 }

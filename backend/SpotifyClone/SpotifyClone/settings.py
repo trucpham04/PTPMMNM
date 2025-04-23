@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'user',
     'music',
     'playlist',
@@ -51,24 +52,29 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'rest_framework.authtoken',
     'chat',
-    'corsheaders'
 ]
 
 # Đặt AUTH_USER_MODEL bên ngoài danh sách INSTALLED_APPS
 AUTH_USER_MODEL = 'user.User'
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-
+    'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",     # React dev server
+    "http://127.0.0.1:3000",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
 ROOT_URLCONF = 'SpotifyClone.urls'
 
 TEMPLATES = [
@@ -104,6 +110,7 @@ DATABASES = {
         'PORT': '3306', # Standard MySQL port inside Docker
     }
 }
+
 
 
 # Password validation
@@ -169,5 +176,27 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
 }
-
-
+""" 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'music': {  # Thay 'myapp' bằng tên ứng dụng của bạn
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+ """

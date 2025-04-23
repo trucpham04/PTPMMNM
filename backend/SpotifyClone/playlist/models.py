@@ -2,6 +2,7 @@ from django.db import models
 from user.models import User
 from music.models import Song
 from music.models import Genre
+from cloudinary.models import CloudinaryField
 
 # Create your models here.
 # Playlist Model
@@ -10,7 +11,7 @@ class Playlist(models.Model):
     description = models.TextField(null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='playlists')
     songs = models.ManyToManyField(Song, through='PlaylistSong', related_name='playlists')
-    cover_image = models.ImageField(upload_to='playlist_covers/', null=True, blank=True)
+    cover_image = CloudinaryField('playlist_covers', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_public = models.BooleanField(default=False)
@@ -59,7 +60,7 @@ class Collection(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     collection_type = models.CharField(max_length=20, choices=COLLECTION_TYPES)
-    cover_image = models.ImageField(upload_to='collection_covers/', null=True, blank=True)
+    cover_image = CloudinaryField('collection_covers', null=True, blank=True)
     songs = models.ManyToManyField(Song, through='CollectionSong', related_name='collections')
     genres = models.ManyToManyField(Genre, related_name='collections', blank=True)
     is_active = models.BooleanField(default=True)

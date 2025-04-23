@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export interface AlbumHeaderPropsInterface {
   cover_url?: string;
@@ -9,7 +9,6 @@ export interface AlbumHeaderPropsInterface {
   author_name?: string;
   author_type?: string;
   author_id?: number;
-  subtitle?: string;
 }
 
 export default function AlbumHeader({
@@ -21,12 +20,11 @@ export default function AlbumHeader({
   author_type,
   author_id,
 }: AlbumHeaderPropsInterface) {
-  const { album_id } = useParams();
   return (
     <div
       className={cn(
         "flex aspect-[4] max-h-80 w-full items-end gap-4 px-[max(2%,16px)] pt-12 pb-[max(2%,16px)]",
-        { "bg-green-500": !backdrop_url },
+        { "bg-zinc-800": !backdrop_url },
       )}
     >
       {cover_url != null ? (
@@ -39,11 +37,9 @@ export default function AlbumHeader({
         <div className=""></div>
       )}
       <div className="space-y-2">
-        <div>{type}</div>
-        <div className="text-7xl font-extrabold">
-          {title} {album_id}
-        </div>
-        <div className="text-lg">
+        <div className="text-xl">{type}</div>
+        <div className="text-7xl font-extrabold">{title}</div>
+        <div className="text-xl">
           {author_type === "artist" ? (
             <Link to={`/artist/${author_id}`} className="hover:underline">
               {author_name}

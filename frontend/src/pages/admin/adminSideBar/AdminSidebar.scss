@@ -1,0 +1,75 @@
+.ps-sidebar-root {
+  height: 100vh !important;
+  background: linear-gradient(180deg, #036927, #2fcf67);
+  color: #c52121;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+
+  &:hover {
+    overflow-y: auto;
+  }
+
+  &::-webkit-scrollbar {
+    width: 0.5rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.6);
+  }
+}
+
+.pro-menu .pro-menu-item {
+  color: #ffffff;
+  padding: 10px 20px;
+  transition: all 0.3s ease;
+  border-left: 3px solid transparent;
+
+  &:hover {
+    background-color: #14833b !important;
+    color: #1ed760 !important;
+  }
+
+  &.active {
+    background-color: #0e6b2f !important;
+    border-left: 3px solid #ffffff;
+  }
+
+  .pro-icon-wrapper {
+    background-color: transparent !important;
+    color: #ffffff !important;
+  }
+}
+
+// Sidebar footer
+.sidebar-footer-container {
+  height: 5rem;
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.1);
+
+  .sidebar-footer-content {
+    width: 100%;
+    font-size: 0.85rem;
+    color: #fff;
+
+    .sidebar-footer-subtitle {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .sidebar-login-name {
+      font-weight: bold;
+      color: #fff;
+    }
+  }
+}

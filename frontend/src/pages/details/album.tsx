@@ -1,252 +1,154 @@
-import AlbumAction from "@/components/details/action";
+import { useParams } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import Icon from "@/components/ui/icon";
 import { DataTable } from "@/components/details/data-table";
 import AlbumHeader from "@/components/details/header";
-
-const album = {
-  id: 1,
-  name: "Chilling?",
-  cover_url: "https://placehold.co/400",
-  authorName: "Truc Pham????",
-  authorID: 1,
-  dateAdded: "2021-10-01",
-  tracks: [
-    {
-      id: 1,
-      title: "My Heart Will Go On",
-      cover_url: "https://placehold.co/400",
-      artistName: "Céline Dion",
-      artistID: 1,
-      albumName: null,
-      albumID: 1,
-      dateAdded: "11/4/2022",
-      duration: "3:21",
-    },
-    {
-      id: 2,
-      title: "Shape of You",
-      cover_url: "https://placehold.co/400",
-      artistName: "Ed Sheeran",
-      artistID: 2,
-      albumName: "Divide",
-      albumID: 2,
-      dateAdded: "12/10/2022",
-      duration: "4:24",
-    },
-    {
-      id: 3,
-      title: "Blinding Lights",
-      cover_url: "https://placehold.co/400",
-      artistName: "The Weeknd",
-      artistID: 3,
-      albumName: "After Hours",
-      albumID: 3,
-      dateAdded: "1/15/2023",
-      duration: "3:20",
-    },
-    {
-      id: 4,
-      title: "Rolling in the Deep",
-      cover_url: "https://placehold.co/400",
-      artistName: "Adele",
-      artistID: 4,
-      albumName: "21",
-      albumID: 4,
-      dateAdded: "2/5/2023",
-      duration: "3:48",
-    },
-    {
-      id: 5,
-      title: "Uptown Funk",
-      artistName: "Mark Ronson ft. Bruno Mars",
-      cover_url: "https://placehold.co/400",
-      artistID: 5,
-      albumName: "Uptown Special",
-      albumID: 5,
-      dateAdded: "3/12/2023",
-      duration: "4:30",
-    },
-    {
-      id: 6,
-      title: "Bohemian Rhapsody",
-      cover_url: "https://placehold.co/400",
-      artistName: "Queen",
-      artistID: 6,
-      albumName: "A Night at the Opera",
-      albumID: 6,
-      dateAdded: "4/2/2023",
-      duration: "5:55",
-    },
-    {
-      id: 7,
-      title: "Hotel California",
-      cover_url: "https://placehold.co/400",
-      artistName: "Eagles",
-      artistID: 7,
-      albumName: "Hotel California",
-      albumID: 7,
-      dateAdded: "5/8/2023",
-      duration: "6:30",
-    },
-    {
-      id: 8,
-      title: "Imagine",
-      cover_url: "https://placehold.co/400",
-      artistName: "John Lennon",
-      artistID: 8,
-      albumName: "Imagine",
-      albumID: 8,
-      dateAdded: "6/14/2023",
-      duration: "3:03",
-    },
-    {
-      id: 9,
-      title: "Billie Jean",
-      cover_url: "https://placehold.co/400",
-      artistName: "Michael Jackson",
-      artistID: 9,
-      albumName: "Thriller",
-      albumID: 9,
-      dateAdded: "7/20/2023",
-      duration: "4:54",
-    },
-    {
-      id: 10,
-      title: "Smells Like Teen Spirit",
-      cover_url: "https://placehold.co/400",
-      artistName: "Nirvana",
-      artistID: 10,
-      albumName: "Nevermind",
-      albumID: 10,
-      dateAdded: "8/1/2023",
-      duration: "5:01",
-    },
-    {
-      id: 11,
-      title: "Wonderwall",
-      cover_url: "https://placehold.co/400",
-      artistName: "Oasis",
-      artistID: 11,
-      albumName: "(What's the Story) Morning Glory?",
-      albumID: 11,
-      dateAdded: "8/15/2023",
-      duration: "4:18",
-    },
-    {
-      id: 12,
-      title: "Hey Jude",
-      cover_url: "https://placehold.co/400",
-      artistName: "The Beatles",
-      artistID: 12,
-      albumName: "Hey Jude",
-      albumID: 12,
-      dateAdded: "9/5/2023",
-      duration: "7:11",
-    },
-    {
-      id: 13,
-      title: "Lose Yourself",
-      cover_url: "https://placehold.co/400",
-      artistName: "Eminem",
-      artistID: 13,
-      albumName: "8 Mile",
-      albumID: 13,
-      dateAdded: "10/2/2023",
-      duration: "5:26",
-    },
-    {
-      id: 14,
-      title: "Sweet Child o' Mine",
-      cover_url: "https://placehold.co/400",
-      artistName: "Guns N' Roses",
-      artistID: 14,
-      albumName: "Appetite for Destruction",
-      albumID: 14,
-      dateAdded: "10/20/2023",
-      duration: "5:56",
-    },
-    {
-      id: 15,
-      title: "Rolling in the Deep (Live)",
-      cover_url: "https://placehold.co/400",
-      artistName: "Adele",
-      artistID: 4,
-      albumName: "Live at the Royal Albert Hall",
-      albumID: 15,
-      dateAdded: "11/3/2023",
-      duration: "4:05",
-    },
-    {
-      id: 16,
-      title: "Stairway to Heaven",
-      cover_url: "https://placehold.co/400",
-      artistName: "Led Zeppelin",
-      artistID: 16,
-      albumName: "Led Zeppelin IV",
-      albumID: 16,
-      dateAdded: "11/15/2023",
-      duration: "8:02",
-    },
-    {
-      id: 17,
-      title: "Poker Face",
-      cover_url: "https://placehold.co/400",
-      artistName: "Lady Gaga",
-      artistID: 17,
-      albumName: "The Fame",
-      albumID: 17,
-      dateAdded: "12/1/2023",
-      duration: "3:57",
-    },
-    {
-      id: 18,
-      title: "I Will Survive",
-      cover_url: "https://placehold.co/400",
-      artistName: "Gloria Gaynor",
-      artistID: 18,
-      albumName: "Love Tracks",
-      albumID: 18,
-      dateAdded: "12/12/2023",
-      duration: "3:15",
-    },
-    {
-      id: 19,
-      title: "Thinking Out Loud",
-      cover_url: "https://placehold.co/400",
-      artistName: "Ed Sheeran",
-      artistID: 2,
-      albumName: "X",
-      albumID: 19,
-      dateAdded: "1/10/2024",
-      duration: "4:41",
-    },
-    {
-      id: 20,
-      title: "Bad Guy",
-      cover_url: "https://placehold.co/400",
-      artistName: "Billie Eilish",
-      artistID: 20,
-      albumName: "When We All Fall Asleep, Where Do We Go?",
-      albumID: 20,
-      dateAdded: "1/25/2024",
-      duration: "3:14",
-    },
-  ],
-};
+import AlbumAction from "@/components/details/action"; // Import the action component
+import { usePlayer } from "@/contexts/playerContext";
+import { useAlbum } from "@/hooks";
+import { useCallback, useEffect } from "react";
 
 export default function AlbumPage() {
+  const { album_id } = useParams<{ album_id: string }>();
+  const albumId = parseInt(album_id || "0");
+
+  const { albumSongs, loading, error, album, getAlbumById, getAlbumSongs } =
+    useAlbum();
+
+  const {
+    play,
+    currentSong,
+    isPlaying,
+    isLoading,
+    togglePlay,
+    addSongToQueue,
+  } = usePlayer();
+
+  useEffect(() => {
+    // Load album data when component mounts or albumId changes
+    if (albumId > 0) {
+      getAlbumSongs(albumId);
+      getAlbumById(albumId);
+    }
+  }, [albumId, getAlbumSongs, getAlbumById]); // Add dependencies to prevent unnecessary re-fetching
+
+  // Memoize handlePlay to avoid recreating this function on every render
+  const handlePlay = useCallback(() => {
+    if (!albumSongs || albumSongs.length === 0) {
+      console.warn("No songs available to play");
+      return;
+    }
+
+    // Check if we're already playing from this album
+    const isPlayingThisAlbum = albumSongs.some(
+      (track) => track.id === currentSong?.id,
+    );
+
+    console.log("Is playing this album:", isPlayingThisAlbum);
+
+    if (isPlayingThisAlbum) {
+      togglePlay();
+    } else {
+      // Make sure the first track has an audio_file property
+      const firstTrack = albumSongs[0];
+      if (!firstTrack.audio_file) {
+        console.warn("First track has no audio file:", firstTrack);
+        return;
+      }
+
+      // Play the first track
+      play(firstTrack);
+
+      // Add remaining songs to queue
+      if (albumSongs.length > 1) {
+        albumSongs
+          .slice(1)
+          .filter((track) => track.audio_file) // Only add tracks with audio files
+          .forEach((track) => {
+            addSongToQueue(track);
+          });
+      }
+    }
+  }, [albumSongs, currentSong, isPlaying, play, addSongToQueue, togglePlay]);
+
+  if (loading) {
+    return (
+      <div className="container space-y-8">
+        {/* Skeleton for Header */}
+        <div className="bg-muted flex aspect-[4] max-h-80 w-full items-end gap-4 px-[max(2%,16px)] pt-12 pb-[max(2%,16px)]">
+          <Skeleton className="aspect-square w-1/5 max-w-64 min-w-32 rounded-md" />
+          <div className="w-full space-y-2">
+            <Skeleton className="h-5 w-24" />
+            <Skeleton className="h-16 w-3/4" />
+            <Skeleton className="h-6 w-40" />
+          </div>
+        </div>
+
+        {/* Skeleton for Actions */}
+        <div className="flex items-center gap-4 px-[max(2%,16px)]">
+          <Skeleton className="h-12 w-24 rounded-full" />
+        </div>
+
+        {/* Skeleton for Table */}
+        <div className="px-[max(2%,16px)]">
+          <div className="space-y-4">
+            {[1, 2, 3, 4, 5].map((item) => (
+              <Skeleton key={item} className="h-16 w-full" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !albumSongs || !albumSongs) {
+    return (
+      <div className="container px-[max(2%,16px)] py-8">
+        <div className="flex flex-col items-center justify-center py-12">
+          <Icon size="xl" className="text-muted-foreground mb-4">
+            error_outline
+          </Icon>
+          <h1 className="text-2xl font-semibold">Error loading album</h1>
+          <p className="text-muted-foreground">Please try again later</p>
+        </div>
+      </div>
+    );
+  }
+
+  const isAlbumPlaying =
+    isPlaying && albumSongs.some((track) => track.id === currentSong?.id);
+
   return (
-    <div className="min-h-full">
+    <div className="space-y-8">
       <AlbumHeader
-        cover_url="https://placehold.co/400"
-        author_type="artist"
-        author_id={1}
-        author_name="Truc"
-        title="This is album"
+        cover_url={album?.cover_image}
         type="Album"
+        title={album?.title}
+        author_name={album?.artist?.name}
+        author_type="artist"
+        author_id={album?.artist_id}
       />
-      <div className="px-4">
-        <AlbumAction />
-        <DataTable data={album.tracks} />
+
+      <div className="flex items-center gap-4 px-[max(2%,16px)]">
+        <Button
+          size="lg"
+          className="flex items-center gap-2 rounded-full"
+          onClick={handlePlay}
+          disabled={isLoading}
+        >
+          <Icon size="md">
+            {isLoading ? "sync" : isAlbumPlaying ? "pause" : "play_arrow"}
+          </Icon>
+          {isLoading ? "Loading..." : isAlbumPlaying ? "Pause" : "Play"}
+        </Button>
+
+        {/* Add the album action button */}
+        <AlbumAction album={album} />
+      </div>
+
+      <div className="px-[max(2%,16px)] pb-16">
+        <DataTable data={albumSongs} />
       </div>
     </div>
   );

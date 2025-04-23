@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,7 +18,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@/contexts/auth-context";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useAuth } from "@/contexts/authContext"; // Updated to use our custom hook
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
@@ -40,9 +40,6 @@ const formSchema = z
       })
       .refine((val) => /[0-9]/.test(val), {
         message: "Password must contain at least one number.",
-      })
-      .refine((val) => /[!@#$%^&*(),.?":{}|<>]/.test(val), {
-        message: "Password must contain at least one special character.",
       }),
     confirmPassword: z.string(),
     email: z
@@ -56,9 +53,8 @@ const formSchema = z
   });
 
 export default function RegisterPage() {
-  const { register } = useAuth();
+  const { register, loading, error } = useAuth(); // Use our custom hook
   const navigate = useNavigate();
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -71,22 +67,21 @@ export default function RegisterPage() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      setIsSubmitting(true);
+    // Extract confirmed password and get registration data
+    const { confirmPassword, ...registrationData } = values;
 
-      const { confirmPassword, ...registrationData } = values;
+    // Use the register method from our hook (already handles loading state)
+    const isSuccess = await register({
+      username: registrationData.username,
+      password: registrationData.password,
+      email: registrationData.email,
+    });
 
-      await register({
-        username: registrationData.username,
-        password: registrationData.password,
-        email: registrationData.email,
-      });
+    // Navigate if successful
+    if (isSuccess) {
       navigate("/login");
-    } catch (error) {
-      console.error("Registration failed:", error);
-    } finally {
-      setIsSubmitting(false);
     }
+    // Error handling is now managed by the hook
   }
 
   return (
@@ -98,6 +93,13 @@ export default function RegisterPage() {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {/* Display error alert if there is an error */}
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -180,8 +182,8 @@ export default function RegisterPage() {
               )}
             />
 
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? (
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? (
                 <>
                   <Icon className="mr-2 h-4 w-4 animate-spin">
                     progress_activity

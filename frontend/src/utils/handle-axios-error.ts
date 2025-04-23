@@ -1,7 +1,10 @@
 // utils/axiosErrorHandler.ts
 import axios from "axios";
 
-export function handleAxiosError(error: unknown): void {
+export function handleAxiosError(error: unknown, message?: String): void {
+  if (message) {
+    console.error(message);
+  }
   if (axios.isAxiosError(error)) {
     console.error("Error message:", error.message);
     if (error.response) {
