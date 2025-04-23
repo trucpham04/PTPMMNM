@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'cloudinary',
     'cloudinary_storage',
     'rest_framework.authtoken',
+    'chat',
+    'corsheaders'
 ]
 
 # Đặt AUTH_USER_MODEL bên ngoài danh sách INSTALLED_APPS
@@ -63,8 +65,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
+    'corsheaders.middleware.CorsMiddleware',
 
+]
+CORS_ALLOW_ALL_ORIGINS = True
 ROOT_URLCONF = 'SpotifyClone.urls'
 
 TEMPLATES = [
@@ -89,16 +93,18 @@ WSGI_APPLICATION = 'SpotifyClone.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'spotifyclone',
-        'USER': 'root',              # Thay bằng username của bạn
-        'PASSWORD': '', # Thay bằng mật khẩu của bạn
-        'HOST': 'localhost',
-        'PORT': '3310',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'db',  # Use the service name in Docker
+        'PORT': '3306', # Standard MySQL port inside Docker
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -163,4 +169,5 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
 }
+
 
