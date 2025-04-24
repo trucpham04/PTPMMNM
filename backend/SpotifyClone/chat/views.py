@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import random
+from music.serializers.song_serializer import SongSerializer
 
 @api_view(['GET'])
 def chat_history(request):
@@ -62,20 +63,11 @@ def chat(request):
         if not songs.exists():
             create_chat_record(f"Nghệ sĩ {artist_name} không có bài hát nào!")
             return Response({"response": f"Nghệ sĩ {artist_name} không có bài hát nào!"})
-        song_list = [{
-            "id": song.id,
-            "title": song.title,
-            "artist": song.artist.name,
-            "album": song.album.title if song.album else None,
-            "audio_file": song.audio_file.url,
-            "video_file": song.video_file.url if song.video_file else None,
-            "duration": str(song.duration),
-            "lyrics": song.lyrics if song.lyrics else None,
-        } for song in songs]
+
         create_chat_record(f"Đang phát các bài hát của {artist_name}!")
         return Response({
             "response": f"Đang phát các bài hát của {artist_name}!",
-            "song": song_list,
+            "song": SongSerializer(songs, many=True).data,
         })
     # What song is currently playing?
     elif message.startswith("bài đang phát là bài gì"):
@@ -124,21 +116,10 @@ def chat(request):
             create_chat_record(f"Không tìm thấy bài hát nào trong album {album_title}!")
             return Response({"response": f"Không tìm thấy bài hát nào trong album {album_title}!"})
         
-        song_list = [{
-            "id": song.id,
-            "title": song.title,
-            "artist": song.artist.name,
-            "album": song.album.title if song.album else None,
-            "audio_file": song.audio_file.url,
-            "video_file": song.video_file.url if song.video_file else None,
-            "duration": str(song.duration),
-            "lyrics": song.lyrics if song.lyrics else None,
-        } for song in songs]
-        
         create_chat_record(f"Đang phát các bài hát trong album {album_title} của {artist_name}!")
         return Response({
             "response": f"Đang phát các bài hát trong album {album_title} của {artist_name}!",
-            "song": song_list,
+            "song": SongSerializer(songs, many=True).data,
         })
 
     # Play specific song by artist
@@ -168,16 +149,7 @@ def chat(request):
         create_chat_record(f"Đang phát: {song.title} - {song.artist.name}")
         return Response({
             "response": f"Đang phát: {song.title} - {song.artist.name}",
-            "song": {
-                "id": song.id,
-                "title": song.title,
-                "artist": song.artist.name,
-                "album": song.album.title if song.album else None,
-                "audio_file": song.audio_file.url,
-                "video_file": song.video_file.url if song.video_file else None,
-                "duration": str(song.duration),
-                "lyrics": song.lyrics if song.lyrics else None,
-            }
+            "song": SongSerializer(song).data,
         })
 
     # Skip to next song

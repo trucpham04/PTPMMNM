@@ -1,14 +1,9 @@
 import { usePlayer } from "@/contexts/playerContext";
 import { formatTime } from "@/utils/format-time";
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 export default function QueuePage() {
   const { queue, currentSong, play, removeSongFromQueue } = usePlayer();
-
-  useEffect(() => {
-    console.log("Queue:", queue);
-  }, [queue]);
 
   return (
     <div className="max-w-2xl space-y-6 p-4">
