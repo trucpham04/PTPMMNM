@@ -24,7 +24,7 @@
     "@radix-ui/react-tabs": "^1.1.3",
     "@radix-ui/react-toast": "^1.2.6",
     "@radix-ui/react-tooltip": "^1.1.8",
-    "@reduxjs/toolkit": "^2.6.1",
+    "@reduxjs/toolkit": "^2.7.0",
     "@tailwindcss/vite": "^4.0.14",
     "@tanstack/react-table": "^8.21.2",
     "axios": "^1.8.4",
@@ -42,7 +42,7 @@
     "react-data-table-component": "^7.7.0",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
-    "react-hook-form": "^7.54.2",
+    "react-hook-form": "^7.56.1",
     "react-icons": "^5.5.0",
     "react-pro-sidebar": "^1.1.0",
     "react-redux": "^9.2.0",
@@ -50,11 +50,12 @@
     "react-spinners": "^0.15.0",
     "react-toastify": "^11.0.5",
     "redux": "^5.0.1",
+    "sass": "^1.87.0",
     "sonner": "^2.0.1",
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.0.14",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.24.2"
+    "zod": "^3.24.3"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.16",

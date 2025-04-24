@@ -1,6 +1,20 @@
 import { cn } from "@/lib/utils";
 import { Slider } from "../ui/slider";
 import Icon from "../ui/icon";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "@/store";
+import {
+  setCurrentSong,
+  togglePlayPause,
+  setPlaying,
+  addToQueue,
+  removeFromQueue,
+  clearQueue,
+  setVolume,
+  nextSong,
+  previousSong,
+  updatePlayCount,
+} from "@/store/slices/playerSlice";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { formatTime } from "@/utils/format-time";
@@ -10,6 +24,7 @@ import { useFavorite } from "@/hooks";
 import { useAuth } from "@/contexts/authContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 export default function AppFooter({ className }: { className?: string }) {
+  const dispatch = useDispatch<AppDispatch>();
   const {
     currentSong,
     isPlaying,
@@ -24,16 +39,23 @@ export default function AppFooter({ className }: { className?: string }) {
   } = usePlayer();
 
   const { user } = useAuth();
-
   const isMobile = useIsMobile();
-
   const {
     isFavorited,
     getIsSongFavorited,
     addSongToFavorites,
     removeSongFromFavorites,
   } = useFavorite();
-
+  const [songIndex, setSongIndex] = useState(0);
+  const [songList, setSongList] = useState<any[]>([currentSong]);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [messages, setMessages] = useState<{ text: string; sender: string }[]>(
+    [],
+  );
+  let tempSongId = 0;
+  let playlistId = 0;
+  let nextSongId = 0;
+  let firstSong = 0;
   useEffect(() => {
     if (currentSong && user) {
       getIsSongFavorited(user?.id, currentSong.id);
@@ -47,92 +69,39 @@ export default function AppFooter({ className }: { className?: string }) {
     if (isFavorited) removeSongFromFavorites(user?.id, currentSong.id);
     else addSongToFavorites(user?.id, currentSong.id);
   };
-
-  const audioRef_ = useRef<HTMLAudioElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying_, setIsPlaying] = useState(false);
-  const [currentTime_, setCurrentTime] = useState(0);
-  const [duration_, setDuration] = useState(0);
-  const [volume_, setVolume] = useState(100);
-  const [songIndex, setSongIndex] = useState(0);
-  const [songList, setSongList] = useState<any[]>([]);
-  const [currentSongId, setCurrentSongId] = useState<number | null>(null);
-  const [songTitle, setSongTitle] = useState("Đang tải...");
-  const [songArtist, setSongArtist] = useState("Artist name");
-  const [chatOpen, setChatOpen] = useState(false);
-  const [messages, setMessages] = useState<{ text: string; sender: string }[]>(
-    [],
-  );
   const [userInput, setUserInput] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/chat-history", {
-          headers: {
-            "Content-Type": "application/json",
-            // Authorization: `Bearer ${yourToken}` nếu có auth
+        const res = await fetch(
+          `http://localhost:8000/api/chat-history?user_id=${user?.id}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
           },
-        });
+        );
         const data = await res.json();
         setMessages(data.chat_history);
       } catch (err) {
         console.error("Lỗi khi lấy lịch sử chat:", err);
       }
     };
-    fetchMessages();
-  }, []);
-  const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-  };
-  const togglePlay_ = () => {
-    if (isPlaying_) {
-      audioRef_.current?.pause();
-      videoRef.current?.pause();
-    } else {
-      audioRef_.current?.play();
-      videoRef.current?.play();
+
+    if (user?.id) {
+      fetchMessages();
     }
-    setIsPlaying(!isPlaying_);
-  };
-  const handleSeek = (value: number[]) => {
-    const newTime = value[0];
-    setCurrentTime(newTime);
-    if (audioRef_.current) audioRef_.current.currentTime = newTime;
-    if (videoRef.current) videoRef.current.currentTime = newTime;
-  };
-  const handleVolumeChange = (value: number[]) => {
-    const newVolume = value[0];
-    setVolume(newVolume);
-    if (audioRef_.current) audioRef_.current.volume = newVolume / 100;
-    if (videoRef.current) videoRef.current.volume = newVolume / 100;
-  };
-  const handleTimeUpdate = () => {
-    if (audioRef_.current) {
-      setCurrentTime(audioRef_.current.currentTime);
-    }
-  };
+  }, [user?.id]);
+
   const toggleChat = () => setChatOpen((prev) => !prev);
   const playSong = useCallback(() => {
-    const currentSong = songList[songIndex];
-    if (!currentSong) return;
-    setCurrentSongId(currentSong.id);
-    setSongTitle(currentSong.title || "Đang tải...");
-    setSongArtist(currentSong.artist || "Artist name");
-    if (audioRef_.current) {
-      audioRef_.current.src = currentSong.audio_file || "";
-      audioRef_.current.load();
-    }
-    if (videoRef.current) {
-      videoRef.current.src = currentSong.video_file || "";
-      videoRef.current.load();
-    }
-    audioRef_.current?.play();
-    videoRef.current?.play();
-    setIsPlaying(true);
-  }, [songList, songIndex]);
+    const song = songList[songIndex];
+    if (!song) return;
+    dispatch(setCurrentSong(song));
+    dispatch(setPlaying(true));
+  }, [songList, songIndex, dispatch]);
 
   useEffect(() => {
     if (songList.length > 0 && songList[songIndex]) {
@@ -140,40 +109,99 @@ export default function AppFooter({ className }: { className?: string }) {
     }
   }, [songList, songIndex, playSong]);
   const handleSendMessage = async () => {
+    if (!user) {
+      setErrorMessage("Bạn cần đăng nhập để gửi tin nhắn!");
+      setUserInput("");
+      return;
+    }
     if (!userInput.trim()) {
       setErrorMessage("Vui lòng nhập tin nhắn!");
       return;
     }
     setErrorMessage("");
     const message = userInput.trim();
-    let tempSongId = currentSongId || 0;
-    if (message === "quay lại bài trước" && songList.length > 0) {
-      const newIndex = songIndex > 0 ? songIndex - 1 : songList.length - 1;
-      if (songIndex < 0) {
-        setSongIndex(0);
-        tempSongId = songList[0].id - 1;
-      } else {
-        setSongIndex(newIndex);
-        tempSongId = songList[newIndex]?.id || tempSongId;
-      }
-    } else if (message === "chuyển bài hát tiếp theo" && songList.length > 0) {
-      const newIndex = (songIndex + 1) % songList.length;
-      if (songIndex + 1 > songList.length - 1) {
-        setSongIndex(0);
-        tempSongId = songList[songList.length - 1].id + 1;
-      } else {
-        setSongIndex(newIndex);
-        tempSongId = songList[newIndex]?.id || tempSongId;
-      }
+    tempSongId = currentSong?.id || 0;
+    console.log("SongTemp:", tempSongId);
+    if (
+      (message === "quay lại bài trước" ||
+        message === "chuyển bài hát tiếp theo") &&
+      songList.length == 1
+    ) {
+      setSongIndex(0);
+      console.log("quay lại bài trước", tempSongId);
     }
+    console.log("SongList:", songList);
+    if (message === "quay lại bài trước" && songList.length > 1) {
+      let artistCount: Record<string, number> = {};
+      songList.forEach((song) => {
+        const artistId = song.artist?.id;
+        if (artistId) {
+          artistCount[artistId] = (artistCount[artistId] || 0) + 1;
+        }
+      });
+      const totalSongs = songList.length;
+      Object.entries(artistCount).forEach(([artistId, count]) => {
+        if (count === totalSongs) {
+          songList.map((msg, index) =>
+            msg.id == tempSongId ? (playlistId = index) : (playlistId = 0),
+          );
+          if (playlistId > 0) {
+            nextSongId = songList[playlistId - 1].id;
+            setSongIndex(playlistId - 1);
+            tempSongId = nextSongId;
+          } else {
+            setSongIndex(0);
+            tempSongId = songList[playlistId].id;
+            firstSong = 1;
+          }
+        }
+      });
+    } else if (message === "chuyển bài hát tiếp theo" && songList.length > 1) {
+      let artistCount: Record<string, number> = {};
+      songList.forEach((song) => {
+        const artistId = song.artist?.id;
+        if (artistId) {
+          artistCount[artistId] = (artistCount[artistId] || 0) + 1;
+        }
+      });
+      const totalSongs = songList.length;
+      Object.entries(artistCount).forEach(([artistId, count]) => {
+        if (count === totalSongs) {
+          songList.map((msg, index) => {
+            if (msg.id == tempSongId) {
+              playlistId = index;
+              console.log(
+                `Bài hát có ID ${tempSongId} nằm ở vị trí: ${playlistId}`,
+              );
+            }
+          });
+          console.log("play", playlistId);
+          if (playlistId < songList.length - 1) {
+            nextSongId = songList[playlistId + 1].id;
+            console.log(`Bài hát có ID ${nextSongId}`);
+            setSongIndex(playlistId + 1);
+            tempSongId = nextSongId;
+          } else {
+            setSongIndex(0);
+            tempSongId = songList[songList.length - 1].id;
+            firstSong = 1;
+          }
+        }
+      });
+    }
+    console.log("tempSongId ID:", tempSongId);
+    console.log("Song ID:", songIndex);
     try {
-      const res = await fetch("http://localhost:3000/api/chat", {
+      const res = await fetch("http://localhost:8000/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message,
           song_id: tempSongId,
-          isPlaying: isPlaying_,
+          isPlaying: isPlaying,
+          user_id: user?.id,
+          songListLength: songList.length,
+          firstSong: firstSong,
         }),
       });
       const data = await res.json();
@@ -184,13 +212,9 @@ export default function AppFooter({ className }: { className?: string }) {
           { text: data.response, sender: "bot" },
         ]);
         if (data.action === "pause") {
-          audioRef_.current?.pause();
-          videoRef.current?.pause();
-          setIsPlaying(false);
+          dispatch(setPlaying(false));
         } else if (data.action === "resume") {
-          audioRef_.current?.play();
-          videoRef.current?.play();
-          setIsPlaying(true);
+          dispatch(setPlaying(true));
         }
         if (data.song) {
           const newSongList = Array.isArray(data.song)
@@ -200,8 +224,12 @@ export default function AppFooter({ className }: { className?: string }) {
             message == "quay lại bài trước" ||
             message == "chuyển bài hát tiếp theo"
           ) {
-            if (!songList.some((song) => song.id === newSongList[0].id)) {
+            if (songList.length == 1) {
               setSongList(newSongList);
+            } else {
+              if (!songList.some((song) => song.id === newSongList[0].id)) {
+                setSongList(newSongList);
+              }
             }
           } else {
             setSongList(newSongList);
@@ -212,97 +240,10 @@ export default function AppFooter({ className }: { className?: string }) {
       console.error("Fetch error:", error);
     }
     setUserInput("");
+    firstSong = 0;
   };
   return (
     <>
-      <audio
-        ref={audioRef_}
-        onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={() => {
-          if (audioRef_.current) setDuration(audioRef_.current.duration);
-        }}
-        onEnded={() => {
-          setIsPlaying(false);
-          // Auto play next song when current song ends
-          if (songList.length > 0) {
-            const newIndex = (songIndex + 1) % songList.length;
-            setSongIndex(newIndex);
-          }
-        }}
-      />
-      <video
-        ref={videoRef}
-        width="200"
-        height="200"
-        style={{ display: "none", marginLeft: "45%" }}
-      />
-      {/* Music Player Section */}
-
-      <div
-        className={cn(
-          "bg--100 relative flex h-16 items-center justify-between p-2 pt-1",
-          className,
-        )}
-      >
-        <div className="flex items-center gap-3">
-          <div className="size-14 rounded-md bg-white"></div>
-          <div className="space-y-1">
-            <div>{songTitle}</div>
-            <div className="text-xs">{songArtist}</div>
-          </div>
-        </div>
-
-        <div className="absolute top-2/5 left-1/2 flex w-full -translate-x-1/2 flex-col items-center justify-center">
-          <div className="flex gap-4">
-            <Icon
-              size="xl"
-              onClick={() => {
-                let newIndex = songIndex - 1;
-                if (newIndex < 0) newIndex = songList.length - 1;
-                setSongIndex(newIndex);
-              }}
-              className="cursor-pointer"
-            >
-              skip_previous
-            </Icon>
-            <Icon size="xl" onClick={togglePlay_} className="cursor-pointer">
-              {isPlaying_ ? "pause" : "play_arrow"}
-            </Icon>
-            <Icon
-              size="xl"
-              onClick={() => {
-                let newIndex = songIndex + 1;
-                if (newIndex >= songList.length) newIndex = 0;
-                setSongIndex(newIndex);
-              }}
-              className="cursor-pointer"
-            >
-              skip_next
-            </Icon>
-          </div>
-          <div className="flex items-center gap-2 text-xs">
-            <div>{formatTime(currentTime_)}</div>
-            <Slider
-              className="w-1/4 min-w-80"
-              value={[currentTime_]}
-              max={duration_}
-              onValueChange={handleSeek}
-            />
-            <div>{formatTime(duration_)}</div>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <Icon size="lg" className="text-muted-foreground/50">
-            volume_up
-          </Icon>
-          <Slider
-            size="small"
-            max={100}
-            value={[volume_]}
-            onValueChange={handleVolumeChange}
-          />
-        </div>
-      </div>
       {/* Chat Section */}
       <button
         onClick={toggleChat}
@@ -368,6 +309,7 @@ export default function AppFooter({ className }: { className?: string }) {
           </div>
         </div>
       )}
+
       {!currentSong ? (
         <div
           className={cn(
