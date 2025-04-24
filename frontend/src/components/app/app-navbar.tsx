@@ -8,60 +8,15 @@ import Icon from "../ui/icon";
 import { useSidebar } from "../ui/sidebar";
 import { useAuth } from "@/contexts/authContext";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { useState, useRef, useEffect } from "react";
-import { Album, Artist } from "@/types";
-import { useAlbum, useArtist } from "@/hooks";
-import { debounce } from "lodash";
-
-type SearchResult = {
-  albums: Album[];
-  artists: Artist[];
-};
+import { useState, useRef } from "react";
 
 function AppNavbar({ className }: { className?: string }) {
   const { openMobile, setOpenMobile } = useSidebar();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<SearchResult>({
-    albums: [],
-    artists: [],
-  });
-  const [showResults, setShowResults] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [searchQuery] = useState("");
   const searchRef = useRef<HTMLDivElement>(null);
-
-  // Close search results on click outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        searchRef.current &&
-        !searchRef.current.contains(event.target as Node)
-      ) {
-        setShowResults(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-
-    if (query) {
-      setShowResults(true);
-      setLoading(true);
-      // debouncedSearch(query);
-    } else {
-      setShowResults(false);
-      setSearchResults({ albums: [], artists: [] });
-    }
-  };
 
   return (
     <div className={cn("fixed h-16 w-dvw p-2", className)}>
@@ -104,120 +59,15 @@ function AppNavbar({ className }: { className?: string }) {
                 placeholder="What do you want to play?"
                 className="h-12 w-md border-0 bg-transparent! pl-0! focus-visible:ring-0"
                 value={searchQuery}
-                onChange={handleSearchChange}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && searchQuery.trim()) {
                     navigate(
                       `/search?q=${encodeURIComponent(searchQuery.trim())}`,
                     );
-                    setShowResults(false);
                   }
                 }}
               />
-              <div className="flex items-center">
-                <Separator orientation="vertical" className="h-3/5!" />
-              </div>
-              <div className="flex size-12 cursor-pointer items-center justify-center rounded-full bg-transparent pr-1 text-white">
-                <NavLink to="/ai-chat">
-                  {({ isActive }) => (
-                    <Icon size={"md"} fill={isActive}>
-                      chat
-                    </Icon>
-                  )}
-                </NavLink>
-              </div>
             </div>
-
-            {/* Search Results Dropdown */}
-            {/* {showResults &&
-              (searchResults.albums.length > 0 ||
-                searchResults.artists.length > 0 ||
-                loading) && (
-                <div className="bg-popover absolute top-full left-0 z-50 mt-2 w-96 rounded-md p-4 shadow-lg">
-                  {loading ? (
-                    <div className="py-3 text-center">
-                      <Icon>hourglass_empty</Icon> Searching...
-                    </div>
-                  ) : (
-                    <>
-                      {searchResults.artists.length > 0 && (
-                        <div className="mb-4">
-                          <h3 className="mb-2 font-semibold">Artists</h3>
-                          <div className="space-y-2">
-                            {searchResults.artists.map((artist) => (
-                              <Link
-                                key={artist.id}
-                                to={`/artist/${artist.id}`}
-                                className="hover:bg-accent flex items-center gap-3 rounded-md p-2"
-                                onClick={() => setShowResults(false)}
-                              >
-                                <div className="size-10 overflow-hidden rounded-full">
-                                  <img
-                                    src={artist.cover_url}
-                                    alt={artist.name}
-                                    className="h-full w-full object-cover"
-                                  />
-                                </div>
-                                <div>
-                                  <div className="font-medium">
-                                    {artist.name}
-                                  </div>
-                                  <div className="text-muted-foreground text-xs">
-                                    Artist
-                                  </div>
-                                </div>
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {searchResults.albums.length > 0 && (
-                        <div className="mb-4">
-                          <h3 className="mb-2 font-semibold">Albums</h3>
-                          <div className="space-y-2">
-                            {searchResults.albums.map((album) => (
-                              <Link
-                                key={album.id}
-                                to={`/album/${album.id}`}
-                                className="hover:bg-accent flex items-center gap-3 rounded-md p-2"
-                                onClick={() => setShowResults(false)}
-                              >
-                                <div className="size-10 overflow-hidden rounded-md">
-                                  <img
-                                    src={album.cover_url}
-                                    alt={album.name}
-                                    className="h-full w-full object-cover"
-                                  />
-                                </div>
-                                <div>
-                                  <div className="font-medium">
-                                    {album.name}
-                                  </div>
-                                  <div className="text-muted-foreground text-xs">
-                                    {album.authorName}
-                                  </div>
-                                </div>
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="border-t pt-2 text-center">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="w-full"
-                          onClick={handleViewAllResults}
-                        >
-                          Show all results
-                        </Button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              )} */}
           </div>
         </div>
 
@@ -235,19 +85,22 @@ function AppNavbar({ className }: { className?: string }) {
               <PopoverContent className="w-40 rounded-sm p-1">
                 <div className="grid gap-1">
                   {user.is_staff ? (
-                    <Button
-                      asChild
-                      variant="ghost"
-                      className="cursor-pointer rounded-xs"
-                    >
-                      <Link to="/admin" className="justify-start">
-                        Admin
-                      </Link>
-                    </Button>
+                    <>
+                      {" "}
+                      <Button
+                        asChild
+                        variant="ghost"
+                        className="cursor-pointer rounded-xs"
+                      >
+                        <Link to="/admin" className="justify-start">
+                          Admin
+                        </Link>
+                      </Button>
+                      <Separator className="w-full" />
+                    </>
                   ) : (
                     ""
                   )}
-                  <Separator className="w-full" />
 
                   <Button
                     variant="ghost"

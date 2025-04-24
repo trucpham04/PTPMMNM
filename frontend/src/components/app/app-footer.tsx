@@ -1,6 +1,3 @@
-import { cn } from "@/lib/utils";
-import { Slider } from "../ui/slider";
-import Icon from "../ui/icon";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import {
@@ -16,19 +13,24 @@ import {
   updatePlayCount,
 } from "@/store/slices/playerSlice";
 import { useState, useRef, useEffect, useCallback } from "react";
+import { cn } from "@/lib/utils";
+import { Slider } from "../ui/slider";
+import Icon from "../ui/icon";
 import { Link } from "react-router-dom";
-import { formatTime } from "@/utils/format-time";
 import { usePlayer } from "@/contexts/playerContext";
 import { Button } from "../ui/button";
 import { useFavorite } from "@/hooks";
 import { useAuth } from "@/contexts/authContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Song } from "@/types";
+
 export default function AppFooter({ className }: { className?: string }) {
   const dispatch = useDispatch<AppDispatch>();
   const {
     currentSong,
     isPlaying,
     volume,
+    play,
     togglePlay,
     playNextSong,
     playPreviousSong,
@@ -36,6 +38,8 @@ export default function AppFooter({ className }: { className?: string }) {
     audioRef,
     currentTime,
     duration,
+    addSongToQueue,
+    clearSongQueue,
   } = usePlayer();
 
   const { user } = useAuth();
@@ -56,6 +60,13 @@ export default function AppFooter({ className }: { className?: string }) {
   let playlistId = 0;
   let nextSongId = 0;
   let firstSong = 0;
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
+
   useEffect(() => {
     if (currentSong && user) {
       getIsSongFavorited(user?.id, currentSong.id);
@@ -71,6 +82,7 @@ export default function AppFooter({ className }: { className?: string }) {
   };
   const [userInput, setUserInput] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
   useEffect(() => {
     const fetchMessages = async () => {
       try {
@@ -118,6 +130,7 @@ export default function AppFooter({ className }: { className?: string }) {
       setErrorMessage("Vui lòng nhập tin nhắn!");
       return;
     }
+
     setErrorMessage("");
     const message = userInput.trim();
     tempSongId = currentSong?.id || 0;
@@ -128,7 +141,6 @@ export default function AppFooter({ className }: { className?: string }) {
       songList.length == 1
     ) {
       setSongIndex(0);
-      console.log("quay lại bài trước", tempSongId);
     }
     console.log("SongList:", songList);
     if (message === "quay lại bài trước" && songList.length > 1) {
@@ -170,9 +182,6 @@ export default function AppFooter({ className }: { className?: string }) {
           songList.map((msg, index) => {
             if (msg.id == tempSongId) {
               playlistId = index;
-              console.log(
-                `Bài hát có ID ${tempSongId} nằm ở vị trí: ${playlistId}`,
-              );
             }
           });
           console.log("play", playlistId);
@@ -204,6 +213,7 @@ export default function AppFooter({ className }: { className?: string }) {
           firstSong: firstSong,
         }),
       });
+
       const data = await res.json();
       setMessages((prev) => [...prev, { text: message, sender: "user" }]);
       if (data.response) {
@@ -211,11 +221,13 @@ export default function AppFooter({ className }: { className?: string }) {
           ...prev,
           { text: data.response, sender: "bot" },
         ]);
+
         if (data.action === "pause") {
           dispatch(setPlaying(false));
         } else if (data.action === "resume") {
           dispatch(setPlaying(true));
         }
+
         if (data.song) {
           const newSongList = Array.isArray(data.song)
             ? data.song
@@ -232,6 +244,8 @@ export default function AppFooter({ className }: { className?: string }) {
               }
             }
           } else {
+            // addSongToQueue(data.song);
+            // play(data.song);
             setSongList(newSongList);
           }
         }
@@ -247,10 +261,11 @@ export default function AppFooter({ className }: { className?: string }) {
       {/* Chat Section */}
       <button
         onClick={toggleChat}
-        className="fixed right-4 bottom-25 rounded-full bg-blue-600 p-2 text-white"
+        className="bg-primary text-primary-foreground fixed right-4 bottom-25 flex size-12 cursor-pointer items-center justify-center rounded-full"
       >
-        💬
+        <Icon>chat</Icon>
       </button>
+
       {chatOpen && (
         <div className="fixed right-4 bottom-24 w-80 overflow-hidden rounded-lg bg-blue-700">
           {/* Chat header */}
@@ -261,11 +276,12 @@ export default function AppFooter({ className }: { className?: string }) {
             </div>
             <button
               onClick={toggleChat}
-              className="text-white hover:text-gray-200"
+              className="cursor-pointer text-white hover:text-gray-200"
             >
               <Icon>close</Icon>
             </button>
           </div>
+
           {/* Chat messages */}
           <div className="flex h-70 flex-col space-y-2 overflow-y-auto bg-gray-50 p-3">
             {Array.isArray(messages) &&
@@ -282,6 +298,7 @@ export default function AppFooter({ className }: { className?: string }) {
                 </div>
               ))}
           </div>
+
           {/* Chat input */}
           <div className="border-t border-gray-300 bg-white p-3">
             <div className="flex items-center gap-2 text-sm">
