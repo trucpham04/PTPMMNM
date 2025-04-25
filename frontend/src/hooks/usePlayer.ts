@@ -177,6 +177,26 @@ export function usePlayer() {
     };
   }, []);
 
+  // Next song on end
+  useEffect(() => {
+    const audio = audioRef.current;
+  
+    const handleEnded = () => {
+      if (queue.length > 0) {
+        dispatch(nextSong());
+      }else{
+        dispatch(setPlaying(false));
+      }
+     
+    };
+  
+    audio.addEventListener("ended", handleEnded);
+  
+    return () => {
+      audio.removeEventListener("ended", handleEnded);
+    };
+  }, [dispatch, currentSong]);
+
   return {
     currentSong,
     isPlaying,

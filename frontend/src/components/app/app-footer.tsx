@@ -107,11 +107,19 @@ export default function AppFooter({ className }: { className?: string }) {
     }
   }, [user?.id]);
 
-  const toggleChat = () => setChatOpen((prev) => !prev);
+  const toggleChat = () => {
+    setChatOpen((prev) => !prev);
+    setErrorMessage("");
+  };
   const playSong = useCallback(() => {
     const song = songList[songIndex];
     if (!song) return;
     dispatch(setCurrentSong(song));
+    songList.forEach((s: Song) => {
+      if (s.id != song.id) {
+        addSongToQueue(s);
+      }
+    });
     dispatch(setPlaying(true));
   }, [songList, songIndex, dispatch]);
 
@@ -208,7 +216,7 @@ export default function AppFooter({ className }: { className?: string }) {
           message,
           song_id: tempSongId,
           isPlaying: isPlaying,
-          user_id: user?.id,
+          user_id: user.id,
           songListLength: songList.length,
           firstSong: firstSong,
         }),
@@ -244,8 +252,6 @@ export default function AppFooter({ className }: { className?: string }) {
               }
             }
           } else {
-            // addSongToQueue(data.song);
-            // play(data.song);
             setSongList(newSongList);
           }
         }

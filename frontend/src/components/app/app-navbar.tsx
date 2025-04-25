@@ -15,7 +15,8 @@ function AppNavbar({ className }: { className?: string }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const [searchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+
   const searchRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -59,6 +60,7 @@ function AppNavbar({ className }: { className?: string }) {
                 placeholder="What do you want to play?"
                 className="h-12 w-md border-0 bg-transparent! pl-0! focus-visible:ring-0"
                 value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && searchQuery.trim()) {
                     navigate(
