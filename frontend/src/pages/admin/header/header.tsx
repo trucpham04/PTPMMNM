@@ -19,11 +19,11 @@ const Header: React.FC<HeaderProps> = ({ setCollapsed, collapsed }) => {
           <FaBars />
         </button>
         <a href="#" className="brand">
-          SB Admin Pro
+          Spotify Admin
         </a>
       </div>
 
-      <form className="header-search d-none d-lg-block">
+      {/* <form className="header-search d-none d-lg-block">
         <div className="search-wrapper">
           <input
             type="search"
@@ -35,23 +35,23 @@ const Header: React.FC<HeaderProps> = ({ setCollapsed, collapsed }) => {
             <IoIosSearch />
           </div>
         </div>
-      </form>
+      </form> */}
 
       <ul className="header-nav">
         <li className="nav-item d-none d-md-block">
-          <a href="#" className="nav-link">
+          {/* <a href="#" className="nav-link">
             Documentation <FaChevronRight />
-          </a>
+          </a> */}
         </li>
         <li className="nav-item">
-          <button className="btn-icon">
+          {/* <button className="btn-icon">
             <FiBell />
-          </button>
+          </button> */}
         </li>
         <li className="nav-item">
-          <button className="btn-icon">
+          {/* <button className="btn-icon">
             <FiMail />
-          </button>
+          </button> */}
         </li>
         <li className="nav-item">
           <button className="avatar-btn">

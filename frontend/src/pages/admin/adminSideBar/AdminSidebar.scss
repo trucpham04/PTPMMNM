@@ -1,7 +1,7 @@
 .ps-sidebar-root {
   height: 100vh !important;
-  background: linear-gradient(180deg, #036927, #2fcf67);
-  color: #c52121;
+  background: linear-gradient(180deg, #00c545, #03ff5b);
+  color: #070000;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
   overflow: hidden;
 
@@ -48,6 +48,9 @@
     color: #ffffff !important;
   }
 }
+.sidebarAdmin span {
+  font-weight: 500;
+}
 
 // Sidebar footer
 .sidebar-footer-container {
@@ -56,7 +59,7 @@
   align-items: center;
   padding: 1rem;
   background-color: rgba(0, 0, 0, 0.1);
-
+  margin-top: 220px;
   .sidebar-footer-content {
     width: 100%;
     font-size: 0.85rem;

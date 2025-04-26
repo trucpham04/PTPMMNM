@@ -6,22 +6,12 @@ import { Card } from "react-bootstrap";
 import { toast } from "react-toastify";
 import "./ArtistManagement.scss";
 import { useArtist } from "../../../../hooks/useArtist";
-import { Artist as ImportedArtist } from "../../../../types/music"; // Rename the imported Artist type
-
-// LocalArtist type definition if necessary
-interface LocalArtist {
-  id: number;
-  name: string;
-  genres: number[]; // Now using number[] for genre IDs
-  image: string;
-  bio: string;
-  slug: string;
-}
+import { Artist, Genre } from "../../../../types/music"; // Dùng trực tiếp Artist
 
 const ArtistManagement = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [data, setData] = useState<LocalArtist[]>([]); // Use LocalArtist type for local state
+  const [data, setData] = useState<Artist[]>([]); // Dùng Artist luôn
 
   const { artists, loading, getArtists } = useArtist();
 
@@ -34,7 +24,7 @@ const ArtistManagement = () => {
 
   useEffect(() => {
     if (!loading && artists) {
-      setData(artists); // Copy the fetched artists into the state
+      setData(artists);
       console.log("Artists data copied into state:", artists);
     }
   }, [artists, loading]);
@@ -54,7 +44,7 @@ const ArtistManagement = () => {
     const artist = data.find((item) => item.id === id);
     if (artist) {
       console.log("Edit Artist:", artist);
-      setShowModal(true); // Show modal for editing
+      setShowModal(true);
     }
   };
 
@@ -69,7 +59,7 @@ const ArtistManagement = () => {
     </div>
   );
 
-  const columns: TableColumn<LocalArtist>[] = [
+  const columns: TableColumn<Artist>[] = [
     {
       name: "ID",
       selector: (row) => row.id,
@@ -83,12 +73,15 @@ const ArtistManagement = () => {
     },
     {
       name: "Genres",
-      selector: (row) => row.genres.join(", "), // Display genre IDs, you can map them later to actual genre names
+      selector: (row) =>
+        row.genres && row.genres.length > 0
+          ? row.genres.map((g) => g.name).join(", ")
+          : "No genres",
       sortable: true,
     },
     {
       name: "Bio",
-      selector: (row) => row.bio,
+      selector: (row) => row.bio || "",
     },
     {
       name: "Image",
@@ -140,6 +133,7 @@ const ArtistManagement = () => {
             pagination
             highlightOnHover
             responsive
+            className="artist-table"
           />
         </Card.Body>
       </Card>

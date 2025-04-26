@@ -19,42 +19,44 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed }) => {
   const navigate = useNavigate();
 
   return (
-    <Sidebar collapsed={collapsed} breakPoint="md">
+    <Sidebar className="sidebarAdmin" collapsed={collapsed} breakPoint="md">
       <Menu>
         <MenuItem
           icon={<FaUserAlt />}
           onClick={() => navigate("/admin/artist")}
         >
-          Artist
+          <span>Artist</span>
         </MenuItem>
         <MenuItem
           icon={<FaCompactDisc />}
           onClick={() => navigate("/admin/album")}
         >
-          Album
+          <span>Album</span>
         </MenuItem>
         <MenuItem
           icon={<FaHeadphones />}
           onClick={() => navigate("/admin/song")}
         >
-          Song
+          <span>Song</span>
         </MenuItem>
         <MenuItem
           icon={<FaListUl />}
           onClick={() => navigate("/admin/playlist")}
         >
-          Playlist
+          <span>Playlist</span>
         </MenuItem>
         <MenuItem icon={<FaTags />} onClick={() => navigate("/admin/genre")}>
-          Genres
+          <span>Genres</span>
         </MenuItem>
         <MenuItem
           icon={<FiSettings />}
           onClick={() => navigate("/admin/settings")}
         >
-          Settings
+          <span>Settings</span>
         </MenuItem>
-        <MenuItem icon={<FiLogOut />}>Log Out</MenuItem>
+        <MenuItem icon={<FiLogOut />}>
+          <span>Log Out</span>
+        </MenuItem>
       </Menu>
 
       <div

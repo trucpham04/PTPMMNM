@@ -24,7 +24,7 @@ function HomePage() {
   const handleSearch = (query: string) => {
     setSearchQuery(query);
   };
-  console.log("artists: ", artists);
+
   return (
     <div className="w-full px-4">
       <AlbumsSection
