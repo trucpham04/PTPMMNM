@@ -14,7 +14,6 @@ import {
 } from "@/store/slices/playerSlice";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Song } from "@/types/music";
-import { songService } from "@/services";
 
 /**
  * Custom hook for music player functionality
@@ -61,7 +60,6 @@ export function usePlayer() {
       return;
     }
 
-    // Cập nhật src mới
     audio.src = currentSong.audio_file;
     audio.currentTime = 0;
 
@@ -106,8 +104,6 @@ export function usePlayer() {
   // Playback controls
   const play = useCallback(
     (song: Song) => {
-      console.log("Playing song:", song);
-
       if (!song || !song.audio_file) {
         console.warn("Attempted to play a song with no audio file:", song);
         return;
@@ -180,6 +176,26 @@ export function usePlayer() {
       progress: audio.duration ? (audio.currentTime / audio.duration) * 100 : 0,
     };
   }, []);
+
+  // Next song on end
+  useEffect(() => {
+    const audio = audioRef.current;
+  
+    const handleEnded = () => {
+      if (queue.length > 0) {
+        dispatch(nextSong());
+      }else{
+        dispatch(setPlaying(false));
+      }
+     
+    };
+  
+    audio.addEventListener("ended", handleEnded);
+  
+    return () => {
+      audio.removeEventListener("ended", handleEnded);
+    };
+  }, [dispatch, currentSong]);
 
   return {
     currentSong,

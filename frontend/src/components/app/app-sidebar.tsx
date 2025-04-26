@@ -1,7 +1,5 @@
 "use client";
 
-import * as React from "react";
-
 import {
   Sidebar,
   SidebarContent,
@@ -15,23 +13,25 @@ import { AppSideBarContext } from "../layouts/default-layout";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/authContext";
 import { Skeleton } from "../ui/skeleton";
-import { useAlbum } from "@/hooks";
+import { useFavoriteContext } from "@/contexts/favoriteContext";
+import { ComponentProps, useContext, useEffect } from "react";
+import { useFavorite } from "@/hooks";
 
 export function AppSidebar({
   className,
   ...props
-}: React.ComponentProps<typeof Sidebar>) {
-  const { sidebarOpen, setSidebarOpen } = React.useContext(AppSideBarContext);
-  const { albums, loading } = useAlbum();
+}: ComponentProps<typeof Sidebar>) {
+  const { sidebarOpen, setSidebarOpen } = useContext(AppSideBarContext);
   const { user } = useAuth();
+  const { getFavoriteAlbumsByUser, loading } = useFavorite();
 
-  // Convert saved albums to the format expected by NavAlbums
-  const formattedAlbums = albums.map((album) => ({
-    title: album.title,
-    url: `/album/${album.id}`,
-    cover_url: album.cover_image,
-    // savedAt: album.,
-  }));
+  const { favoriteAlbums } = useFavoriteContext();
+
+  useEffect(() => {
+    if (user) {
+      getFavoriteAlbumsByUser(user.id);
+    }
+  }, [user]);
 
   return (
     <Sidebar
@@ -82,7 +82,7 @@ export function AppSidebar({
               ))}
           </div>
         ) : user ? (
-          <NavAlbums albums={formattedAlbums} />
+          <NavAlbums albums={favoriteAlbums} />
         ) : (
           <div className="text-muted-foreground flex flex-col items-center justify-center p-6 text-center">
             <Icon size="xl" className="mb-2">

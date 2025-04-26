@@ -34,7 +34,7 @@ const columns: ColumnDef<Song>[] = [
           <div>
             <Link
               className="text-muted-foreground text-xs hover:underline"
-              to={"/artist/" + cell.getContext().row.original.artist_id}
+              to={"/artist/" + cell.getContext().row.original.artist?.id}
             >
               {cell.getContext().row.original.artist?.name}
             </Link>

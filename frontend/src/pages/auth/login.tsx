@@ -73,7 +73,7 @@ export default function LoginPage() {
         {/* Display error alert if there is an error */}
         {error && (
           <Alert variant="destructive" className="mb-4">
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription>Invalid username or password.</AlertDescription>
           </Alert>
         )}
 

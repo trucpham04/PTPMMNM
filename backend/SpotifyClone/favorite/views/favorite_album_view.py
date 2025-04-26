@@ -70,19 +70,45 @@ class FavoriteAlbumListView(APIView):
         serializer = AlbumSerializer(albums, many=True)
 
         return custom_response(em="Fetched favorite albums", dt=serializer.data)
+    
 class FavoriteAlbumByUserView(APIView):
     permission_classes = [permissions.AllowAny]
 
-    def get(self, request):
-        # Nhận user_id từ body
-        user_id = request.data.get("user_id")
-
-        if not user_id:
-            return custom_response(ec=1, em="Missing user_id")
-
-        favorites = FavoriteAlbum.objects.filter(user__id=user_id)
-        serializer = FavoriteAlbumSerializer(favorites, many=True)
+    def get(self, request, user_id):
+        favorite_albums = Album.objects.filter(favorited_by__user__id=user_id).distinct()
+        serializer = AlbumSerializer(favorite_albums, many=True)
         return custom_response(em="Fetched albums favorited by user", dt=serializer.data)
+
+    def post(self, request, user_id):
+        serializer = FavoriteAlbumSerializer(data=request.data, context={'user_id': user_id})
+        if serializer.is_valid():
+            serializer.save()
+            return custom_response(em="Favorite album added", dt=serializer.data)
+        return custom_response(ec=1, em="Validation failed", dt=serializer.errors)
+  
+    def delete(self, request, user_id):
+        album_id = request.data.get("album_id")
+        if not album_id:
+            return custom_response(ec=1, em="Missing album_id in request body")
+
+        try:
+            favorite = FavoriteAlbum.objects.get(user__id=user_id, album__id=album_id)
+            favorite.delete()
+            return custom_response(em="Favorite album removed successfully")
+        except FavoriteAlbum.DoesNotExist:
+            return custom_response(ec=1, em="Favorite album not found")
+
+class IsAlbumFavoritedView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, user_id, album_id):
+        is_favorited = Album.objects.filter(id=album_id, favorited_by__user__id=user_id).exists()
+        return custom_response(
+            ec=0,
+            em="Checked favorite status",
+            dt={"album_id": album_id, "user_id": user_id, "is_favorited": is_favorited}
+        )
+  
 
 class FavoriteAlbumCountView(APIView):
     permission_classes = [permissions.AllowAny]

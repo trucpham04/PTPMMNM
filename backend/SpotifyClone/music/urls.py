@@ -10,7 +10,7 @@ from .views import (
     SmartSearchSongView, GenreSearchView, GenreGetByIDView,
     AlbumSearchByNameView, AlbumGetByIdView,
     ArtistSearchByNameView, ArtistSearchByIdView,
-    AlbumSongsView, ArtistSongsView
+    AlbumSongsView, ArtistSongsView, SongSearchView
 )
 
 urlpatterns = [
@@ -26,21 +26,22 @@ urlpatterns = [
     path('artists/<int:artist_id>/follow/', FollowArtistView.as_view(), name='artist-follow'),
     path('artists/<int:artist_id>/songs/', ArtistSongsView.as_view(), name='artist-songs'),
     path('artists/<int:artist_id>/albums/', ArtistAlbumsView.as_view(), name='artist-albums'),
-    path('artists/search-by-name/', ArtistSearchByNameView.as_view(), name='artist-search-by-name'),
+    path('artists/search/', ArtistSearchByNameView.as_view(), name='artist-search-by-name'),
     path('artists/<int:pk>/search-by-id/', ArtistSearchByIdView.as_view(), name='artist-search-by-id'),  
 
     # Album URLs
     path('albums/', AlbumListCreateView.as_view(), name='album-list-create'),
     path('albums/<int:pk>/', AlbumDetailView.as_view(), name='album-detail'),
     path('albums/<int:pk>/get/', AlbumGetByIdView.as_view(), name='album-get-by-id'), 
-    path('albums/search-by-name/', AlbumSearchByNameView.as_view(), name='album-search-by-name'),
+    path('albums/search/', AlbumSearchByNameView.as_view(), name='album-search-by-name'),
     path('albums/<int:album_id>/songs/', AlbumSongsView.as_view(), name='album-songs'),
 
     # Song URLs
     path('songs/', SongListCreateView.as_view(), name='song-list-create'),
     path('songs/<int:pk>/', SongDetailView.as_view(), name='song-detail'),
     path('songs/<int:song_id>/play/', IncreasePlayCountView.as_view(), name='increase-play-count'),
-    path('songs/search/', SmartSearchSongView.as_view(), name='search-songs'),
+    path('songs/search/', SongSearchView.as_view(), name='search-songs'),
+    path('songs/smart-search/', SmartSearchSongView.as_view(), name='smart-search-songs'),
 
     # Song Recommendation URLs
     path('recommendations/', SongRecommendationListView.as_view(), name='song-recommendations'),

@@ -58,11 +58,12 @@ class AlbumGetByIdView(APIView):
         album = get_object_or_404(Album, pk=pk)
         serializer = AlbumSerializer(album)
         return custom_response(em="Fetched album by ID", dt=serializer.data)
+    
 class AlbumSearchByNameView(APIView):
     permission_classes = [permissions.AllowAny]
 
-    def post(self, request):
-        title = request.data.get("title")
+    def get(self, request):
+        title = request.query_params.get("q").strip()
         if not title:
             return custom_response(ec=1, em="Missing album title")
         

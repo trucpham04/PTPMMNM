@@ -2,14 +2,15 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import Icon from "@/components/ui/icon";
 import { DataTable } from "@/components/details/data-table";
-import AlbumHeader from "@/components/details/header";
-import AlbumAction from "@/components/details/action"; // Import the action component
 import { usePlayer } from "@/contexts/playerContext";
 import { useFavorite } from "@/hooks";
 import { useCallback, useEffect } from "react";
+import { useAuth } from "@/contexts/authContext";
+import { useFavoriteContext } from "@/contexts/favoriteContext";
 
 export default function FavoritePage() {
-  const { favorites, getFavoriteSongsByUser, loading, error } = useFavorite();
+  const { getFavoriteSongsByUser, loading, error } = useFavorite();
+  const { favoriteSongs } = useFavoriteContext();
   const {
     play,
     currentSong,
@@ -19,24 +20,26 @@ export default function FavoritePage() {
     addSongToQueue,
   } = usePlayer();
 
+  const { user } = useAuth();
+
   useEffect(() => {
     const fetchFavorites = async () => {
-      if (favorites.length === 0) {
-        await getFavoriteSongsByUser(1); // Replace with actual user ID
+      if (user?.id) {
+        await getFavoriteSongsByUser(user.id);
       }
     };
 
     fetchFavorites();
-  }, []);
+  }, [user]);
 
   const handlePlay = useCallback(() => {
-    if (!favorites || favorites.length === 0) {
+    if (!favoriteSongs || favoriteSongs.length === 0) {
       console.warn("No songs available to play");
       return;
     }
 
     // Check if we're already playing from this album
-    const isPlayingThisAlbum = favorites.some(
+    const isPlayingThisAlbum = favoriteSongs.some(
       (track) => track.id === currentSong?.id,
     );
 
@@ -46,7 +49,7 @@ export default function FavoritePage() {
       togglePlay();
     } else {
       // Make sure the first track has an audio_file property
-      const firstTrack = favorites[0];
+      const firstTrack = favoriteSongs[0];
       if (!firstTrack.audio_file) {
         console.warn("First track has no audio file:", firstTrack);
         return;
@@ -56,8 +59,8 @@ export default function FavoritePage() {
       play(firstTrack);
 
       // Add remaining songs to queue
-      if (favorites.length > 1) {
-        favorites
+      if (favoriteSongs.length > 1) {
+        favoriteSongs
           .slice(1)
           .filter((track) => track.audio_file) // Only add tracks with audio files
           .forEach((track) => {
@@ -65,7 +68,7 @@ export default function FavoritePage() {
           });
       }
     }
-  }, [favorites, currentSong, isPlaying, play, addSongToQueue, togglePlay]);
+  }, [favoriteSongs, currentSong, isPlaying, play, addSongToQueue, togglePlay]);
 
   if (loading) {
     return (
@@ -97,7 +100,7 @@ export default function FavoritePage() {
     );
   }
 
-  if (error || !favorites || !favorites) {
+  if (error || !favoriteSongs) {
     return (
       <div className="container px-[max(2%,16px)] py-8">
         <div className="flex flex-col items-center justify-center py-12">
@@ -112,7 +115,7 @@ export default function FavoritePage() {
   }
 
   const isAlbumPlaying =
-    isPlaying && favorites.some((track) => track.id === currentSong?.id);
+    isPlaying && favoriteSongs.some((track) => track.id === currentSong?.id);
 
   return (
     <div className="space-y-8">
@@ -128,13 +131,10 @@ export default function FavoritePage() {
           </Icon>
           {isLoading ? "Loading..." : isAlbumPlaying ? "Pause" : "Play"}
         </Button>
-
-        {/* Add the album action button */}
-        {/* <AlbumAction album={album} /> */}
       </div>
 
       <div className="px-[max(2%,16px)] pb-16">
-        <DataTable data={favorites} />
+        <DataTable data={favoriteSongs} />
       </div>
     </div>
   );
