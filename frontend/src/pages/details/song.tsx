@@ -36,8 +36,6 @@ export default function TrackPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log(user);
-
       const songData = await getSongById(songId);
       if (songData) {
         getAlbumById(songData.album?.id);

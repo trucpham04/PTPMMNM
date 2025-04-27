@@ -33,6 +33,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^3.6.0",
+    "file-saver": "^2.0.5",
     "lodash": "^4.17.21",
     "lucide-react": "^0.482.0",
     "material-symbols": "^0.29.2",
@@ -57,6 +58,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.7",
     "@types/lodash": "^4.17.16",
     "@types/node": "^22.13.10",
     "@types/react": "^19.0.10",

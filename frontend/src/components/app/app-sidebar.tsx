@@ -8,14 +8,14 @@ import {
 import NavAlbums from "@/components/app/nav-albums";
 import { Button } from "../ui/button";
 import Icon from "../ui/icon";
-
 import { AppSideBarContext } from "../layouts/default-layout";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/authContext";
 import { Skeleton } from "../ui/skeleton";
 import { useFavoriteContext } from "@/contexts/favoriteContext";
 import { ComponentProps, useContext, useEffect } from "react";
-import { useFavorite } from "@/hooks";
+import { useFavorite, usePlaylist } from "@/hooks";
+import NavPlaylists from "./nav-playlists";
 
 export function AppSidebar({
   className,
@@ -24,12 +24,14 @@ export function AppSidebar({
   const { sidebarOpen, setSidebarOpen } = useContext(AppSideBarContext);
   const { user } = useAuth();
   const { getFavoriteAlbumsByUser, loading } = useFavorite();
+  const { getPlaylistsByUser } = usePlaylist();
 
-  const { favoriteAlbums } = useFavoriteContext();
+  const { favoriteAlbums, userPlaylists } = useFavoriteContext();
 
   useEffect(() => {
     if (user) {
       getFavoriteAlbumsByUser(user.id);
+      getPlaylistsByUser(user.id);
     }
   }, [user]);
 
@@ -82,7 +84,10 @@ export function AppSidebar({
               ))}
           </div>
         ) : user ? (
-          <NavAlbums albums={favoriteAlbums} />
+          <>
+            <NavAlbums albums={favoriteAlbums} />
+            <NavPlaylists playlists={userPlaylists} />
+          </>
         ) : (
           <div className="text-muted-foreground flex flex-col items-center justify-center p-6 text-center">
             <Icon size="xl" className="mb-2">

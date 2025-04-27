@@ -12,23 +12,6 @@ import Icon from "../ui/icon";
 import { Album } from "@/types";
 
 export default function NavAlbums({ albums }: { albums: Album[] }) {
-  // Get current timestamp for display
-  // const currentDate = new Date("2025-04-04T16:38:51Z");
-  // const timeAgo = (savedAt: string) => {
-  //   if (!savedAt) return "Recently added";
-
-  //   const savedDate = new Date(savedAt);
-  //   const diffInDays = Math.floor(
-  //     (currentDate.getTime() - savedDate.getTime()) / (1000 * 60 * 60 * 24),
-  //   );
-
-  //   if (diffInDays === 0) return "Today";
-  //   if (diffInDays === 1) return "Yesterday";
-  //   if (diffInDays < 7) return `${diffInDays} days ago`;
-  //   if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`;
-  //   return `${Math.floor(diffInDays / 30)} months ago`;
-  // };
-
   return (
     <SidebarGroup className="w-full px-1">
       <SidebarMenu>
