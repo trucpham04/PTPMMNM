@@ -9,6 +9,7 @@ export interface AlbumHeaderPropsInterface {
   author_name?: string;
   author_type?: string;
   author_id?: number;
+  description?: string;
 }
 
 export default function AlbumHeader({
@@ -19,6 +20,7 @@ export default function AlbumHeader({
   author_name,
   author_type,
   author_id,
+  description,
 }: AlbumHeaderPropsInterface) {
   return (
     <div
@@ -48,6 +50,7 @@ export default function AlbumHeader({
             <>{author_name}</>
           )}
         </div>
+        <div className="text-muted-foreground">{description}</div>
       </div>
     </div>
   );

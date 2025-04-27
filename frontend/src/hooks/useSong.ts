@@ -1,6 +1,8 @@
 import { useState, useCallback } from "react";
 import { songService } from "../services";
 import { Song, SongRecommendation, ListeningHistory } from "../types";
+import { saveAs } from "file-saver";
+import axios from "axios";
 
 interface CreateSongRequest {
   title: string;
@@ -83,22 +85,11 @@ export const useSong = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch video: ${response.statusText}`);
-        }
+        const response = await axios.get(url, {
+          responseType: "blob",
+        });
 
-        const blob = await response.blob();
-        const objectUrl = URL.createObjectURL(blob);
-
-        const a = document.createElement("a");
-        a.href = objectUrl;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-
-        URL.revokeObjectURL(objectUrl);
+        saveAs(response.data, filename);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to download music video";

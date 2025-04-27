@@ -1,5 +1,5 @@
 import { apiClient, ApiResponse } from "./apiClient";
-import { Playlist, PlaylistSong } from "../types";
+import { Playlist, PlaylistSong, Song } from "../types";
 
 interface CreatePlaylistRequest {
   name: string;
@@ -106,17 +106,15 @@ class PlaylistService {
   /**
    * Get all playlist songs
    */
-  async getPlaylistSongs(): Promise<ApiResponse<PlaylistSong[]>> {
-    return apiClient.get<PlaylistSong[]>("/playlist-songs/");
+  async getPlaylistSongs(): Promise<ApiResponse<Song[]>> {
+    return apiClient.get<Song[]>("/playlist-songs/");
   }
 
   /**
    * Add song to playlist
    */
-  async addSongToPlaylist(
-    data: AddSongRequest,
-  ): Promise<ApiResponse<PlaylistSong>> {
-    return apiClient.post<PlaylistSong>("/playlist-songs/", data);
+  async addSongToPlaylist(data: AddSongRequest): Promise<ApiResponse<Song>> {
+    return apiClient.post<Song>("/playlist-songs/", data);
   }
 
   /**
@@ -124,8 +122,10 @@ class PlaylistService {
    */
   async getPlaylistSongById(
     playlistSongId: number,
-  ): Promise<ApiResponse<PlaylistSong>> {
-    return apiClient.get<PlaylistSong>(`/playlist-songs/${playlistSongId}/`);
+  ): Promise<ApiResponse<PlaylistSong[]>> {
+    return apiClient.get<PlaylistSong[]>(
+      `/playlist-songs/playlist/${playlistSongId}/`,
+    );
   }
 
   /**
@@ -134,11 +134,8 @@ class PlaylistService {
   async updatePlaylistSong(
     playlistSongId: number,
     data: UpdatePlaylistSongRequest,
-  ): Promise<ApiResponse<PlaylistSong>> {
-    return apiClient.put<PlaylistSong>(
-      `/playlist-songs/${playlistSongId}/`,
-      data,
-    );
+  ): Promise<ApiResponse<Song>> {
+    return apiClient.put<Song>(`/playlist-songs/${playlistSongId}/`, data);
   }
 
   /**
@@ -146,6 +143,15 @@ class PlaylistService {
    */
   async deletePlaylistSong(playlistSongId: number): Promise<ApiResponse<null>> {
     return apiClient.delete<null>(`/playlist-songs/${playlistSongId}/`);
+  }
+
+  /**
+   * Get playlist by user
+   */
+  async getPlaylistsByUser(
+    userId: number,
+  ): Promise<ApiResponse<Playlist[] | null>> {
+    return apiClient.get<Playlist[]>(`/playlists/user/${userId}`);
   }
 }
 

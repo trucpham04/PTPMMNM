@@ -9,6 +9,8 @@ class PlaylistSerializer(serializers.ModelSerializer):
     songs = serializers.PrimaryKeyRelatedField(
         queryset=Song.objects.all(),
         many=True,
+        required=False,
+        allow_null=True
     )
     cover_image = serializers.ImageField(required=False, allow_null=True)
 

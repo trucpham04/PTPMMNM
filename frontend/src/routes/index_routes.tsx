@@ -17,6 +17,7 @@ import AdminLayout from "@/components/layouts/admin-layout/admin-layout";
 import ArtistManagement from "@/pages/admin/content/ArtistManagement/ArtistManagement ";
 import SearchPage from "@/pages/search";
 import QueuePage from "@/pages/queue";
+import PlaylistPage from "@/pages/details/playlist";
 function routes() {
   return (
     <BrowserRouter>
@@ -27,6 +28,7 @@ function routes() {
           <Route path="home" element={<Navigate to={"/"} />} />
           <Route path="ai-chat" element={<AIChat />} />
           <Route path="album/:album_id" element={<AlbumPage />} />
+          <Route path="playlist/:playlist_id" element={<PlaylistPage />} />
           <Route path="artist/:artist_id" element={<ArtistPage />} />
           <Route path="song/:song_id" element={<TrackPage />} />
           <Route path="favorites" element={<FavoritePage />} />

@@ -51,7 +51,6 @@ export const useFavorite = () => {
         );
         if (response.EC === 0 && response.DT) {
           setIsFavorited(response.DT.is_favorited);
-          console.log("Is song favorited:", response.DT.is_favorited);
 
           return response.DT.is_favorited;
         } else {

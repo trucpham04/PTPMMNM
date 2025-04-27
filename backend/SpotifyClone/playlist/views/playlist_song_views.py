@@ -53,4 +53,4 @@ class PlaylistSongByPlaylistView(APIView):
             serializer = PlaylistSongSerializer(playlist_songs, many=True)
             return custom_response(dt=serializer.data, em="Songs retrieved successfully for playlist")
         else:
-            return custom_response(ec=1, em="No songs found for this playlist", dt=None)
+            return custom_response(ec=0, em="No songs found for this playlist", dt=None)
