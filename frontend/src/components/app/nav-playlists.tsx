@@ -14,7 +14,7 @@ import { Playlist } from "@/types";
 export default function NavPlaylists({ playlists }: { playlists: Playlist[] }) {
   return (
     <SidebarGroup className="w-full px-1">
-      <SidebarGroupLabel className="mb-2 text-2xl font-semibold">
+      <SidebarGroupLabel className="mb-2 text-2xl font-semibold group-data-[collapsible=icon]:hidden">
         Playlists
       </SidebarGroupLabel>
       <SidebarMenu>

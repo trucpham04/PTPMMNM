@@ -13,9 +13,12 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/authContext";
 import { Skeleton } from "../ui/skeleton";
 import { useFavoriteContext } from "@/contexts/favoriteContext";
-import { ComponentProps, useContext, useEffect } from "react";
+import { ComponentProps, useContext, useEffect, useState } from "react";
 import { useFavorite, usePlaylist } from "@/hooks";
 import NavPlaylists from "./nav-playlists";
+import { Dialog, DialogContent, DialogFooter, DialogTitle } from "../ui/dialog";
+import { Input } from "../ui/input";
+import { Playlist } from "@/types";
 
 export function AppSidebar({
   className,
@@ -24,9 +27,12 @@ export function AppSidebar({
   const { sidebarOpen, setSidebarOpen } = useContext(AppSideBarContext);
   const { user } = useAuth();
   const { getFavoriteAlbumsByUser, loading } = useFavorite();
-  const { getPlaylistsByUser } = usePlaylist();
-
+  const { getPlaylistsByUser, createPlaylist } = usePlaylist();
   const { favoriteAlbums, userPlaylists } = useFavoriteContext();
+
+  const [isNewPlaylistDialogOpen, setIsNewPlaylistDialogOpen] = useState(false);
+  const [newPlaylistName, setNewPlaylistName] = useState("");
+  const [nameError, setNameError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -34,6 +40,55 @@ export function AppSidebar({
       getPlaylistsByUser(user.id);
     }
   }, [user]);
+
+  const handleNewPlaylistNameChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setNewPlaylistName(e.target.value);
+    setNameError(null);
+  };
+
+  const validatePlaylistName = () => {
+    if (!newPlaylistName.trim()) {
+      setNameError("Playlist name cannot be empty");
+      return false;
+    }
+
+    const nameExists = userPlaylists.some(
+      (playlist: Playlist) =>
+        playlist.name.toLowerCase() === newPlaylistName.trim().toLowerCase(),
+    );
+
+    if (nameExists) {
+      setNameError("A playlist with this name already exists");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleCreatePlaylist = () => {
+    if (validatePlaylistName() && user) {
+      createPlaylist({
+        user: user.id,
+        name: newPlaylistName,
+        is_public: false,
+      }).then(() => {
+        getPlaylistsByUser(user.id);
+      });
+
+      setNewPlaylistName("");
+      setIsNewPlaylistDialogOpen(false);
+    }
+  };
+
+  const handleDialogClose = (open: boolean) => {
+    setIsNewPlaylistDialogOpen(open);
+    if (!open) {
+      setNewPlaylistName("");
+      setNameError(null);
+    }
+  };
 
   return (
     <Sidebar
@@ -56,8 +111,9 @@ export function AppSidebar({
         </div>
 
         <Button
-          className="hidden items-center justify-center rounded-full group-data-[collapsible=icon]:flex"
+          className="hidden cursor-pointer items-center justify-center rounded-full group-data-[collapsible=icon]:flex"
           size={"icon"}
+          onClick={() => setIsNewPlaylistDialogOpen(true)}
         >
           <Icon size="lg">add</Icon>
         </Button>
@@ -65,6 +121,7 @@ export function AppSidebar({
         <Button
           className="w-fit cursor-pointer rounded-full pr-4! group-data-[collapsible=icon]:hidden"
           size="sm"
+          onClick={() => setIsNewPlaylistDialogOpen(true)}
         >
           <Icon size="lg">add</Icon>
           <div className="text-md font-semibold">Create</div>
@@ -97,6 +154,38 @@ export function AppSidebar({
           </div>
         )}
       </SidebarContent>
+
+      <Dialog open={isNewPlaylistDialogOpen} onOpenChange={handleDialogClose}>
+        <DialogContent>
+          <DialogTitle className="mb-4 text-xl font-bold">
+            New playlist
+          </DialogTitle>
+          <div className="space-y-2">
+            {/* <Label htmlFor="playlist-name">Playlist name</Label> */}
+            <Input
+              id="playlist-name"
+              placeholder="Your playlist name..."
+              value={newPlaylistName}
+              onChange={handleNewPlaylistNameChange}
+            />
+            {nameError && <p className="text-sm text-red-500">{nameError}</p>}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsNewPlaylistDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCreatePlaylist}
+              disabled={!newPlaylistName.trim()}
+            >
+              Create
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Sidebar>
   );
 }

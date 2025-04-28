@@ -20,8 +20,7 @@ interface UpdatePlaylistRequest {
 
 interface AddSongRequest {
   playlist: number;
-  song: number;
-  position: number;
+  song_id: number;
 }
 
 interface UpdatePlaylistSongRequest {

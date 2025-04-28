@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { playlistService } from "../services";
-import { Playlist, PlaylistSong, Song } from "../types";
+import { Playlist, Song } from "../types";
 import { useFavoriteContext } from "@/contexts/favoriteContext";
 
 interface CreatePlaylistRequest {
@@ -22,8 +22,7 @@ interface UpdatePlaylistRequest {
 
 interface AddSongRequest {
   playlist: number;
-  song: number;
-  position: number;
+  song_id: number;
 }
 
 interface UpdatePlaylistSongRequest {
@@ -367,6 +366,7 @@ export const usePlaylist = () => {
     playlists,
     playlist,
     playlistSongs,
+    setPlaylistSongs,
     playlistSong,
     getPlaylists,
     createPlaylist,

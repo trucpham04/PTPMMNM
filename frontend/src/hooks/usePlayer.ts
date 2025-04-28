@@ -10,10 +10,10 @@ import {
   setVolume,
   nextSong,
   previousSong,
-  updatePlayCount,
 } from "@/store/slices/playerSlice";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Song } from "@/types/music";
+import useSong from "./useSong";
 
 /**
  * Custom hook for music player functionality
@@ -28,6 +28,7 @@ export function usePlayer() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const { incrementPlayCount } = useSong();
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -108,6 +109,7 @@ export function usePlayer() {
         console.warn("Attempted to play a song with no audio file:", song);
         return;
       }
+      incrementPlayCount(song.id);
       dispatch(setCurrentSong(song));
       dispatch(setPlaying(true));
     },
