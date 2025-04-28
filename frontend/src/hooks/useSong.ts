@@ -256,6 +256,29 @@ export const useSong = () => {
     [song],
   );
 
+  // Get top songs
+  const getTopSongs = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await songService.getTopSongs();
+      if (response.EC === 0 && response.DT) {
+        setSongs(response.DT);
+        return response.DT;
+      } else {
+        setError(response.EM || "Failed to fetch top songs");
+        return [];
+      }
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch top songs";
+      setError(errorMessage);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   // Get song recommendations
   const getSongRecommendations = useCallback(async () => {
     setLoading(true);
@@ -347,6 +370,7 @@ export const useSong = () => {
     recommendations,
     listeningHistory,
     getSongs,
+    getTopSongs,
     createSong,
     getSongById,
     updateSong,

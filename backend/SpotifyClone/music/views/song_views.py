@@ -68,7 +68,15 @@ class IncreasePlayCountView(APIView):
         song.save()
         return custom_response(ec=0, em="Play count updated!", dt={"play_count": song.play_count})
 
-
+class TopSongsView(APIView):
+    """
+    API endpoint lấy top 5 bài hát có lượt nghe nhiều nhất
+    """
+    def get(self, request):
+        songs = Song.objects.order_by('-play_count')[:5]
+        serializer = SongSerializer(songs, many=True)
+        return custom_response(ec=0, em="Play count updated!", dt = serializer.data)
+    
 """ 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.CRITICAL)

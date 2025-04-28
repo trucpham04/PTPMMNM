@@ -14,6 +14,7 @@ export default function PlaylistPage() {
 
   const {
     playlistSongs,
+    setPlaylistSongs,
     loading,
     error,
     playlist,
@@ -31,6 +32,7 @@ export default function PlaylistPage() {
   } = usePlayer();
 
   useEffect(() => {
+    setPlaylistSongs([]);
     if (playlistId > 0) {
       getPlaylistSongById(playlistId);
       getPlaylistById(playlistId);
