@@ -7,9 +7,27 @@ import AlbumHeader from "@/components/details/header";
 import { VideoPlayer } from "@/components/player/video-player";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePlayer } from "@/contexts/playerContext";
-import { useAlbum, useArtist, useFavorite, useSong } from "@/hooks";
+import {
+  useAlbum,
+  useArtist,
+  useFavorite,
+  usePlaylist,
+  useSong,
+} from "@/hooks";
 import { useAuth } from "@/contexts/authContext";
 import { formatTime } from "@/utils/format-time";
+import { useFavoriteContext } from "@/contexts/favoriteContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { toast } from "sonner";
+import { Playlist } from "@/types";
 
 export default function TrackPage() {
   const { user } = useAuth();
@@ -24,7 +42,8 @@ export default function TrackPage() {
     downloadMusicVideo,
   } = useSong();
 
-  const { play, currentSong, isPlaying, togglePlay } = usePlayer();
+  const { play, currentSong, isPlaying, togglePlay, addSongToQueue } =
+    usePlayer();
 
   const {
     isFavorited,
@@ -34,10 +53,25 @@ export default function TrackPage() {
     removeSongFromFavorites,
   } = useFavorite();
 
+  const { addSongToPlaylist } = usePlaylist();
+  const { userPlaylists } = useFavoriteContext();
+
+  const [selectedPlaylists, setSelectedPlaylists] = useState<number[]>([]);
+  const [isPlaylistSelectDropdownOpen, setIsPlaylistSelectDropdownOpen] =
+    useState(false);
+
+  const handleAddSongToQueue = () => {
+    if (!song) {
+      console.warn("No song available to add to queue");
+      return;
+    }
+
+    addSongToQueue(song);
+    toast.success(`Added "${song.title}" to queue`);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
-      console.log(user);
-
       const songData = await getSongById(songId);
       if (songData) {
         getAlbumById(songData.album?.id);
@@ -51,14 +85,11 @@ export default function TrackPage() {
     fetchData();
   }, [songId, user?.id]);
 
-  // Load album and artist data if song is loaded
   const { album, loading: albumLoading, getAlbumById } = useAlbum();
   const { artist, loading: artistLoading, getArtistById } = useArtist();
 
-  // Overall loading state
   const loading = songLoading || (song && (albumLoading || artistLoading));
 
-  // Tab state
   const [activeTab, setActiveTab] = useState<string>("details");
 
   const handlePlayToggle = () => {
@@ -84,8 +115,40 @@ export default function TrackPage() {
     } else {
       addSongToFavorites(user.id, songId);
     }
-    // Update local state
-    // setIsFavorited(!isFavorited);
+  };
+
+  const handlePlaylistCheckboxChange = (playlistId: number) => {
+    setSelectedPlaylists((prev) => {
+      if (prev.includes(playlistId)) {
+        return prev.filter((id) => id !== playlistId);
+      } else {
+        return [...prev, playlistId];
+      }
+    });
+  };
+
+  const handleAddToPlaylists = async () => {
+    if (!user?.id || !song) {
+      return;
+    }
+
+    try {
+      for (const playlistId of selectedPlaylists) {
+        await addSongToPlaylist({ playlist: playlistId, song_id: songId });
+      }
+
+      if (selectedPlaylists.length > 0) {
+        toast.success(
+          `Added "${song.title}" to ${selectedPlaylists.length} playlist${selectedPlaylists.length > 1 ? "s" : ""}`,
+        );
+        setSelectedPlaylists([]);
+      }
+    } catch (error) {
+      console.error("Error adding song to playlists:", error);
+      toast.error("Failed to add song to playlists");
+    } finally {
+      setIsPlaylistSelectDropdownOpen(false);
+    }
   };
 
   if (loading) {
@@ -145,7 +208,7 @@ export default function TrackPage() {
       <div className="flex items-center gap-4 px-[max(2%,16px)]">
         <Button
           size="lg"
-          className="flex items-center gap-2 rounded-full"
+          className="flex cursor-pointer items-center gap-2 rounded-full"
           onClick={handlePlayToggle}
         >
           <Icon size="md">
@@ -153,6 +216,84 @@ export default function TrackPage() {
           </Icon>
           {currentSong?.id === song.id && isPlaying ? "Pause" : "Play"}
         </Button>
+
+        <Button
+          size="lg"
+          className="flex cursor-pointer items-center gap-2 rounded-full"
+          onClick={handleAddSongToQueue}
+        >
+          <Icon size="md">add_to_queue</Icon>
+          Add to Queue
+        </Button>
+
+        <DropdownMenu
+          open={isPlaylistSelectDropdownOpen}
+          onOpenChange={setIsPlaylistSelectDropdownOpen}
+        >
+          <DropdownMenuTrigger>
+            <Button
+              variant="outline"
+              size="lg"
+              className="flex items-center gap-2 rounded-full"
+              disabled={!user || userPlaylists.length === 0}
+            >
+              <Icon size="md">playlist_add</Icon>
+              Add to Playlist
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-56">
+            {!user ? (
+              <DropdownMenuItem className="text-muted-foreground">
+                Log in to add to playlists
+              </DropdownMenuItem>
+            ) : userPlaylists.length === 0 ? (
+              <DropdownMenuItem className="text-muted-foreground">
+                No playlists available
+              </DropdownMenuItem>
+            ) : (
+              <>
+                <div className="px-2 py-1.5 text-sm font-semibold">
+                  Select playlists
+                </div>
+                <ScrollArea className="max-h-80">
+                  <div className="space-y-1 p-2">
+                    {userPlaylists.map((playlist: Playlist) => (
+                      <div
+                        key={playlist.id}
+                        className="flex items-center space-x-2"
+                      >
+                        <Checkbox
+                          id={`playlist-${playlist.id}`}
+                          checked={selectedPlaylists.includes(playlist.id)}
+                          onCheckedChange={() =>
+                            handlePlaylistCheckboxChange(playlist.id)
+                          }
+                        />
+                        <label
+                          htmlFor={`playlist-${playlist.id}`}
+                          className="cursor-pointer text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {playlist.name}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+                <DropdownMenuSeparator />
+                <div className="p-2">
+                  <Button
+                    size="sm"
+                    className="w-full"
+                    disabled={selectedPlaylists.length === 0}
+                    onClick={handleAddToPlaylists}
+                  >
+                    Add to Selected ({selectedPlaylists.length})
+                  </Button>
+                </div>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {song.video_file && (
           <Button
@@ -171,7 +312,6 @@ export default function TrackPage() {
           size="icon"
           className="size-12 cursor-pointer rounded-full"
           onClick={handleToggleFavorite}
-          // disabled={loading}
         >
           {isFavorited ? (
             <Icon size="md" className="fill text-green-500">

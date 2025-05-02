@@ -10,7 +10,7 @@ export const FavoriteProvider = ({
 }) => {
   const [favoriteSongs, setFavoriteSongs] = useState([]);
   const [favoriteAlbums, setFavoriteAlbums] = useState([]);
-  const [playlists, setPlaylists] = useState([]);
+  const [userPlaylists, setUserPlaylists] = useState([]);
 
   return (
     <FavoriteContext.Provider
@@ -19,8 +19,8 @@ export const FavoriteProvider = ({
         setFavoriteSongs,
         favoriteAlbums,
         setFavoriteAlbums,
-        playlists,
-        setPlaylists,
+        userPlaylists,
+        setUserPlaylists,
       }}
     >
       {children}

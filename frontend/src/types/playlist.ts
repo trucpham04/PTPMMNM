@@ -1,21 +1,5 @@
-// Import or reference types from other files as needed
-export interface User {
-  id: number;
-  username: string;
-  // Other user fields...
-}
-
-export interface Song {
-  id: number;
-  title: string;
-  // Other song fields...
-}
-
-export interface Genre {
-  id: number;
-  name: string;
-  // Other genre fields...
-}
+import { Genre, Song } from "./music";
+import { User } from "./user";
 
 // Playlist Model
 export interface Playlist {

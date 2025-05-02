@@ -119,6 +119,13 @@ class SongService {
   }
 
   /**
+   * Get top songs
+   */
+  async getTopSongs(): Promise<ApiResponse<Song[]>> {
+    return apiClient.get<Song[]>("/songs/top");
+  }
+
+  /**
    * Increment play count
    */
   async incrementPlayCount(

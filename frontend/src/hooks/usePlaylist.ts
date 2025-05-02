@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { playlistService } from "../services";
-import { Playlist, PlaylistSong } from "../types";
+import { Playlist, Song } from "../types";
+import { useFavoriteContext } from "@/contexts/favoriteContext";
 
 interface CreatePlaylistRequest {
   name: string;
@@ -21,8 +22,7 @@ interface UpdatePlaylistRequest {
 
 interface AddSongRequest {
   playlist: number;
-  song: number;
-  position: number;
+  song_id: number;
 }
 
 interface UpdatePlaylistSongRequest {
@@ -34,8 +34,10 @@ export const usePlaylist = () => {
   const [error, setError] = useState<string | null>(null);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
-  const [playlistSongs, setPlaylistSongs] = useState<PlaylistSong[]>([]);
-  const [playlistSong, setPlaylistSong] = useState<PlaylistSong | null>(null);
+  const [playlistSongs, setPlaylistSongs] = useState<Song[]>([]);
+  const [playlistSong, setPlaylistSong] = useState<Song | null>(null);
+
+  const { setUserPlaylists } = useFavoriteContext();
 
   // Get all playlists
   const getPlaylists = useCallback(async () => {
@@ -240,8 +242,14 @@ export const usePlaylist = () => {
         await playlistService.getPlaylistSongById(playlistSongId);
 
       if (response.EC === 0 && response.DT) {
-        setPlaylistSong(response.DT);
+        let tempSongs: Song[] = [];
+        response.DT.forEach((rs) => {
+          tempSongs.push(rs.song);
+        });
+        setPlaylistSongs(tempSongs);
         return response.DT;
+      } else if (response.EC === 0 && response.DT === null) {
+        return null;
       } else {
         setError(response.EM || "Failed to fetch playlist song");
         return null;
@@ -326,12 +334,39 @@ export const usePlaylist = () => {
     [playlistSong],
   );
 
+  // Get playlists by user
+  const getPlaylistsByUser = useCallback(async (userId: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await playlistService.getPlaylistsByUser(userId);
+      if (response.EC === 0 && response.DT) {
+        setUserPlaylists(response.DT);
+
+        return response.DT;
+      } else {
+        setError(response.EM || "Failed to fetch playlists by user");
+        return [];
+      }
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Failed to fetch playlists by user";
+      setError(errorMessage);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return {
     loading,
     error,
     playlists,
     playlist,
     playlistSongs,
+    setPlaylistSongs,
     playlistSong,
     getPlaylists,
     createPlaylist,
@@ -343,6 +378,7 @@ export const usePlaylist = () => {
     getPlaylistSongById,
     updatePlaylistSong,
     deletePlaylistSong,
+    getPlaylistsByUser,
   };
 };
 
