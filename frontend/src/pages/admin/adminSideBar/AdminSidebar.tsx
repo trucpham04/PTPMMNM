@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import {
@@ -17,44 +17,76 @@ interface AdminSidebarProps {
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed }) => {
   const navigate = useNavigate();
+  const [selectedItem, setSelectedItem] = useState<string>("artist"); // mặc định chọn "artist" luôn
+
+  const handleMenuClick = (item: string) => {
+    console.log("is submit", item);
+    setSelectedItem(item);
+    navigate(`/admin/${item.toLowerCase()}`);
+  };
 
   return (
     <Sidebar className="sidebarAdmin" collapsed={collapsed} breakPoint="md">
       <Menu>
         <MenuItem
           icon={<FaUserAlt />}
-          onClick={() => navigate("/admin/artist")}
+          className={`${selectedItem === "artist" ? "active" : ""}`}
+          onClick={() => handleMenuClick("artist")}
+        >
+          <span>Artist</span>
+        </MenuItem>
+
+        <MenuItem
+          icon={<FaCompactDisc />}
+          className={`${selectedItem === "album" ? "active" : ""}`}
+          onClick={() => handleMenuClick("album")}
+        >
+          <span>Album</span>
+        </MenuItem>
+
+        <MenuItem
+          icon={<FaHeadphones />}
+          className={`${selectedItem === "song" ? "active" : ""}`}
+          onClick={() => handleMenuClick("song")}
+        >
+          <span>Song</span>
+        </MenuItem>
+
+        <MenuItem
+          icon={<FaListUl />}
+          className={`${selectedItem === "playlist" ? "active" : ""}`}
+          onClick={() => handleMenuClick("playlist")}
+        >
+          <span>Playlist</span>
+        </MenuItem>
+
+        <MenuItem
+          icon={<FaTags />}
+          className={`${selectedItem === "genre" ? "active" : ""}`}
+          onClick={() => handleMenuClick("genre")}
+        >
+          <span>Genres</span>
+        </MenuItem>
+        <MenuItem
+          icon={<FaUserAlt />}
+          className={`${selectedItem === "user" ? "active" : ""}`}
+          onClick={() => handleMenuClick("user")}
         >
           <span>Artist</span>
         </MenuItem>
         <MenuItem
-          icon={<FaCompactDisc />}
-          onClick={() => navigate("/admin/album")}
-        >
-          <span>Album</span>
-        </MenuItem>
-        <MenuItem
-          icon={<FaHeadphones />}
-          onClick={() => navigate("/admin/song")}
-        >
-          <span>Song</span>
-        </MenuItem>
-        <MenuItem
-          icon={<FaListUl />}
-          onClick={() => navigate("/admin/playlist")}
-        >
-          <span>Playlist</span>
-        </MenuItem>
-        <MenuItem icon={<FaTags />} onClick={() => navigate("/admin/genre")}>
-          <span>Genres</span>
-        </MenuItem>
-        <MenuItem
           icon={<FiSettings />}
-          onClick={() => navigate("/admin/settings")}
+          className={`${selectedItem === "settings" ? "active" : ""}`}
+          onClick={() => handleMenuClick("settings")}
         >
           <span>Settings</span>
         </MenuItem>
-        <MenuItem icon={<FiLogOut />}>
+
+        <MenuItem
+          icon={<FiLogOut />}
+          className={`${selectedItem === "logout" ? "active" : ""}`}
+          onClick={() => handleMenuClick("logout")}
+        >
           <span>Log Out</span>
         </MenuItem>
       </Menu>

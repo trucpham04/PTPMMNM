@@ -114,7 +114,7 @@ WSGI_APPLICATION = 'SpotifyClone.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'spotifyclone',
+        'NAME': 'spotifyclone1',
         'USER': 'root',              # Thay bằng username của bạn
         'PASSWORD': '', # Thay bằng mật khẩu của bạn
         'HOST': 'localhost',

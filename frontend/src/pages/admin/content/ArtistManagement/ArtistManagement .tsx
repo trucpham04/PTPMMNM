@@ -6,14 +6,19 @@ import { Card } from "react-bootstrap";
 import { toast } from "react-toastify";
 import "./ArtistManagement.scss";
 import { useArtist } from "../../../../hooks/useArtist";
-import { Artist, Genre } from "../../../../types/music"; // Dùng trực tiếp Artist
-
+import { Artist, Genre } from "../../../../types/music";
+import FormArtistModal from "./FormArtistModal";
+import ConfirmDeleteModal from "../ConfirmDeleteModal";
 const ArtistManagement = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [data, setData] = useState<Artist[]>([]); // Dùng Artist luôn
+  const [showModalDel, setShowModalDel] = useState<boolean>(false);
 
-  const { artists, loading, getArtists } = useArtist();
+  const [data, setData] = useState<Artist[]>([]);
+  const [artistId, setArtistId] = useState<number | null>(null);
+  const [deleteArtistId, setDeleteArtistId] = useState<number | null>(null);
+
+  const { artists, loading, getArtists, deleteArtist } = useArtist();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,19 +38,26 @@ const ArtistManagement = () => {
     setSearchTerm(e.target.value);
   };
 
-  const handleDelete = (id: number) => {
-    if (window.confirm("Are you sure you want to delete this artist?")) {
-      setData(data.filter((artist) => artist.id !== id));
-      toast.success("Deleted successfully!");
+  const handleDelete = async (id: number) => {
+    const success = await deleteArtist(id);
+
+    if (success) {
+      toast.success("Artist deleted successfully.");
+      setShowModalDel(false);
+      setDeleteArtistId(null);
+    } else {
+      toast.error("Failed to delete artist.");
     }
   };
-
+  const showModalDelete = (id: number) => {
+    console.log("Delete artist with ID:", id);
+    setDeleteArtistId(id);
+    setShowModalDel(true);
+  };
   const handleEdit = (id: number) => {
-    const artist = data.find((item) => item.id === id);
-    if (artist) {
-      console.log("Edit Artist:", artist);
-      setShowModal(true);
-    }
+    console.log("Edit artist with ID: ", id);
+    setShowModal(true);
+    setArtistId(id);
   };
 
   const ActionButtons = ({ id }: { id: number }) => (
@@ -53,7 +65,7 @@ const ArtistManagement = () => {
       <button className="btn-icon me-2" onClick={() => handleEdit(id)}>
         <FaEllipsisV />
       </button>
-      <button className="btn-icon" onClick={() => handleDelete(id)}>
+      <button className="btn-icon" onClick={() => showModalDelete(id)}>
         <FaTrashAlt />
       </button>
     </div>
@@ -64,12 +76,13 @@ const ArtistManagement = () => {
       name: "ID",
       selector: (row) => row.id,
       sortable: true,
-      width: "80px",
+      width: "10%",
     },
     {
       name: "Name",
       selector: (row) => row.name,
       sortable: true,
+      width: "18%",
     },
     {
       name: "Genres",
@@ -78,6 +91,7 @@ const ArtistManagement = () => {
           ? row.genres.map((g) => g.name).join(", ")
           : "No genres",
       sortable: true,
+      width: "18%",
     },
     {
       name: "Bio",
@@ -91,11 +105,13 @@ const ArtistManagement = () => {
         ) : (
           <span>No image</span>
         ),
+      width: "18%",
     },
     {
       name: "Actions",
       cell: (row) => <ActionButtons id={row.id} />,
       button: true,
+      width: "18%",
     },
   ];
 
@@ -111,10 +127,10 @@ const ArtistManagement = () => {
       <Card>
         <Card.Header>Artist Management</Card.Header>
         <Card.Body>
-          <div className="d-flex justify-content-between align-items-center mb-3">
+          <div className="input-group d-flex justify-content-between align-items-center mb-3">
             <input
               type="text"
-              className="form-control w-75"
+              className="form-control"
               placeholder="Search artist..."
               value={searchTerm}
               onChange={handleSearch}
@@ -133,10 +149,28 @@ const ArtistManagement = () => {
             pagination
             highlightOnHover
             responsive
-            className="artist-table"
+            className="card-table"
           />
         </Card.Body>
       </Card>
+
+      <FormArtistModal
+        show={showModal}
+        onClose={() => {
+          setShowModal(false);
+          setArtistId(null);
+        }}
+        id={artistId}
+      />
+      <ConfirmDeleteModal
+        show={showModalDel}
+        onClose={() => {
+          setShowModalDel(false);
+          setDeleteArtistId(null);
+        }}
+        onDelete={() => handleDelete(deleteArtistId!)}
+        itemName="artist"
+      />
     </div>
   );
 };
