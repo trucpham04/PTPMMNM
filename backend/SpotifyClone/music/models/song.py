@@ -41,12 +41,12 @@ class Song(models.Model):
     featuring_artists = models.ManyToManyField(Artist, related_name='featured_in', blank=True)
     album = models.ForeignKey(Album, on_delete=models.CASCADE, null=True, blank=True, related_name='songs')
     genres = models.ManyToManyField(Genre, related_name='songs')
-    composers = models.ManyToManyField(Artist, related_name='composed_songs')
+    composers = models.ManyToManyField(Artist, related_name='composed_songs', blank=True)
 
     # Trường file âm thanh
     audio_file = models.FileField(
         storage=audio_storage,  # Sử dụng storage với resource_type='raw'
-        validators=[FileExtensionValidator(allowed_extensions=['mp3', 'wav', 'flac'])]
+        validators=[FileExtensionValidator(allowed_extensions=['mp3', 'wav', 'flac'])],null=True, blank=True
     )
 
     # Trường file video

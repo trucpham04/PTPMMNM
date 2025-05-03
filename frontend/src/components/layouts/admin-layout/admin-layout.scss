@@ -1,7 +1,7 @@
 $highlight-color: #dee2ec;
 .admin-container {
   //display: flex;
-  overflow: hidden;
+  /* overflow: hidden; */
   height: 100vh;
 
   .admin-header {
@@ -60,10 +60,7 @@ $highlight-color: #dee2ec;
     display: flex;
 
     .admin-sidebar {
-      height: 100vh;
-
-      .pro-sidebar {
-      }
+      height: 100%;
 
       .sidebar-btn-wrapper {
         display: flex;
@@ -99,13 +96,14 @@ $highlight-color: #dee2ec;
     }
 
     .admin-main {
-      height: calc(100vh - 50px);
+      /* height: calc(100vh - 50px); */
+      height: 100vh;
       float: left;
       width: calc(100vw - 240px);
-      padding: 30px;
+      /* padding: 0px 20px 20px 20px; */
       transition: width 0.3s ease;
       overflow: auto;
-
+      background-color: #ededed;
       &.collapsed {
         width: 100vw;
       }
@@ -134,6 +132,89 @@ $highlight-color: #dee2ec;
             font-size: 1.15rem;
             margin-top: 0.25rem;
             font-weight: 400;
+          }
+        }
+      }
+      .card {
+        .card-header {
+          height: 3.1rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #1db954;
+          font-weight: bold;
+          border-radius: 20%;
+          background-color: white;
+          font-size: 1.25rem;
+        }
+        .card-body {
+          border: solid 20px #ededed;
+
+          .input-group {
+            display: flex;
+            justify-content: space-between;
+            border-radius: 20px;
+            .form-control {
+              width: 30%;
+              height: 2.5rem;
+              margin-top: 10px;
+              margin-left: 10px;
+              background-color: black;
+              color: white;
+              font-weight: 500;
+              text-indent: 15px;
+              border-radius: 5px;
+              &::placeholder {
+                color: white;
+              }
+            }
+            button {
+              width: 10%;
+              height: 2.5rem;
+              margin: 10px 10px 0px 0px;
+              background-color: #1db954;
+              float: right;
+              border-radius: 5px; // Bo tròn góc của nút
+              font-size: 0.9rem; // Kích thước chữ của nút
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              cursor: pointer;
+              font-weight: 500;
+              transition: color 0.3s ease;
+              &:hover {
+                background-color: #2ce46c;
+              }
+              svg {
+                margin-right: 5px; // Khoảng cách giữa icon và chữ
+              }
+            }
+          }
+
+          .card-table {
+            height: 60vh;
+            .action-buttons {
+              display: flex;
+              gap: 10px; // Khoảng cách giữa các nút
+              .btn-icon {
+                background: none;
+                border: none;
+                color: black;
+                font-size: 1.25rem;
+                cursor: pointer;
+                transition: color 0.3s ease;
+                &:hover {
+                  color: #bababa; // Màu khi hover
+                }
+              }
+            }
+            /* .rdt_Table {
+              .rdt_TableBody {
+                .rdt_TableRow {
+                  height: 5px;
+                }
+              }
+            } */
           }
         }
       }
@@ -170,12 +251,6 @@ $highlight-color: #dee2ec;
   width: 0.875rem;
 }
 
-.btn {
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-}
-
 .btn-icon {
   height: calc((0.875rem * 1) + (0.875rem * 2) + (2px)) !important;
   width: calc((0.875rem * 1) + (0.875rem * 2) + (2px)) !important;
@@ -206,15 +281,4 @@ $highlight-color: #dee2ec;
 
 .mt-n10 {
   margin-top: -6rem !important;
-}
-
-.card-header {
-  height: 3.5625rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 0.5625rem !important;
-  padding-bottom: 0.5625rem !important;
-  font-weight: 600;
-  color: #0061f2 !important;
 }

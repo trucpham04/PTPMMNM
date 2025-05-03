@@ -7,7 +7,6 @@ import App from "@/App";
 import { Provider } from "react-redux";
 import { store } from "./store";
 import { FavoriteProvider } from "./contexts/favoriteContext";
-
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>

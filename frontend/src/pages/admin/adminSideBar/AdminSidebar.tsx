@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import {
@@ -10,51 +10,85 @@ import {
 } from "react-icons/fa";
 import { FiLogOut, FiSettings } from "react-icons/fi";
 import "./AdminSidebar.scss";
-
+import { useAuth } from "@/contexts/authContext";
 interface AdminSidebarProps {
   collapsed: boolean;
 }
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed }) => {
   const navigate = useNavigate();
+  const [selectedItem, setSelectedItem] = useState<string>("artist"); // mặc định chọn "artist" luôn
+  const { user, logout } = useAuth();
+  const handleMenuClick = (item: string) => {
+    console.log("is submit", item);
+    setSelectedItem(item);
+    navigate(`/admin/${item.toLowerCase()}`);
+  };
 
   return (
-    <Sidebar collapsed={collapsed} breakPoint="md">
+    <Sidebar className="sidebarAdmin" collapsed={collapsed} breakPoint="md">
       <Menu>
         <MenuItem
           icon={<FaUserAlt />}
-          onClick={() => navigate("/admin/artist")}
+          className={`${selectedItem === "artist" ? "active" : ""}`}
+          onClick={() => handleMenuClick("artist")}
         >
-          Artist
+          <span>Artist</span>
         </MenuItem>
+
         <MenuItem
           icon={<FaCompactDisc />}
-          onClick={() => navigate("/admin/album")}
+          className={`${selectedItem === "album" ? "active" : ""}`}
+          onClick={() => handleMenuClick("album")}
         >
-          Album
+          <span>Album</span>
         </MenuItem>
+
         <MenuItem
           icon={<FaHeadphones />}
-          onClick={() => navigate("/admin/song")}
+          className={`${selectedItem === "song" ? "active" : ""}`}
+          onClick={() => handleMenuClick("song")}
         >
-          Song
+          <span>Song</span>
+        </MenuItem>
+
+        {/* <MenuItem
+          icon={<FaListUl />}
+          className={`${selectedItem === "playlist" ? "active" : ""}`}
+          onClick={() => handleMenuClick("playlist")}
+        >
+          <span>Playlist</span>
+        </MenuItem> */}
+
+        <MenuItem
+          icon={<FaTags />}
+          className={`${selectedItem === "genres" ? "active" : ""}`}
+          onClick={() => handleMenuClick("genres")}
+        >
+          <span>Genres</span>
         </MenuItem>
         <MenuItem
-          icon={<FaListUl />}
-          onClick={() => navigate("/admin/playlist")}
+          icon={<FaUserAlt />}
+          className={`${selectedItem === "user" ? "active" : ""}`}
+          onClick={() => handleMenuClick("user")}
         >
-          Playlist
-        </MenuItem>
-        <MenuItem icon={<FaTags />} onClick={() => navigate("/admin/genre")}>
-          Genres
+          <span>User</span>
         </MenuItem>
         <MenuItem
           icon={<FiSettings />}
-          onClick={() => navigate("/admin/settings")}
+          className={`${selectedItem === "/" ? "active" : ""}`}
+          onClick={() => navigate("/")}
         >
-          Settings
+          <span>User UI</span>
         </MenuItem>
-        <MenuItem icon={<FiLogOut />}>Log Out</MenuItem>
+
+        <MenuItem
+          icon={<FiLogOut />}
+          className={`${selectedItem === "logout" ? "active" : ""}`}
+          onClick={logout}
+        >
+          <span>Log Out</span>
+        </MenuItem>
       </Menu>
 
       <div
@@ -65,10 +99,10 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed }) => {
           padding: "1rem",
         }}
       >
-        <div className="sidebar-footer-content">
+        {/* <div className="sidebar-footer-content">
           <div className="sidebar-footer-subtitle">Logged in as:</div>
           <div className="sidebar-login-name">Guest</div>
-        </div>
+        </div> */}
       </div>
     </Sidebar>
   );

@@ -13,7 +13,7 @@ export interface User {
   // last_login: string | null; // ISO date string
 
   // Custom fields
-  profile_picture?: string; // URL from Cloudinary
+  profile_picture?: string | File | null; // URL from Cloudinary
   bio?: string;
   date_of_birth?: string; // ISO date string (YYYY-MM-DD)
   country?: string;

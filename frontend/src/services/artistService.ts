@@ -4,15 +4,15 @@ import { Album, Artist, ArtistFollow, Song } from "../types";
 interface CreateArtistRequest {
   name: string;
   bio?: string;
-  image?: File;
+  image?: string | File | null;
   genres?: number[];
-  slug: string;
+  slug?: string;
 }
 
 interface UpdateArtistRequest {
   name?: string;
   bio?: string;
-  image?: File;
+  image?: string | File | null;
   genres?: number[];
   slug?: string;
 }
@@ -36,7 +36,10 @@ class ArtistService {
     Object.entries(artistData).forEach(([key, value]) => {
       if (value !== undefined) {
         if (key === "genres" && Array.isArray(value)) {
-          formData.append(key, JSON.stringify(value));
+          // Chuyển genres thành mảng ID thể loại
+          value.forEach((genreId) =>
+            formData.append("genre_ids", genreId.toString()),
+          );
         } else if (value instanceof File) {
           formData.append(key, value);
         } else {
@@ -67,7 +70,10 @@ class ArtistService {
     Object.entries(artistData).forEach(([key, value]) => {
       if (value !== undefined) {
         if (key === "genres" && Array.isArray(value)) {
-          formData.append(key, JSON.stringify(value));
+          // Chuyển genres thành mảng ID thể loại
+          value.forEach((genreId) =>
+            formData.append("genre_ids", genreId.toString()),
+          );
         } else if (value instanceof File) {
           formData.append(key, value);
         } else {

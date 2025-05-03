@@ -10,7 +10,8 @@ class Artist(models.Model):
     bio = models.TextField(null=True, blank=True)
     image = CloudinaryField('artist_images', null=True, blank=True)
     genres = models.ManyToManyField(Genre, related_name='artists')
-    slug = models.SlugField(unique=True, max_length=255)
+    slug = models.SlugField(max_length=255, blank=True)
+
     
     def save(self, *args, **kwargs):
         if not self.slug:

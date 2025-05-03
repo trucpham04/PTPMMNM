@@ -1,0 +1,22 @@
+.admin-song-management {
+  height: 100%;
+  background-color: white;
+}
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-group.full {
+  flex: 1 1 100%;
+}
+
+.form-group.half {
+  flex: 1 1 48%;
+}
+
+.form-group.quarter {
+  flex: 1 1 23%;
+}

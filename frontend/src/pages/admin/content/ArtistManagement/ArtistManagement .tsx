@@ -1,118 +1,146 @@
-import React, { useState } from "react";
-import DataTable from "react-data-table-component";
-import { FaEllipsisV, FaTrashAlt } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import DataTable, { TableColumn } from "react-data-table-component";
+import { FaTools, FaTrashAlt } from "react-icons/fa";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { Card } from "react-bootstrap";
 import { toast } from "react-toastify";
 import "./ArtistManagement.scss";
-
-// Định nghĩa kiểu dữ liệu cho Artist
-interface Artist {
-  id: number;
-  name: string;
-  genre: string;
-  country: string;
-}
-
-const ArtistManagement: React.FC = () => {
+import { useArtist } from "../../../../hooks/useArtist";
+import { Artist } from "../../../../types/music";
+import FormArtistModal from "./FormArtistModal";
+import ConfirmDeleteModal from "../ConfirmDeleteModal";
+const ArtistManagement = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [showModalDel, setShowModalDel] = useState<boolean>(false);
 
-  const [data, setData] = useState<Artist[]>([
-    {
-      id: 1,
-      name: "Taylor Swift",
-      genre: "Pop",
-      country: "USA",
-    },
-    {
-      id: 2,
-      name: "Sơn Tùng M-TP",
-      genre: "V-Pop",
-      country: "Vietnam",
-    },
-    {
-      id: 3,
-      name: "Ed Sheeran",
-      genre: "Pop",
-      country: "UK",
-    },
-  ]);
+  const [data, setData] = useState<Artist[]>([]);
+  const [artistId, setArtistId] = useState<number | null>(null);
+  const [deleteArtistId, setDeleteArtistId] = useState<number | null>(null);
+
+  const { artists, loading, getArtists, deleteArtist } = useArtist();
+  const fetchData = async () => {
+    try {
+      await getArtists(); // Lấy lại dữ liệu artist từ API
+    } catch (error) {
+      console.error("Error fetching artists:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [getArtists]);
+
+  useEffect(() => {
+    if (!loading && artists) {
+      setData(artists);
+      console.log("Artists data copied into state:", artists);
+    }
+  }, [artists, loading]);
+
+  /* ----------------------------------------------------------------------------SEARCH-------------------------------------------------------------------------- */
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
-
-  const handleDelete = (id: number) => {
-    if (window.confirm("Are you sure you want to delete this artist?")) {
-      setData(data.filter((artist) => artist.id !== id));
-      toast.success("Deleted successfully!");
+  const filteredData = data.filter((artist) =>
+    [artist.name, artist.bio]
+      .join(" ")
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase()),
+  );
+  /* ----------------------------------------------------------------------------DELETE-------------------------------------------------------------------------- */
+  const handleDelete = async (id: number) => {
+    const success = await deleteArtist(id);
+    if (success) {
+      toast.success("Artist deleted successfully.");
+      setShowModalDel(false);
+      setDeleteArtistId(null);
+    } else {
+      toast.error("Failed to delete artist.");
     }
   };
+  const showModalDelete = (id: number) => {
+    console.log("Delete artist with ID:", id);
+    setDeleteArtistId(id);
+    setShowModalDel(true);
+  };
+
+  /* ----------------------------------------------------------------------------EDIT-------------------------------------------------------------------------- */
 
   const handleEdit = (id: number) => {
-    const artist = data.find((item) => item.id === id);
-    if (artist) {
-      // Hiện modal chỉnh sửa tại đây
-      console.log("Edit Artist:", artist);
-    }
+    console.log("Edit artist with ID: ", id);
+    setShowModal(true);
+    setArtistId(id);
   };
+
+  /* ----------------------------------------------------------------------------TABLE-------------------------------------------------------------------------- */
+
 
   const ActionButtons = ({ id }: { id: number }) => (
     <div className="action-buttons">
       <button className="btn-icon me-2" onClick={() => handleEdit(id)}>
-        <FaEllipsisV />
+        <FaTools />
       </button>
-      <button className="btn-icon" onClick={() => handleDelete(id)}>
+      <button className="btn-icon" onClick={() => showModalDelete(id)}>
         <FaTrashAlt />
       </button>
     </div>
   );
 
-  const columns = [
+  const columns: TableColumn<Artist>[] = [
     {
       name: "ID",
-      selector: (row: Artist) => row.id,
+      selector: (row) => row.id,
       sortable: true,
-      width: "80px",
+      width: "10%",
     },
     {
       name: "Name",
-      selector: (row: Artist) => row.name,
+      selector: (row) => row.name,
       sortable: true,
+      width: "18%",
     },
     {
-      name: "Genre",
-      selector: (row: Artist) => row.genre,
+      name: "Genres",
+      selector: (row) =>
+        row.genres && row.genres.length > 0
+          ? row.genres.map((g) => g.name).join(", ")
+          : "No genres",
       sortable: true,
+      width: "18%",
     },
     {
-      name: "Country",
-      selector: (row: Artist) => row.country,
-      sortable: true,
+      name: "Bio",
+      selector: (row) => row.bio || "",
+    },
+    {
+      name: "Image",
+      cell: (row) =>
+        row.image ? (
+          <img src={row.image} alt={row.name} width={50} height={50} />
+        ) : (
+          <span>No image</span>
+        ),
+      width: "18%",
     },
     {
       name: "Actions",
-      cell: (row: Artist) => <ActionButtons id={row.id} />,
+      cell: (row) => <ActionButtons id={row.id} />,
+      button: true,
+      width: "18%",
     },
   ];
-
-  const filteredData = data.filter(
-    (artist) =>
-      artist.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      artist.genre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      artist.country.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
 
   return (
     <div className="admin-artist-management">
       <Card>
         <Card.Header>Artist Management</Card.Header>
         <Card.Body>
-          <div className="d-flex justify-content-between align-items-center mb-3">
+          <div className="input-group d-flex justify-content-between align-items-center mb-3">
             <input
               type="text"
-              className="form-control w-75"
+              className="form-control"
               placeholder="Search artist..."
               value={searchTerm}
               onChange={handleSearch}
@@ -131,11 +159,39 @@ const ArtistManagement: React.FC = () => {
             pagination
             highlightOnHover
             responsive
+            fixedHeader
+            fixedHeaderScrollHeight="375px"
+            customStyles={{
+              rows: {
+                style: {
+                  minHeight: "32px",
+                  paddingTop: "4px",
+                  paddingBottom: "4px",
+                },
+              },
+            }}
           />
         </Card.Body>
       </Card>
 
-      {/* Modal thêm/sửa nghệ sĩ nếu có thể tạo sau */}
+      <FormArtistModal
+        show={showModal}
+        onClose={() => {
+          setShowModal(false);
+          setArtistId(null);
+          fetchData();
+        }}
+        id={artistId}
+      />
+      <ConfirmDeleteModal
+        show={showModalDel}
+        onClose={() => {
+          setShowModalDel(false);
+          setDeleteArtistId(null);
+        }}
+        onDelete={() => handleDelete(deleteArtistId!)}
+        itemName="artist"
+      />
     </div>
   );
 };

@@ -23,8 +23,14 @@ class ArtistListCreateView(BaseListCreateView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        # 👉 In ra dữ liệu đã được validate
+        print("VALIDATED DATA:", serializer.validated_data)
+
         self.perform_create(serializer)
+
         return custom_response(ec=0, em="Artist created successfully", dt=serializer.data)
+
 
 
 class ArtistDetailView(BaseRetrieveUpdateDestroyView):

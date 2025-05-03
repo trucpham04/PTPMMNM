@@ -3,39 +3,61 @@ from ..models import Song, Artist, Genre, Album
 from .artist_serializer import ArtistSerializer
 from .genre_serializer import GenreSerializer
 from .album_serializer import AlbumSerializer
-import magic  # Thêm thư viện magic để kiểm tra loại file
+import magic  # Để kiểm tra loại file (MIME)
 
 class SongSerializer(serializers.ModelSerializer):
-    # artist = serializers.PrimaryKeyRelatedField(queryset=Artist.objects.all())  # Cho phép nhập ID của Artist
-    # genres = serializers.PrimaryKeyRelatedField(queryset=Genre.objects.all(), many=True)  # Nhận danh sách ID của Genre
-    album = serializers.SerializerMethodField()
+    # Read-only nested serializers
     artist = ArtistSerializer(read_only=True)
-    genres = serializers.SerializerMethodField()
+    genres = GenreSerializer(many=True, read_only=True)
+    album = AlbumSerializer(read_only=True)
+    featuring_artists = ArtistSerializer(many=True, read_only=True)
+    composers = ArtistSerializer(many=True, read_only=True)
+    
+    # Write-only ID fields
+    artist_id = serializers.PrimaryKeyRelatedField(
+        queryset=Artist.objects.all(),
+        write_only=True,
+        source='artist'
+    )
+    genre_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Genre.objects.all(),
+        many=True,
+        write_only=True,
+        source='genres'
+    )
+    album_id = serializers.PrimaryKeyRelatedField(
+        queryset=Album.objects.all(),
+        write_only=True,
+        source='album'
+    )
+    featuring_artist_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Artist.objects.all(),
+        many=True,
+        write_only=True,
+        source='featuring_artists'
+    )
+    composer_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Artist.objects.all(),
+        many=True,
+        write_only=True,
+        source='composers'
+    )
 
     class Meta:
         model = Song
-        fields = '__all__'
+        fields = [
+            'id', 'title', 'artist', 'artist_id', 'album', 'album_id',
+            'genres', 'genre_ids', 'featuring_artists', 'featuring_artist_ids',
+            'composers', 'composer_ids', 'audio_file', 'video_file',
+            'lyrics', 'duration', 'release_date', 'price',
+            'is_downloadable', 'is_premium'
+        ]
 
-    def get_genres(self, obj):
-        return [{"id": genre.id, "name": genre.name} for genre in obj.genres.all()]
-    
-    def get_album(self, obj):
-        album = obj.album
-        if album:
-            return {
-                "id": album.id,
-                "title": album.title,
-                "cover_image": album.cover_image.url if album.cover_image else None,
-            }
-        return None
-
-
-    def validate_file(self, value):
-        """ Kiểm tra nếu là video/audio thì cho phép """
-        mime = magic.from_buffer(value.read(1024), mime=True)
-        value.seek(0)
+    def validate_audio_file(self, value):
+        """ Kiểm tra MIME type của file âm thanh (hoặc video nếu dùng chung) """
+        mime = magic.from_buffer(value.read(), mime=True)  # Đọc toàn bộ file
+        value.seek(0)  # Reset lại con trỏ file về đầu sau khi kiểm tra MIME
         if not mime.startswith(('audio/', 'video/')):
             raise serializers.ValidationError("Chỉ chấp nhận file âm thanh hoặc video!")
         return value
-    
-    
+

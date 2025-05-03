@@ -11,7 +11,7 @@ class Album(models.Model):
     release_date = models.DateField()
     cover_image = CloudinaryField('album_covers', null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    slug = models.SlugField(max_length=255)
+    slug = models.SlugField(max_length=255, blank=True)
     
     def save(self, *args, **kwargs):
         if not self.slug:

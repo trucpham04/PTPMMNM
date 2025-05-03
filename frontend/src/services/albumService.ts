@@ -6,15 +6,15 @@ interface CreateAlbumRequest {
   artist: number;
   genres?: number[];
   release_date: string; // YYYY-MM-DD
-  cover_image?: File;
+  cover_image?: string | File | null;
   description?: string;
-  slug: string;
+  slug?: string;
 }
 
 interface UpdateAlbumRequest {
   title?: string;
   description?: string;
-  cover_image?: File;
+  cover_image?: string | File | null;
   genres?: number[];
   release_date?: string;
 }
@@ -45,7 +45,11 @@ class AlbumService {
     Object.entries(albumData).forEach(([key, value]) => {
       if (value !== undefined) {
         if (key === "genres" && Array.isArray(value)) {
-          formData.append(key, JSON.stringify(value));
+          value.forEach((genreId) => {
+            formData.append("genre_ids", genreId.toString());
+          });
+        } else if (key === "artist") {
+          formData.append("artist_id", value.toString());
         } else if (value instanceof File) {
           formData.append(key, value);
         } else {
@@ -76,7 +80,11 @@ class AlbumService {
     Object.entries(albumData).forEach(([key, value]) => {
       if (value !== undefined) {
         if (key === "genres" && Array.isArray(value)) {
-          formData.append(key, JSON.stringify(value));
+          value.forEach((genreId) => {
+            formData.append("genre_ids", genreId.toString());
+          });
+        } else if (key === "artist") {
+          formData.append("artist_id", value.toString());
         } else if (value instanceof File) {
           formData.append(key, value);
         } else {
