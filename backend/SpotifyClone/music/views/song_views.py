@@ -26,13 +26,29 @@ class SongListCreateView(BaseListCreateView):
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
+        
+        # Debugging: In ra dữ liệu sau khi serialize
+        print("Serialized data:", serializer.data)
+        
         return custom_response(ec=0, em="Fetched songs successfully", dt=serializer.data)
 
     def create(self, request, *args, **kwargs):
+        print("\nnDATA------:", request.data)
         serializer = self.get_serializer(data=request.data)
+        print("Received data:", request.data)  # In dữ liệu yêu cầu từ client
+
         serializer.is_valid(raise_exception=True)
+        
+        # Debugging: In ra dữ liệu đã validate
+        print("Validated data:", serializer.validated_data)
+        
         self.perform_create(serializer)
+        
+        # Debugging: In ra dữ liệu sau khi lưu
+        print("Saved data:", serializer.instance)
+
         return custom_response(ec=0, em="Song created successfully", dt=serializer.data)
+
 
 
 class SongDetailView(BaseRetrieveUpdateDestroyView):
@@ -46,11 +62,16 @@ class SongDetailView(BaseRetrieveUpdateDestroyView):
         return custom_response(ec=0, em="Fetched song detail", dt=serializer.data)
 
     def update(self, request, *args, **kwargs):
+        print("\nnDATA------:", request.data)
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
+        # Debugging: In ra dữ liệu đã validate
+        print("Validated data:", serializer.validated_data)
         self.perform_update(serializer)
+        # Debugging: In ra dữ liệu sau khi lưu
+        print("Saved data:", serializer.instance)
         return custom_response(ec=0, em="Song updated successfully", dt=serializer.data)
 
     def destroy(self, request, *args, **kwargs):

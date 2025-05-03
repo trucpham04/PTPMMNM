@@ -4,7 +4,7 @@ import { Genre } from "../types";
 interface CreateGenreRequest {
   name: string;
   description?: string;
-  slug: string;
+  slug?: string;
 }
 
 interface UpdateGenreRequest {

@@ -10,16 +10,16 @@ interface CreateSongRequest {
   featuring_artists?: number[];
   album?: number;
   genres?: number[];
-  composers?: string;
-  audio_file: File;
-  video_file?: File;
+  composers?: number[];
+  audio_file: string | File | null;
+  video_file?: string | File | null;
   duration: string;
   lyrics?: string;
   release_date?: string;
   price?: string;
   is_downloadable: boolean;
   is_premium: boolean;
-  slug: string;
+  slug?: string;
 }
 
 interface UpdateSongRequest {
@@ -28,8 +28,8 @@ interface UpdateSongRequest {
   price?: string;
   is_downloadable?: boolean;
   is_premium?: boolean;
-  audio_file?: File;
-  video_file?: File;
+  audio_file?: string | File | null;
+  video_file?: string | File | null;
   featuring_artists?: number[];
   genres?: number[];
 }
@@ -63,6 +63,7 @@ export const useSong = () => {
       const response = await songService.getSongs();
 
       if (response.EC === 0 && response.DT) {
+        console.log("Response: ", response);
         setSongs(response.DT);
         return response.DT;
       } else {
@@ -361,6 +362,59 @@ export const useSong = () => {
     [],
   );
 
+  const createSongAdmin = useCallback(async (songData: CreateSongRequest) => {
+    setLoading(true);
+    setError(null);
+    console.log("Create Song Data:", songData);
+    try {
+      const response = await songService.createSongAdmin(songData);
+      console.log("Create Song Response:", response);
+      if (response.EC === 0 && response.DT) {
+        setSongs((prev) => [...prev, response.DT!]);
+        return response.DT;
+      } else {
+        setError(response.EM || "Failed to create song");
+        return null;
+      }
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to create song";
+      setError(errorMessage);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+  const updateSongAdmin = useCallback(
+    async (songId: number, songData: UpdateSongRequest) => {
+      setLoading(true);
+      setError(null);
+      console.log("Update Song Data:", songData);
+      try {
+        const response = await songService.updateSongAdmin(songId, songData);
+
+        if (response.EC === 0 && response.DT) {
+          setSong(response.DT);
+          setSongs((prev) =>
+            prev.map((s) => (s.id === songId ? response.DT! : s)),
+          );
+          return response.DT;
+        } else {
+          setError(response.EM || "Failed to update song");
+          return null;
+        }
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to update song";
+        setError(errorMessage);
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
   return {
     loading,
     error,
@@ -379,6 +433,8 @@ export const useSong = () => {
     getSongRecommendations,
     getListeningHistory,
     createListeningHistory,
+    createSongAdmin,
+    updateSongAdmin,
   };
 };
 

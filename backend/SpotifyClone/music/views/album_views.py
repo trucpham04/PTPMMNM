@@ -21,9 +21,12 @@ class AlbumListCreateView(BaseListCreateView):
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
+        
         if serializer.is_valid():
             serializer.save()
             return custom_response(em="Album created successfully", dt=serializer.data)
+        print("VALIDATED serializer:", serializer)
+        print("VALIDATED DATA:", serializer.validated_data)
         return custom_response(ec=1, em="Validation failed", dt=serializer.errors)
 
 

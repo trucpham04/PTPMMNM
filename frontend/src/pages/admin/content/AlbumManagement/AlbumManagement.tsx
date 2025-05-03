@@ -4,78 +4,83 @@ import { FaTools, FaTrashAlt } from "react-icons/fa";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { Card } from "react-bootstrap";
 import { toast } from "react-toastify";
-import "./ArtistManagement.scss";
-import { useArtist } from "../../../../hooks/useArtist";
-import { Artist } from "../../../../types/music";
-import FormArtistModal from "./FormArtistModal";
+import "./AlbumManagement.scss";
+import { useAlbum } from "../../../../hooks/useAlbum"; // Hook quản lý album
+import { Album } from "../../../../types/music"; // Kiểu dữ liệu album
+import FormAlbumModal from "./FormAlbumModal";
 import ConfirmDeleteModal from "../ConfirmDeleteModal";
-const ArtistManagement = () => {
+
+const AlbumManagement = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showModalDel, setShowModalDel] = useState<boolean>(false);
 
-  const [data, setData] = useState<Artist[]>([]);
-  const [artistId, setArtistId] = useState<number | null>(null);
-  const [deleteArtistId, setDeleteArtistId] = useState<number | null>(null);
+  const [data, setData] = useState<Album[]>([]);
+  const [albumId, setAlbumId] = useState<number | null>(null);
+  const [deleteAlbumId, setDeleteAlbumId] = useState<number | null>(null);
 
-  const { artists, loading, getArtists, deleteArtist } = useArtist();
+  const { albums, loading, getAlbums, deleteAlbum } = useAlbum();
   const fetchData = async () => {
     try {
-      await getArtists(); // Lấy lại dữ liệu artist từ API
+      await getAlbums(); // Lấy dữ liệu album từ API
+      console.log(albums);
     } catch (error) {
-      console.error("Error fetching artists:", error);
+      console.error("Error fetching albums:", error);
     }
   };
 
   useEffect(() => {
     fetchData();
-  }, [getArtists]);
+  }, [getAlbums]);
 
   useEffect(() => {
-    if (!loading && artists) {
-      setData(artists);
-      console.log("Artists data copied into state:", artists);
+    if (!loading && albums) {
+      setData(albums);
+      console.log("Albums data copied into state:", albums);
     }
-  }, [artists, loading]);
+  }, [albums, loading]);
 
-  /* ----------------------------------------------------------------------------SEARCH-------------------------------------------------------------------------- */
+  // ----------------------------------------------------------------------------SEARCH--------------------------------------------------------------------------
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
-  const filteredData = data.filter((artist) =>
-    [artist.name, artist.bio]
+
+  const filteredData = data.filter((album) =>
+    [album.title, album.artist?.name ?? "", album.description]
       .join(" ")
       .toLowerCase()
       .includes(searchTerm.toLowerCase()),
   );
-  /* ----------------------------------------------------------------------------DELETE-------------------------------------------------------------------------- */
+
+  // ----------------------------------------------------------------------------DELETE--------------------------------------------------------------------------
+
   const handleDelete = async (id: number) => {
-    const success = await deleteArtist(id);
+    const success = await deleteAlbum(id);
     if (success) {
-      toast.success("Artist deleted successfully.");
+      toast.success("Album deleted successfully.");
       setShowModalDel(false);
-      setDeleteArtistId(null);
+      setDeleteAlbumId(null);
     } else {
-      toast.error("Failed to delete artist.");
+      toast.error("Failed to delete album.");
     }
   };
+
   const showModalDelete = (id: number) => {
-    console.log("Delete artist with ID:", id);
-    setDeleteArtistId(id);
+    console.log("Delete album with ID:", id);
+    setDeleteAlbumId(id);
     setShowModalDel(true);
   };
 
-  /* ----------------------------------------------------------------------------EDIT-------------------------------------------------------------------------- */
+  // ----------------------------------------------------------------------------EDIT--------------------------------------------------------------------------
 
   const handleEdit = (id: number) => {
-    console.log("Edit artist with ID: ", id);
+    console.log("Edit album with ID: ", id);
     setShowModal(true);
-    setArtistId(id);
+    setAlbumId(id);
   };
 
-  /* ----------------------------------------------------------------------------TABLE-------------------------------------------------------------------------- */
-
+  // ----------------------------------------------------------------------------TABLE--------------------------------------------------------------------------
 
   const ActionButtons = ({ id }: { id: number }) => (
     <div className="action-buttons">
@@ -88,7 +93,7 @@ const ArtistManagement = () => {
     </div>
   );
 
-  const columns: TableColumn<Artist>[] = [
+  const columns: TableColumn<Album>[] = [
     {
       name: "ID",
       selector: (row) => row.id,
@@ -96,11 +101,18 @@ const ArtistManagement = () => {
       width: "10%",
     },
     {
-      name: "Name",
-      selector: (row) => row.name,
+      name: "Title",
+      selector: (row) => row.title,
       sortable: true,
       width: "18%",
     },
+    {
+      name: "Artist",
+      selector: (row) => row.artist?.name || "Unknown",
+      sortable: true,
+      width: "18%",
+    },
+
     {
       name: "Genres",
       selector: (row) =>
@@ -111,14 +123,10 @@ const ArtistManagement = () => {
       width: "18%",
     },
     {
-      name: "Bio",
-      selector: (row) => row.bio || "",
-    },
-    {
-      name: "Image",
+      name: "Cover Image",
       cell: (row) =>
-        row.image ? (
-          <img src={row.image} alt={row.name} width={50} height={50} />
+        row.cover_image ? (
+          <img src={row.cover_image} alt={row.title} width={50} height={50} />
         ) : (
           <span>No image</span>
         ),
@@ -133,15 +141,15 @@ const ArtistManagement = () => {
   ];
 
   return (
-    <div className="admin-artist-management">
+    <div className="admin-album-management">
       <Card>
-        <Card.Header>Artist Management</Card.Header>
+        <Card.Header>Album Management</Card.Header>
         <Card.Body>
           <div className="input-group d-flex justify-content-between align-items-center mb-3">
             <input
               type="text"
               className="form-control"
-              placeholder="Search artist..."
+              placeholder="Search album..."
               value={searchTerm}
               onChange={handleSearch}
             />
@@ -150,7 +158,7 @@ const ArtistManagement = () => {
               onClick={() => setShowModal(true)}
             >
               <IoIosAddCircleOutline className="me-1" />
-              Add Artist
+              Add Album
             </button>
           </div>
           <DataTable
@@ -174,26 +182,26 @@ const ArtistManagement = () => {
         </Card.Body>
       </Card>
 
-      <FormArtistModal
+      <FormAlbumModal
         show={showModal}
         onClose={() => {
           setShowModal(false);
-          setArtistId(null);
+          setAlbumId(null);
           fetchData();
         }}
-        id={artistId}
+        id={albumId}
       />
       <ConfirmDeleteModal
         show={showModalDel}
         onClose={() => {
           setShowModalDel(false);
-          setDeleteArtistId(null);
+          setDeleteAlbumId(null);
         }}
-        onDelete={() => handleDelete(deleteArtistId!)}
-        itemName="artist"
+        onDelete={() => handleDelete(deleteAlbumId!)}
+        itemName="album"
       />
     </div>
   );
 };
 
-export default ArtistManagement;
+export default AlbumManagement;

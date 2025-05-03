@@ -137,7 +137,7 @@ $highlight-color: #dee2ec;
       }
       .card {
         .card-header {
-          height: 3.5625rem;
+          height: 3.1rem;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -208,6 +208,13 @@ $highlight-color: #dee2ec;
                 }
               }
             }
+            /* .rdt_Table {
+              .rdt_TableBody {
+                .rdt_TableRow {
+                  height: 5px;
+                }
+              }
+            } */
           }
         }
       }

@@ -15,6 +15,12 @@ import { AccountForm } from "@/pages/auth/account";
 import AdminPage from "@/pages/admin/adminPage";
 import AdminLayout from "@/components/layouts/admin-layout/admin-layout";
 import ArtistManagement from "@/pages/admin/content/ArtistManagement/ArtistManagement ";
+import GenresManagement from "@/pages/admin/content/GenresManagement/GenresManagement";
+import AlbumManagement from "@/pages/admin/content/AlbumManagement/AlbumManagement";
+import SongManagement from "@/pages/admin/content/SongManagement/SongManagement";
+import UserManagement from "@/pages/admin/content/UserManagement/UserManagement";
+/* import PlaylistManagement from "@/pages/admin/content/PlaylistManagement/PlaylistManagement"; */
+
 import SearchPage from "@/pages/search";
 import QueuePage from "@/pages/queue";
 import PlaylistPage from "@/pages/details/playlist";
@@ -39,7 +45,10 @@ function routes() {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminPage />} />
           <Route path="artist" element={<ArtistManagement />} />
-          <Route path="song" element={<ArtistManagement />} />
+          <Route path="genres" element={<GenresManagement />} />
+          <Route path="album" element={<AlbumManagement />} />
+          <Route path="song" element={<SongManagement />} />
+          <Route path="user" element={<UserManagement />} />
         </Route>
 
         <Route path="/" element={<AuthLayout />}>

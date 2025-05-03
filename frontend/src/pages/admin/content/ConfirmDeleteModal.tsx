@@ -21,9 +21,9 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
       <div className="custom-modal" onClick={(e) => e.stopPropagation()}>
         <div className="custom-modal-header">
           <span className="custom-modal-title">Confirm Deletion</span>
-          <button className="close-button" onClick={onClose}>
+          {/* <button className="close-button" onClick={onClose}>
             ×
-          </button>
+          </button> */}
         </div>
         <div className="custom-modal-body">
           Are you sure you want to delete <strong>{itemName}</strong>?

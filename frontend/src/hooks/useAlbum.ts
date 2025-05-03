@@ -7,15 +7,15 @@ interface CreateAlbumRequest {
   artist: number;
   genres?: number[];
   release_date: string; // YYYY-MM-DD
-  cover_image?: File;
+  cover_image?: string | File | null;
   description?: string;
-  slug: string;
+  slug?: string;
 }
 
 interface UpdateAlbumRequest {
   title?: string;
   description?: string;
-  cover_image?: File;
+  cover_image?: string | File | null;
   genres?: number[];
   release_date?: string;
 }

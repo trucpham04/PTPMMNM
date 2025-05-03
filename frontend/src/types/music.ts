@@ -15,7 +15,7 @@ export interface Genre {
   id: number;
   name: string;
   description?: string;
-  slug: string;
+  slug?: string;
 
   // Virtual fields from related models
   artists?: Artist[];

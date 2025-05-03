@@ -1,0 +1,306 @@
+/* AddArtistModal.scss */
+
+/* Color Variables */
+$primary-color: #007bff; /* Main color */
+$secondary-color: #ccc; /* Secondary color for buttons */
+$background-color: #f8f9fa; /* Modal background color */
+$text-color: #000; /* Main text color */
+$input-bg-color: #fff; /* Input background color */
+$button-hover-color: #0056b3; /* Hover color for primary buttons */
+$close-button-color: #333; /* Color for the close button */
+$input-border-color: #ccc; /* Border color for inputs */
+
+/* Overlay styles */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  z-index: 1000;
+  overflow: hidden; /* Prevent page scroll when overlay is active */
+}
+
+.overlay.show {
+  display: block;
+}
+
+/* Modal content */
+.modal-content {
+  background-color: $input-bg-color;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 1200px;
+  max-height: 90vh; /* Set a maximum height for the modal */
+  padding: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  margin: 30px auto;
+  color: $text-color;
+  /* overflow-y: auto; */ /* Enable scroll inside the modal if content overflows */
+
+  .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-height: 70vh; /* Limit height for the body section */
+    overflow-y: auto; /* Enable scroll if content overflows */
+  }
+
+  .form-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    width: 100%;
+
+    .form-group {
+      flex: 1;
+      margin-bottom: 15px;
+    }
+  }
+}
+
+/* Modal Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #ddd;
+  background-color: #f3f3f3;
+  border-radius: 8px 8px 0 0;
+
+  h5 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: bold;
+    color: #149c43;
+  }
+
+  .close-button {
+    background: none;
+    border: none;
+    font-size: 32px;
+    cursor: pointer;
+    line-height: 1;
+    color: #333;
+
+    &:hover {
+      color: #ff4d4f;
+    }
+  }
+}
+
+/* Close button */
+.close-button {
+  font-size: 1.5rem;
+  color: $close-button-color;
+  cursor: pointer;
+
+  &:hover {
+    color: $primary-color;
+  }
+}
+
+/* Input Fields */
+.input {
+  padding: 10px;
+  margin: 5px 0 10px 0;
+  border: 1px solid $input-border-color;
+  border-radius: 5px;
+  font-size: 1rem;
+  background-color: $input-bg-color;
+  color: $text-color;
+  width: 100%; /* Ensure input takes up full width */
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+  }
+}
+
+/* Button Styles */
+.button {
+  padding: 10px 20px;
+  border-radius: 5px;
+  background-color: $primary-color;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-left: 10px;
+
+  &:hover {
+    background-color: $button-hover-color;
+  }
+
+  &.secondary {
+    background-color: $secondary-color;
+
+    &:hover {
+      background-color: darken($secondary-color, 10%);
+    }
+  }
+}
+
+/* React-Select Styles */
+.react-select__control {
+  border: 1px solid $input-border-color;
+  border-radius: 5px;
+  background-color: $input-bg-color;
+  color: $text-color;
+  font-size: 1rem;
+  padding: 5px;
+  margin: 5px 0 10px 0;
+
+  &:hover {
+    border-color: $primary-color;
+  }
+
+  &.react-select__control--is-focused {
+    border-color: $primary-color;
+  }
+}
+
+.react-select__menu {
+  background-color: $input-bg-color;
+  border-radius: 5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.react-select__multi-value {
+  background-color: $primary-color;
+  color: white;
+  border-radius: 10px;
+  margin: 0 5px;
+  padding: 5px;
+}
+
+.react-select__multi-value__remove {
+  background-color: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+
+  &:hover {
+    color: $button-hover-color;
+  }
+}
+
+/* Image Section */
+.form-group img {
+  margin-top: 10px;
+  width: 100px;
+  cursor: zoom-in;
+}
+
+/* Image Preview Overlay */
+.image-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.image-popup {
+  position: relative;
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  max-width: 80%;
+  max-height: 80%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.3s ease-in-out;
+
+  img {
+    max-width: 100%;
+    max-height: 70vh;
+    border-radius: 8px;
+    display: block;
+  }
+}
+
+.image-close-button {
+  background: transparent;
+  border: none;
+  font-size: 28px;
+  color: #999;
+  position: absolute;
+  top: 17px;
+  right: 17px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  border-radius: 20%;
+  font-weight: 500;
+
+  &:hover {
+    color: #828282;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.custom-file-button {
+  display: inline-block;
+  background-color: #007bff;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  font-size: 14px;
+}
+
+.custom-file-button input[type="file"] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.file-preview {
+  margin-top: 10px;
+}
+
+.file-info {
+  font-size: 0.9em;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.file-note {
+  font-size: 0.8em;
+  color: #666;
+  margin-top: 4px;
+}
+
+.remove-file-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  margin-top: 8px;
+  font-size: 0.85em;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.remove-file-button:hover {
+  background-color: #c82333;
+}

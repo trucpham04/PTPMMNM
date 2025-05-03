@@ -5,15 +5,15 @@ import { Album, Artist, ArtistFollow, Song } from "../types";
 interface CreateArtistRequest {
   name: string;
   bio?: string;
-  image?: File;
+  image?: string | File | null;
   genres?: number[];
-  slug: string;
+  slug?: string;
 }
 
 interface UpdateArtistRequest {
   name?: string;
   bio?: string;
-  image?: File;
+  image?: string | File | null;
   genres?: number[];
   slug?: string;
 }

@@ -10,7 +10,7 @@ import {
 } from "react-icons/fa";
 import { FiLogOut, FiSettings } from "react-icons/fi";
 import "./AdminSidebar.scss";
-
+import { useAuth } from "@/contexts/authContext";
 interface AdminSidebarProps {
   collapsed: boolean;
 }
@@ -18,7 +18,7 @@ interface AdminSidebarProps {
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed }) => {
   const navigate = useNavigate();
   const [selectedItem, setSelectedItem] = useState<string>("artist"); // mặc định chọn "artist" luôn
-
+  const { user, logout } = useAuth();
   const handleMenuClick = (item: string) => {
     console.log("is submit", item);
     setSelectedItem(item);
@@ -52,18 +52,18 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed }) => {
           <span>Song</span>
         </MenuItem>
 
-        <MenuItem
+        {/* <MenuItem
           icon={<FaListUl />}
           className={`${selectedItem === "playlist" ? "active" : ""}`}
           onClick={() => handleMenuClick("playlist")}
         >
           <span>Playlist</span>
-        </MenuItem>
+        </MenuItem> */}
 
         <MenuItem
           icon={<FaTags />}
-          className={`${selectedItem === "genre" ? "active" : ""}`}
-          onClick={() => handleMenuClick("genre")}
+          className={`${selectedItem === "genres" ? "active" : ""}`}
+          onClick={() => handleMenuClick("genres")}
         >
           <span>Genres</span>
         </MenuItem>
@@ -72,20 +72,20 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed }) => {
           className={`${selectedItem === "user" ? "active" : ""}`}
           onClick={() => handleMenuClick("user")}
         >
-          <span>Artist</span>
+          <span>User</span>
         </MenuItem>
         <MenuItem
           icon={<FiSettings />}
-          className={`${selectedItem === "settings" ? "active" : ""}`}
-          onClick={() => handleMenuClick("settings")}
+          className={`${selectedItem === "/" ? "active" : ""}`}
+          onClick={() => navigate("/")}
         >
-          <span>Settings</span>
+          <span>User UI</span>
         </MenuItem>
 
         <MenuItem
           icon={<FiLogOut />}
           className={`${selectedItem === "logout" ? "active" : ""}`}
-          onClick={() => handleMenuClick("logout")}
+          onClick={logout}
         >
           <span>Log Out</span>
         </MenuItem>
@@ -99,10 +99,10 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed }) => {
           padding: "1rem",
         }}
       >
-        <div className="sidebar-footer-content">
+        {/* <div className="sidebar-footer-content">
           <div className="sidebar-footer-subtitle">Logged in as:</div>
           <div className="sidebar-login-name">Guest</div>
-        </div>
+        </div> */}
       </div>
     </Sidebar>
   );
