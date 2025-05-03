@@ -7,6 +7,11 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import random
 from django.db.models import Min,Max
+from music.serializers.song_serializer import SongSerializer
+from playlist.models import Playlist
+from playlist.serializers.playlist_serializer import PlaylistSerializer
+from playlist.models import PlaylistSong
+from playlist.serializers.playlist_song_serializer import PlaylistSongSerializer
 @api_view(['GET'])
 def chat_history(request):
     user_id = request.GET.get('user_id')
@@ -78,7 +83,7 @@ def chat(request):
     if request.method != "POST":
         return Response({"response": "Method not allowed"}, status=405)
     data = request.data
-    message = data.get("message", "").lower()
+    message = data.get("message", "")
     song_id = data.get("song_id", None)
     isPlaying = data.get("isPlaying", False)
     user_id = data.get('user_id',None)
@@ -141,9 +146,8 @@ def chat(request):
         if not artist:
             create_chat_record(f"Không tìm thấy nghệ sĩ: {artist_name}")
             return Response({"response": f"Không tìm thấy nghệ sĩ: {artist_name}"})
-        
         album = Album.objects.filter(Q(title__icontains=album_title), Q(artist=artist)).first()
-        
+
         if not album:
             create_chat_record(f"Không tìm thấy album {album_title} của nghệ sĩ {artist_name}")
             return Response({"response": f"Không tìm thấy album {album_title} của nghệ sĩ {artist_name}"})
@@ -169,7 +173,102 @@ def chat(request):
             "song": song_list,
             "action": "play_list"
         })
-
+    # Fetch favorite songs of the user
+    elif "phát các bài hát yêu thích" in message:
+        favorite_songs = Song.objects.filter(favorited_by__user__id=user_id).distinct()
+        if not favorite_songs.exists():
+            create_chat_record("Không có bài hát yêu thích nào!")
+            return Response({"response": "Không có bài hát yêu thích nào!"})
+        serializer = SongSerializer(favorite_songs, many=True)
+        create_chat_record( f"Đang phát các bài hát yêu thích.")
+        return Response({
+            "response": f"Đang phát các bài hát yêu thích.",
+            "song": serializer.data,
+        })
+     # Fetch favorite albums of the user
+    elif "phát album " in message:
+        album_title = message.replace("phát album ", "").strip()
+        parts = album_title.split(" yêu thích")
+        album_title = parts[0].strip()
+        favorite_albums = Album.objects.filter(favorited_by__user__id=user_id,
+        title=album_title
+        ).select_related("artist").distinct()
+        if not favorite_albums.exists():
+            create_chat_record(f"Không tìm thấy album {album_title} yêu thích.")
+            return Response({"response": f"Không tìm thấy album {album_title} yêu thích."})
+        artist = favorite_albums.first().artist
+        album = Album.objects.filter(Q(title__icontains=album_title), Q(artist=artist)).first()
+        songs = Song.objects.filter(album=album).select_related(
+        'album', 'artist'
+        ).prefetch_related(
+        'genres',
+        'featuring_artists',
+        'composers',
+        'artist__genres',
+        'album__genres'
+        ).order_by("id")
+        if not songs.exists():
+            create_chat_record(f"Không tìm thấy bài hát nào trong album {album.title}!")
+            return Response({"response": f"Không tìm thấy bài hát nào trong album {album.title}!"})
+        create_chat_record(f"Đang phát các bài hát trong album yêu thích.")
+        return Response({
+            "response": f"Đang phát các bài hát trong album yêu thích.",
+            "song": SongSerializer(songs, many=True).data ,
+        })
+    # Fetch favorite playlist of the user
+    elif "phát playlist " in message:
+        playlist_title = message.replace("phát playlist ", "").strip()
+        playlists = Playlist.objects.filter(user_id=user_id,name=playlist_title)
+        if not playlists.exists():
+            create_chat_record(f"Không tìm thấy playlist {playlist_title}.")
+            return Response({"response": f"Không tìm thấy playlist {playlist_title}."})
+        playlist_songs = PlaylistSong.objects.filter(playlist_id=playlists.first().id)
+        if not playlist_songs.exists():
+            create_chat_record(f"Không tìm thấy bài hát nào trong playlist {playlist_title}.")
+            return Response({"response": f"Không tìm thấy bài hát nào trong playlist {playlist_title}."})
+        result_songs = []
+        for ps in playlist_songs:
+            song = ps.song
+            result_songs.append({
+            "id": song.id,
+            "title": song.title,
+            "artist": {
+                "id": song.artist.id,
+                "name": song.artist.name,
+                "image": song.artist.image.url if song.artist.image else None,
+                "bio": song.artist.bio,
+                "slug": song.artist.slug,
+                "genres": [genre.name for genre in song.artist.genres.all()],
+            },
+            "album": {
+                "id": song.album.id,
+                "title": song.album.title,
+                "cover_image": song.album.cover_image.url if song.album and song.album.cover_image else None,
+            } if song.album else None,
+            "genres": [genre.name for genre in song.genres.all()],
+            "audio_file": song.audio_file.url,
+            "video_file": song.video_file.url if song.video_file else None,
+            "duration": song.duration,
+            "lyrics": song.lyrics,
+            "release_date": song.release_date,
+            "price": str(song.price),
+            "is_downloadable": song.is_downloadable,
+            "is_premium": song.is_premium,
+            "play_count": song.play_count,
+            "featuring_artists": [{
+                "id": fa.id,
+                "name": fa.name
+            } for fa in song.featuring_artists.all()],
+            "composers": [{
+                "id": composer.id,
+                "name": composer.name
+            } for composer in song.composers.all()],
+        })
+        create_chat_record( f"Đang phát các bài hát trong playlist {playlist_title}.")
+        return Response({
+            "response": f"Đang phát các bài hát trong playlist {playlist_title}.",
+            "song":  result_songs ,
+        })
     # Play specific song by artist
     elif message.startswith("phát bài "):
         song_title = message.replace("phát bài", "").strip()
@@ -221,7 +320,6 @@ def chat(request):
             'artist__genres',  
             'album__genres'  
             ))
-
         else:
             if(songListLength == 1):
                 if song_id == Song.objects.aggregate(Max('id'))['id__max']:
@@ -245,28 +343,6 @@ def chat(request):
             'album__genres'
             ).first()
             else:
-                if song_id == Song.objects.aggregate(Max('id'))['id__max']:
-                    next_song = random.choice(Song.objects.all().select_related(
-            'album', 'artist'  
-            ).prefetch_related(
-            'genres', 
-            'featuring_artists',
-            'composers',
-            'artist__genres',  
-            'album__genres'  
-            ))  
-                else:
-                    if Song.objects.filter(id=song_id+1).exists():
-                        next_song = Song.objects.filter(id=song_id+1).order_by('id').select_related(
-            'album', 'artist'
-            ).prefetch_related(
-            'genres',
-            'featuring_artists',
-            'composers',
-            'artist__genres',
-            'album__genres'
-            ).first()
-                    else:
                         if firstSong==1:
                             next_song = random.choice(Song.objects.all().select_related(
                             'album', 'artist'  
@@ -276,7 +352,7 @@ def chat(request):
                             'composers',
                             'artist__genres',  
                             'album__genres'  
-                            ))      
+                            ))   
                         else:
                             next_song = Song.objects.filter(id=song_id).order_by("id").select_related(
             'album', 'artist'
@@ -286,11 +362,10 @@ def chat(request):
             'composers',
             'artist__genres',
             'album__genres'
-            ).first()
+            ).first()       
         if not next_song:
             create_chat_record("Không thể chuyển bài!")
             return Response({"response": "Không thể chuyển bài!"})
-        
         create_chat_record(f"Đã chuyển sang bài hát tiếp theo: {next_song.title} - {next_song.artist.name}")
         return Response({
             "response": f"Đã chuyển sang bài hát tiếp theo: {next_song.title} - {next_song.artist.name}",
@@ -332,28 +407,6 @@ def chat(request):
             'album__genres'
             ).first()
             else:
-                if song_id == Song.objects.aggregate(Min('id'))['id__min']:
-                    prev_song = random.choice(Song.objects.all().select_related(
-            'album', 'artist'  
-            ).prefetch_related(
-            'genres', 
-            'featuring_artists',
-            'composers',
-            'artist__genres',  
-            'album__genres'  
-            ))  
-                else:
-                    if Song.objects.filter(id=song_id-1).exists():
-                        prev_song = Song.objects.filter(id=song_id-1).order_by('id').select_related(
-            'album', 'artist'
-            ).prefetch_related(
-            'genres',
-            'featuring_artists',
-            'composers',
-            'artist__genres',
-            'album__genres'
-            ).first()
-                    else:
                         if firstSong==1:
                             prev_song = random.choice(Song.objects.all().select_related(
                             'album', 'artist'  

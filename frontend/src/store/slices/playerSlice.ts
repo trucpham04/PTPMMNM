@@ -38,7 +38,7 @@ export const playerSlice = createSlice({
       state.queue = state.queue.filter((song) => song.id !== action.payload);
     },
     clearQueue: (state) => {
-      state.queue = [];
+      state.queue = Array.from(state.queue).filter(q => q.isSingleQueue);
     },
     setVolume: (state, action: PayloadAction<number>) => {
       state.volume = action.payload;
@@ -67,6 +67,11 @@ export const playerSlice = createSlice({
       // This will be used to trigger the API call to increment play count
       // The actual API call will be handled in a middleware or thunk
     },
+    addToHistory: (state, action: PayloadAction<Song>) => {
+      if (action.payload) {
+        state.history.push(action.payload);
+      }
+    },
   },
 });
 
@@ -81,6 +86,7 @@ export const {
   nextSong,
   previousSong,
   updatePlayCount,
+  addToHistory,
 } = playerSlice.actions;
 
 export default playerSlice.reducer;

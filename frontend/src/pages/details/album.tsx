@@ -8,6 +8,7 @@ import AlbumAction from "@/components/details/action"; // Import the action comp
 import { usePlayer } from "@/contexts/playerContext";
 import { useAlbum } from "@/hooks";
 import { useCallback, useEffect } from "react";
+import * as _ from "lodash";
 
 export default function AlbumPage() {
   const { album_id } = useParams<{ album_id: string }>();
@@ -23,6 +24,7 @@ export default function AlbumPage() {
     isLoading,
     togglePlay,
     addSongToQueue,
+    clearSongQueue,
   } = usePlayer();
 
   useEffect(() => {
@@ -39,7 +41,7 @@ export default function AlbumPage() {
       console.warn("No songs available to play");
       return;
     }
-
+    clearSongQueue();
     // Check if we're already playing from this album
     const isPlayingThisAlbum = albumSongs.some(
       (track) => track.id === currentSong?.id,

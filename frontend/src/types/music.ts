@@ -89,6 +89,7 @@ export interface Song {
   is_premium: boolean;
   play_count: number;
   slug: string;
+  isSingleQueue?: boolean; // Optional field to indicate if the song is in a queue
 
   // Related fields
   genres: Genre[];

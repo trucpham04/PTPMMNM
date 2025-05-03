@@ -29,6 +29,7 @@ export default function PlaylistPage() {
     isLoading,
     togglePlay,
     addSongToQueue,
+    clearSongQueue,
   } = usePlayer();
 
   useEffect(() => {
@@ -44,7 +45,7 @@ export default function PlaylistPage() {
       console.warn("No songs available to play");
       return;
     }
-
+    clearSongQueue();
     const isPlayingThisPlaylist = playlistSongs.some(
       (track) => track.id === currentSong?.id,
     );

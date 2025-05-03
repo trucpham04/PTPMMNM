@@ -28,12 +28,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { Playlist } from "@/types";
+import * as _ from "lodash";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
 
 export default function TrackPage() {
   const { user } = useAuth();
   const { song_id } = useParams<{ song_id: string }>();
   const songId = parseInt(song_id || "0");
-
   const {
     song,
     loading: songLoading,
@@ -42,8 +44,14 @@ export default function TrackPage() {
     downloadMusicVideo,
   } = useSong();
 
-  const { play, currentSong, isPlaying, togglePlay, addSongToQueue } =
-    usePlayer();
+  const {
+    play,
+    currentSong,
+    isPlaying,
+    togglePlay,
+    addSongToQueue,
+    clearSongQueue,
+  } = usePlayer();
 
   const {
     isFavorited,
@@ -65,9 +73,12 @@ export default function TrackPage() {
       console.warn("No song available to add to queue");
       return;
     }
-
-    addSongToQueue(song);
-    toast.success(`Added "${song.title}" to queue`);
+    const isCurrentSong = currentSong?.id === song.id;
+    if (!isCurrentSong) {
+      song.isSingleQueue = true;
+      addSongToQueue(song);
+      toast.success(`Added "${song.title}" to queue`);
+    }
   };
 
   useEffect(() => {
