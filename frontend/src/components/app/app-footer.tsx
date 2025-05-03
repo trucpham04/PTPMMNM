@@ -11,6 +11,7 @@ import {
   nextSong,
   previousSong,
   updatePlayCount,
+  addToHistory,
 } from "@/store/slices/playerSlice";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
@@ -22,7 +23,7 @@ import { Button } from "../ui/button";
 import { useFavorite } from "@/hooks";
 import { useAuth } from "@/contexts/authContext";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Song } from "@/types";
+import { Song } from "@/types/music";
 
 export default function AppFooter({ className }: { className?: string }) {
   const dispatch = useDispatch<AppDispatch>();
@@ -40,8 +41,10 @@ export default function AppFooter({ className }: { className?: string }) {
     duration,
     addSongToQueue,
     clearSongQueue,
+    removeSongFromQueue,
+    queue,
   } = usePlayer();
-
+  const history = useSelector((state: RootState) => state.player.history);
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const {
@@ -51,16 +54,14 @@ export default function AppFooter({ className }: { className?: string }) {
     removeSongFromFavorites,
   } = useFavorite();
   const [songIndex, setSongIndex] = useState(0);
-  const [songList, setSongList] = useState<any[]>([currentSong]);
   const [chatOpen, setChatOpen] = useState(false);
   const [messages, setMessages] = useState<{ text: string; sender: string }[]>(
     [],
   );
+  let songListInChat = [currentSong, ...queue];
   let tempSongId = 0;
-  let playlistId = 0;
   let nextSongId = 0;
   let firstSong = 0;
-
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
@@ -111,23 +112,19 @@ export default function AppFooter({ className }: { className?: string }) {
     setChatOpen((prev) => !prev);
     setErrorMessage("");
   };
-  const playSong = useCallback(() => {
-    const song = songList[songIndex];
-    if (!song) return;
-    dispatch(setCurrentSong(song));
-    songList.forEach((s: Song) => {
-      if (s.id != song.id) {
-        addSongToQueue(s);
-      }
-    });
+
+  const playSong = () => {
+    console.log("SongIndex songListInChat:", songListInChat);
     dispatch(setPlaying(true));
-  }, [songList, songIndex, dispatch]);
+  };
 
   useEffect(() => {
-    if (songList.length > 0 && songList[songIndex]) {
+    songListInChat = [currentSong, ...queue];
+    if (songListInChat.length > 0 && songListInChat[songIndex]) {
       playSong();
     }
-  }, [songList, songIndex, playSong]);
+  }, [songIndex, queue]);
+  console.log("history.length", history.length);
   const handleSendMessage = async () => {
     if (!user) {
       setErrorMessage("Bạn cần đăng nhập để gửi tin nhắn!");
@@ -142,72 +139,28 @@ export default function AppFooter({ className }: { className?: string }) {
     setErrorMessage("");
     const message = userInput.trim();
     tempSongId = currentSong?.id || 0;
-    console.log("SongTemp:", tempSongId);
-    if (
-      (message === "quay lại bài trước" ||
-        message === "chuyển bài hát tiếp theo") &&
-      songList.length == 1
+
+    if (message === "quay lại bài trước" && songListInChat.length > 1) {
+      if (history.length <= 0) {
+        tempSongId = songListInChat[songIndex]?.id || 0;
+        firstSong = 1;
+      }
+    } else if (
+      message === "chuyển bài hát tiếp theo" &&
+      songListInChat.length > 1
     ) {
-      setSongIndex(0);
+      if (songIndex < songListInChat.length - 1) {
+        let is_SongQueue = songListInChat.findIndex(
+          (song) => song && song.id == tempSongId,
+        );
+        nextSongId = songListInChat[is_SongQueue + 1]?.id || 0;
+        tempSongId = nextSongId;
+      } else {
+        tempSongId = songListInChat[songListInChat.length - 1]?.id || 0;
+        firstSong = 1;
+      }
     }
-    console.log("SongList:", songList);
-    if (message === "quay lại bài trước" && songList.length > 1) {
-      let artistCount: Record<string, number> = {};
-      songList.forEach((song) => {
-        const artistId = song.artist?.id;
-        if (artistId) {
-          artistCount[artistId] = (artistCount[artistId] || 0) + 1;
-        }
-      });
-      const totalSongs = songList.length;
-      Object.entries(artistCount).forEach(([artistId, count]) => {
-        if (count === totalSongs) {
-          songList.map((msg, index) =>
-            msg.id == tempSongId ? (playlistId = index) : (playlistId = 0),
-          );
-          if (playlistId > 0) {
-            nextSongId = songList[playlistId - 1].id;
-            setSongIndex(playlistId - 1);
-            tempSongId = nextSongId;
-          } else {
-            setSongIndex(0);
-            tempSongId = songList[playlistId].id;
-            firstSong = 1;
-          }
-        }
-      });
-    } else if (message === "chuyển bài hát tiếp theo" && songList.length > 1) {
-      let artistCount: Record<string, number> = {};
-      songList.forEach((song) => {
-        const artistId = song.artist?.id;
-        if (artistId) {
-          artistCount[artistId] = (artistCount[artistId] || 0) + 1;
-        }
-      });
-      const totalSongs = songList.length;
-      Object.entries(artistCount).forEach(([artistId, count]) => {
-        if (count === totalSongs) {
-          songList.map((msg, index) => {
-            if (msg.id == tempSongId) {
-              playlistId = index;
-            }
-          });
-          console.log("play", playlistId);
-          if (playlistId < songList.length - 1) {
-            nextSongId = songList[playlistId + 1].id;
-            console.log(`Bài hát có ID ${nextSongId}`);
-            setSongIndex(playlistId + 1);
-            tempSongId = nextSongId;
-          } else {
-            setSongIndex(0);
-            tempSongId = songList[songList.length - 1].id;
-            firstSong = 1;
-          }
-        }
-      });
-    }
-    console.log("tempSongId ID:", tempSongId);
-    console.log("Song ID:", songIndex);
+
     try {
       const res = await fetch("http://localhost:8000/api/chat", {
         method: "POST",
@@ -217,7 +170,7 @@ export default function AppFooter({ className }: { className?: string }) {
           song_id: tempSongId,
           isPlaying: isPlaying,
           user_id: user.id,
-          songListLength: songList.length,
+          songListLength: songListInChat.length,
           firstSong: firstSong,
         }),
       });
@@ -235,24 +188,74 @@ export default function AppFooter({ className }: { className?: string }) {
         } else if (data.action === "resume") {
           dispatch(setPlaying(true));
         }
-
         if (data.song) {
           const newSongList = Array.isArray(data.song)
             ? data.song
             : [data.song];
-          if (
-            message == "quay lại bài trước" ||
-            message == "chuyển bài hát tiếp theo"
-          ) {
-            if (songList.length == 1) {
-              setSongList(newSongList);
+          if (message == "chuyển bài hát tiếp theo") {
+            if (songListInChat.length == 1) {
+              dispatch(clearSongQueue());
+              dispatch(setCurrentSong(newSongList[0]));
+              dispatch({
+                type: "player/addToHistory",
+                payload: currentSong,
+              });
+              setSongIndex(0);
             } else {
-              if (!songList.some((song) => song.id === newSongList[0].id)) {
-                setSongList(newSongList);
+              if (
+                !songListInChat.some(
+                  (song) => song && song.id === newSongList[0].id,
+                )
+              ) {
+                dispatch(clearSongQueue());
+                dispatch(setCurrentSong(newSongList[0]));
+                dispatch({
+                  type: "player/addToHistory",
+                  payload: currentSong,
+                });
+                setSongIndex(0);
+              } else {
+                const index = songListInChat.findIndex(
+                  (song) => song && song.id == newSongList[0].id,
+                );
+
+                if (index !== -1) {
+                  if (songListInChat[index]) {
+                    dispatch(setCurrentSong(songListInChat[index]));
+                    dispatch({
+                      type: "player/addToHistory",
+                      payload: currentSong,
+                    });
+                    dispatch(removeSongFromQueue(songListInChat[index].id));
+                    setSongIndex(0);
+                  }
+                }
               }
             }
-          } else {
-            setSongList(newSongList);
+          }
+          if (message == "quay lại bài trước") {
+            if (history.length > 0) {
+              dispatch(previousSong());
+              setSongIndex(0);
+            } else {
+              dispatch(clearSongQueue());
+              dispatch(setCurrentSong(newSongList[0]));
+              setSongIndex(0);
+            }
+          }
+          if (
+            message.startsWith("phát bài của ") ||
+            message.startsWith("phát bài trong album ") ||
+            message.startsWith("phát các bài hát yêu thích") ||
+            message.startsWith("phát album ") ||
+            message.startsWith("phát bài ")
+          ) {
+            dispatch(clearSongQueue());
+            dispatch(setCurrentSong(newSongList[0]));
+            newSongList.slice(1).forEach((song: Song) => {
+              addSongToQueue(song);
+            });
+            setSongIndex(0);
           }
         }
       }

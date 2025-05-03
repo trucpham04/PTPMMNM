@@ -26,8 +26,14 @@ export default function ArtistPage() {
   const { artist_id } = useParams<{ artist_id: string }>();
   const artistId = parseInt(artist_id || "0");
 
-  const { play, currentSong, isPlaying, togglePlay, addSongToQueue } =
-    usePlayer();
+  const {
+    play,
+    currentSong,
+    isPlaying,
+    togglePlay,
+    addSongToQueue,
+    clearSongQueue,
+  } = usePlayer();
 
   useEffect(() => {
     if (artistId > 0) {
@@ -42,7 +48,7 @@ export default function ArtistPage() {
       console.warn("No songs available to play");
       return;
     }
-
+    clearSongQueue();
     // Check if we're already playing from this album
     const isPlayingThisAlbum = artistSongs.some(
       (track) => track.id === currentSong?.id,

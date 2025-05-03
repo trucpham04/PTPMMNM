@@ -17,6 +17,7 @@ export default function FavoritePage() {
     isPlaying,
     isLoading,
     togglePlay,
+    clearSongQueue,
     addSongToQueue,
   } = usePlayer();
 
@@ -37,7 +38,7 @@ export default function FavoritePage() {
       console.warn("No songs available to play");
       return;
     }
-
+    clearSongQueue();
     // Check if we're already playing from this album
     const isPlayingThisAlbum = favoriteSongs.some(
       (track) => track.id === currentSong?.id,

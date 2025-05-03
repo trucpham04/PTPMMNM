@@ -14,6 +14,7 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Song } from "@/types/music";
 import useSong from "./useSong";
+import { forEach } from "lodash";
 
 /**
  * Custom hook for music player functionality
@@ -21,7 +22,7 @@ import useSong from "./useSong";
  */
 export function usePlayer() {
   const dispatch = useDispatch<AppDispatch>();
-  const { currentSong, isPlaying, queue, volume } = useSelector(
+  const { currentSong, isPlaying, queue, volume} = useSelector(
     (state: RootState) => state.player,
   );
   const audioRef = useRef<HTMLAudioElement>(new Audio());
@@ -136,9 +137,15 @@ export function usePlayer() {
 
   // Queue controls
   const addSongToQueue = useCallback(
-    (song: Song) => dispatch(addToQueue(song)),
-    [dispatch],
+    (song: Song) => {
+      // const existsInQueue = queue.some((s) => s.id === song.id);
+      const isCurrentSong = currentSong?.id === song.id;
+      if (isCurrentSong) return;
+      dispatch(addToQueue(song));
+    },
+    [dispatch, queue, currentSong]
   );
+  
   const removeSongFromQueue = useCallback(
     (id: number) => dispatch(removeFromQueue(id)),
     [dispatch],
@@ -198,6 +205,7 @@ export function usePlayer() {
       audio.removeEventListener("ended", handleEnded);
     };
   }, [dispatch, currentSong]);
+
 
   return {
     currentSong,
