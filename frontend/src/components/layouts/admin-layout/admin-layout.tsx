@@ -1,13 +1,20 @@
 import { Outlet } from "react-router-dom";
-import { memo, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 
 import AdminSidebar from "../../../pages/admin/adminSideBar/AdminSidebar";
 import Header from "../../../pages/admin/header/header";
 import "./admin-layout.scss";
+import { useAuth } from "@/contexts/authContext";
 
 const AdminLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const { user } = useAuth();
+  useEffect(() => {
+    if (!user || user.is_staff === false) {
+      window.location.href = "/";
+    }
+  }, [user]);
 
   return (
     <div className={`app-container`}>
