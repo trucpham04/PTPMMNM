@@ -11,7 +11,7 @@ from .views import (
     SmartSearchSongView, GenreSearchView, GenreGetByIDView,
     AlbumSearchByNameView, AlbumGetByIdView,
     ArtistSearchByNameView, ArtistSearchByIdView,
-    AlbumSongsView, ArtistSongsView, SongSearchView
+    AlbumSongsView, ArtistSongsView, SongSearchView, TopArtistsByPlayCountView,TopSongsViewX
 )
 
 urlpatterns = [
@@ -44,6 +44,8 @@ urlpatterns = [
     path('songs/<int:song_id>/play/', IncreasePlayCountView.as_view(), name='increase-play-count'),
     path('songs/search/', SongSearchView.as_view(), name='search-songs'),
     path('songs/smart-search/', SmartSearchSongView.as_view(), name='smart-search-songs'),
+    path("artists/top/", TopArtistsByPlayCountView.as_view(), name="top-artists-by-playcount"),
+    path('songs/top/', TopSongsViewX.as_view(), name='top-songs'),
 
     # Song Recommendation URLs
     path('recommendations/', SongRecommendationListView.as_view(), name='song-recommendations'),

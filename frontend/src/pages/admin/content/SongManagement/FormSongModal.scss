@@ -139,7 +139,7 @@ $input-border-color: #ccc; /* Border color for inputs */
     background-color: $secondary-color;
 
     &:hover {
-      background-color: darken($secondary-color, 10%);
+      background-color: #ccc;
     }
   }
 }

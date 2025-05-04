@@ -152,7 +152,7 @@ $input-border-color: #ccc; /* Màu viền input */
     background-color: $secondary-color;
 
     &:hover {
-      background-color: darken($secondary-color, 10%);
+      background-color: #ccc;
     }
   }
 }

@@ -19,6 +19,7 @@ import GenresManagement from "@/pages/admin/content/GenresManagement/GenresManag
 import AlbumManagement from "@/pages/admin/content/AlbumManagement/AlbumManagement";
 import SongManagement from "@/pages/admin/content/SongManagement/SongManagement";
 import UserManagement from "@/pages/admin/content/UserManagement/UserManagement";
+import AdminStatisticsPage from "@/pages/admin/content/Statistics/AdminStatisticsPage";
 /* import PlaylistManagement from "@/pages/admin/content/PlaylistManagement/PlaylistManagement"; */
 
 import SearchPage from "@/pages/search";
@@ -49,6 +50,7 @@ function routes() {
           <Route path="album" element={<AlbumManagement />} />
           <Route path="song" element={<SongManagement />} />
           <Route path="user" element={<UserManagement />} />
+          <Route path="statistics" element={<AdminStatisticsPage />} />
         </Route>
 
         <Route path="/" element={<AuthLayout />}>

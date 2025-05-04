@@ -99,7 +99,7 @@ WSGI_APPLICATION = 'SpotifyClone.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-
+""" 
 DATABASES = {
 
     'default': {
@@ -110,18 +110,19 @@ DATABASES = {
         'HOST': 'db',  # Use the service name in Docker
         'PORT': '3306', # Standard MySQL port inside Docker
     }
-}
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'spotifyclone1',
-#         'USER': 'root',              # Thay bằng username của bạn
-#         'PASSWORD': '', # Thay bằng mật khẩu của bạn
-#         'HOST': 'localhost',
-#         'PORT': '3310',
-#     }
-# }
+} """
 
+DATABASES = {
+
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'spotifyclone1',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'localhost',  # Use the service name in Docker
+        'PORT': '3310', # Standard MySQL port inside Docker
+    }
+}
 
 
 # Password validation
@@ -171,8 +172,8 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': 'eaDdEvcb1IkctNIznI34poBW8_k',
     'MEDIA_TAG': 'media',
     'INVALID_VIDEO_ERROR_MESSAGE': 'Vui lòng tải lên một file video hợp lệ.',
-    'RESOURCE_TYPES': ['image', 'video', 'raw'],  # Thêm video và raw
-    'SECURE': True  # Sử dụng HTTPS
+    'RESOURCE_TYPES': ['image', 'video', 'raw'],  
+    'SECURE': True # Sử dụng HTTPS
 }
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'

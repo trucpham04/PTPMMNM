@@ -15,6 +15,8 @@ from music.serializers.song_serializer import SongSerializer
 from utils.custom_response import custom_response
 from rapidfuzz import fuzz
 import logging
+from django.db.models import Sum, Count, Avg, Max, Min
+
 
 # -------------------- SONG API --------------------
 
@@ -97,7 +99,49 @@ class TopSongsView(APIView):
         songs = Song.objects.order_by('-play_count')[:5]
         serializer = SongSerializer(songs, many=True)
         return custom_response(ec=0, em="Play count updated!", dt = serializer.data)
-    
+
+class TopSongsViewX(APIView):
+    """
+    API endpoint lấy top X bài hát có lượt nghe nhiều nhất
+    """
+    def get(self, request):
+        # Lấy tham số x từ query params, mặc định là 5 nếu không có
+        x = int(request.query_params.get('x', 5))  # Mặc định là 5 bài hát
+        
+        # Lấy top X bài hát theo lượt nghe
+        songs = Song.objects.order_by('-play_count')[:x]
+        
+        # Tạo danh sách dữ liệu trả về
+        data = [
+            {
+                "id": song.id,
+                "name": song.title,
+                "total_play_count": song.play_count or 0
+            }
+            for song in songs
+        ]
+        
+        return custom_response(ec=0, em="Fetched top songs", dt=data)
+class TopArtistsByPlayCountView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        limit = int(request.query_params.get('limit', 10))
+
+        artists = Artist.objects.annotate(
+            total_play_count=Sum('songs__play_count')
+        ).order_by('-total_play_count')[:limit]
+
+        data = [
+            {
+                "id": artist.id,
+                "name": artist.name,
+                "total_play_count": artist.total_play_count or 0
+            }
+            for artist in artists
+        ]
+
+        return custom_response(ec=0, em="Fetched top artists", dt=data)   
 """ 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.CRITICAL)
