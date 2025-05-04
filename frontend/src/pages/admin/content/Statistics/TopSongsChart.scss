@@ -1,0 +1,15 @@
+.text-xlll {
+  color: black;
+}
+.form-select {
+  color: black;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  font-size: 14px;
+  width: 150px; /* Điều chỉnh chiều rộng của dropdown */
+  cursor: pointer;
+  z-index: 10; /* Đảm bảo dropdown không bị chặn */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Thêm shadow để dropdown nổi bật */
+}

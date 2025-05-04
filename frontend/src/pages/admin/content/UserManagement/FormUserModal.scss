@@ -129,8 +129,7 @@ $input-border-color: #ccc; /* Màu viền input */
   font-size: 1rem;
   background-color: $input-bg-color;
   color: $text-color;
-  width: 100%; /* Đảm bảo input chiếm hết chiều rộng */
-
+  width: 100%;
   &:focus {
     outline: none;
     border-color: $primary-color;
@@ -156,7 +155,7 @@ $input-border-color: #ccc; /* Màu viền input */
     background-color: $secondary-color;
 
     &:hover {
-      background-color: darken($secondary-color, 10%);
+      background-color: #ccc;
     }
   }
 }

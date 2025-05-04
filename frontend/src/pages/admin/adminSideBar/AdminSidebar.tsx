@@ -5,8 +5,8 @@ import {
   FaUserAlt,
   FaCompactDisc,
   FaHeadphones,
-  FaListUl,
   FaTags,
+  FaChartBar,
 } from "react-icons/fa";
 import { FiLogOut, FiSettings } from "react-icons/fi";
 import "./AdminSidebar.scss";
@@ -57,14 +57,6 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed }) => {
           <span>Song</span>
         </MenuItem>
 
-        {/* <MenuItem
-          icon={<FaListUl />}
-          className={`${selectedItem === "playlist" ? "active" : ""}`}
-          onClick={() => handleMenuClick("playlist")}
-        >
-          <span>Playlist</span>
-        </MenuItem> */}
-
         <MenuItem
           icon={<FaTags />}
           className={`${selectedItem === "genres" ? "active" : ""}`}
@@ -79,6 +71,15 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed }) => {
         >
           <span>User</span>
         </MenuItem>
+
+        <MenuItem
+          icon={<FaChartBar />}
+          className={`${selectedItem === "statistics" ? "active" : ""}`}
+          onClick={() => handleMenuClick("statistics")}
+        >
+          <span>statistics</span>
+        </MenuItem>
+
         <MenuItem
           icon={<FiSettings />}
           className={`${selectedItem === "/" ? "active" : ""}`}

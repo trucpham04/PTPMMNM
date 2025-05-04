@@ -1,0 +1,49 @@
+.top-artists-chart {
+  width: 100%;
+  height: 400px;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1f2937; // Màu tối cho tiêu đề
+  }
+
+  .recharts-wrapper {
+    margin-top: 1.25rem;
+  }
+
+  .recharts-cartesian-axis-tick {
+    font-size: 12px;
+    fill: #6b7280; // Màu cho nhãn trục X và Y
+  }
+
+  .recharts-tooltip-wrapper {
+    background-color: #333;
+    opacity: 0.9;
+    border-radius: 4px;
+    color: white;
+  }
+
+  .recharts-legend-item {
+    font-size: 14px;
+    color: #6b7280;
+    padding: 0.25rem 0;
+  }
+
+  .recharts-legend-item.active {
+    color: #3b82f6;
+  }
+
+  .note {
+    transition: fill 0.3s ease;
+
+    &:hover {
+      fill: #4caf50; // Màu khi hover
+    }
+  }
+}
