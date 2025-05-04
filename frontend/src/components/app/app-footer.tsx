@@ -88,7 +88,7 @@ export default function AppFooter({ className }: { className?: string }) {
     const fetchMessages = async () => {
       try {
         const res = await fetch(
-          `http://localhost:8000/api/chat-history?user_id=${user?.id}`,
+          `http://127.0.0.1:8000/api/chat-history?user_id=${user?.id}`,
           {
             method: "GET",
             headers: {
@@ -113,18 +113,18 @@ export default function AppFooter({ className }: { className?: string }) {
     setErrorMessage("");
   };
 
-  const playSong = () => {
-    console.log("SongIndex songListInChat:", songListInChat);
-    dispatch(setPlaying(true));
-  };
+  // const playSong = () => {
+  //   console.log("SongIndex songListInChat:", songListInChat);
+  //   dispatch(setPlaying(true));
+  // };
 
-  useEffect(() => {
-    songListInChat = [currentSong, ...queue];
-    if (songListInChat.length > 0 && songListInChat[songIndex]) {
-      playSong();
-    }
-  }, [songIndex, queue]);
-  console.log("history.length", history.length);
+  // useEffect(() => {
+  //   songListInChat = [currentSong, ...queue];
+  //   if (songListInChat.length > 0 && songListInChat[songIndex]) {
+  //     playSong();
+  //   }
+  // }, [songIndex, queue]);
+  // console.log("history.length", history.length);
   const handleSendMessage = async () => {
     if (!user) {
       setErrorMessage("Bạn cần đăng nhập để gửi tin nhắn!");
@@ -162,7 +162,7 @@ export default function AppFooter({ className }: { className?: string }) {
     }
 
     try {
-      const res = await fetch("http://localhost:8000/api/chat", {
+      const res = await fetch("http://localhost:127.0.0.1/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
