@@ -25,6 +25,11 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed }) => {
     navigate(`/admin/${item.toLowerCase()}`);
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
   return (
     <Sidebar className="sidebarAdmin" collapsed={collapsed} breakPoint="md">
       <Menu>
@@ -85,7 +90,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed }) => {
         <MenuItem
           icon={<FiLogOut />}
           className={`${selectedItem === "logout" ? "active" : ""}`}
-          onClick={logout}
+          onClick={handleLogout}
         >
           <span>Log Out</span>
         </MenuItem>

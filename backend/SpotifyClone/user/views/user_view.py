@@ -55,11 +55,11 @@ class LoginView(APIView):
     
 @method_decorator(csrf_exempt, name="dispatch")
 class LogoutView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         try:
-            request.user.auth_token.delete()
+            # request.user.auth_token.delete()
             logout(request)
             return custom_response(em="Logout successful")
         except Exception as e:
