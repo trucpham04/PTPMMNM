@@ -1,11 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import Icon from "@/components/ui/icon";
 import { AlbumItem } from "@/components/media/album-item";
 import { DataTable } from "@/components/details/data-table";
-import { Album } from "@/types";
 import AlbumHeader from "@/components/details/header";
 import { MediaGrid } from "@/components/media/media-grid";
 import { SectionSkeleton } from "@/components/media/section-skeleton";
@@ -49,31 +48,25 @@ export default function ArtistPage() {
       return;
     }
     clearSongQueue();
-    // Check if we're already playing from this album
     const isPlayingThisAlbum = artistSongs.some(
       (track) => track.id === currentSong?.id,
     );
 
-    console.log("Is playing this album:", isPlayingThisAlbum);
-
     if (isPlayingThisAlbum) {
       togglePlay();
     } else {
-      // Make sure the first track has an audio_file property
       const firstTrack = artistSongs[0];
       if (!firstTrack.audio_file) {
         console.warn("First track has no audio file:", firstTrack);
         return;
       }
 
-      // Play the first track
       play(firstTrack);
 
-      // Add remaining songs to queue
       if (artistSongs.length > 1) {
         artistSongs
           .slice(1)
-          .filter((track) => track.audio_file) // Only add tracks with audio files
+          .filter((track) => track.audio_file)
           .forEach((track) => {
             addSongToQueue(track);
           });
@@ -140,7 +133,6 @@ export default function ArtistPage() {
     );
   }
 
-  // Determine if any tracks from this artist are currently playing
   const isArtistPlaying =
     isPlaying &&
     currentSong &&
@@ -153,7 +145,7 @@ export default function ArtistPage() {
       <div className="flex flex-wrap items-center gap-4 px-[max(2%,16px)]">
         <Button
           size="lg"
-          className="flex items-center gap-2 rounded-full"
+          className="flex cursor-pointer items-center gap-2 rounded-full"
           onClick={handlePlay}
           disabled={artistSongs.length === 0}
         >

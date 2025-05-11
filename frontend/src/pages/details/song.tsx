@@ -28,9 +28,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { Playlist } from "@/types";
-import * as _ from "lodash";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/store";
 
 export default function TrackPage() {
   const { user } = useAuth();
@@ -44,19 +41,12 @@ export default function TrackPage() {
     downloadMusicVideo,
   } = useSong();
 
-  const {
-    play,
-    currentSong,
-    isPlaying,
-    togglePlay,
-    addSongToQueue,
-    clearSongQueue,
-  } = usePlayer();
+  const { play, currentSong, isPlaying, togglePlay, addSongToQueue } =
+    usePlayer();
 
   const {
     isFavorited,
     getIsSongFavorited,
-    loading: favoriteLoading,
     addSongToFavorites,
     removeSongFromFavorites,
   } = useFavorite();
@@ -85,8 +75,8 @@ export default function TrackPage() {
     const fetchData = async () => {
       const songData = await getSongById(songId);
       if (songData) {
-        getAlbumById(songData.album?.id);
-        getArtistById(songData.artist?.id);
+        if (songData.album?.id) getAlbumById(songData.album.id);
+        if (songData.artist?.id) getArtistById(songData.artist.id);
         if (user?.id) {
           getIsSongFavorited(user.id, songId);
         }
@@ -97,7 +87,7 @@ export default function TrackPage() {
   }, [songId, user?.id]);
 
   const { album, loading: albumLoading, getAlbumById } = useAlbum();
-  const { artist, loading: artistLoading, getArtistById } = useArtist();
+  const { loading: artistLoading, getArtistById } = useArtist();
 
   const loading = songLoading || (song && (albumLoading || artistLoading));
 

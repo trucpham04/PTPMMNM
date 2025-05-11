@@ -162,7 +162,7 @@ export default function AppFooter({ className }: { className?: string }) {
     }
 
     try {
-      const res = await fetch("http://localhost:127.0.0.1/api/chat", {
+      const res = await fetch("http://127.0.0.1:8000/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -339,45 +339,82 @@ export default function AppFooter({ className }: { className?: string }) {
       {!currentSong ? (
         <div
           className={cn(
-            "bg--100 relative flex h-16 items-center justify-between p-2 pt-1",
+            "bg--100 relative flex h-16 items-center justify-between p-2",
+            { "pb-14": isMobile },
             className,
           )}
         >
-          <div className="flex items-center gap-3">
-            <div className="size-14 rounded-md bg-white/10" />
-            <div className="space-y-">
-              <div className="text-muted-foreground">No track playing</div>
+          {/* Track info */}
+          <div className="z-10 flex items-center gap-3">
+            <div className="flex size-12 items-center justify-center rounded-md bg-white/10">
+              <Icon className="text-muted-foreground/50">music_note</Icon>
+            </div>
+            <div className="space-y-1">
+              <div className="text-muted-foreground text-sm font-medium">
+                No track playing
+              </div>
+              <div className="text-muted-foreground/70 text-xs">
+                Select a song to start listening
+              </div>
             </div>
           </div>
+
+          {/* Controls */}
           <div className="absolute top-2/5 left-1/2 flex w-full -translate-1/2 flex-col items-center justify-center">
             <div className="flex gap-4">
-              <Icon size="xl" className="text-muted-foreground/50">
+              <Icon
+                size="xl"
+                className="text-muted-foreground/50 cursor-not-allowed"
+              >
                 skip_previous
               </Icon>
-              <Icon size="xl" className="text-muted-foreground/50">
+              <Icon
+                size="xl"
+                className="text-muted-foreground/50 cursor-not-allowed"
+              >
                 play_arrow
               </Icon>
-              <Icon size="xl" className="text-muted-foreground/50">
+              <Icon
+                size="xl"
+                className="text-muted-foreground/50 cursor-not-allowed"
+              >
                 skip_next
               </Icon>
             </div>
             <div className="flex items-center gap-2 text-xs">
-              <div className="text-muted-foreground">0:00</div>
+              <div className="text-muted-foreground/70">0:00</div>
               <Slider className="w-1/4 min-w-80" disabled />
-              <div className="text-muted-foreground">0:00</div>
+              <div className="text-muted-foreground/70">0:00</div>
             </div>
           </div>
-          <div className="flex gap-2">
-            <Icon size="lg" className="text-muted-foreground/50">
-              volume_up
-            </Icon>
-            <Slider
-              size="small"
-              max={100}
-              defaultValue={[volume]}
-              className="w-20"
-              onValueChange={(values) => changeVolume(values[0])}
-            />
+
+          {/* Volume */}
+          <div className="z-10 flex gap-2">
+            <Button
+              variant={"ghost"}
+              className="hover:bg-primary-foreground size-12 cursor-pointer rounded-full"
+              asChild
+            >
+              <Link to="/queue">
+                <Icon>queue_music</Icon>
+              </Link>
+            </Button>
+
+            <div className="flex gap-2">
+              <Icon
+                size="lg"
+                className="text-muted-foreground/50 cursor-not-allowed"
+              >
+                volume_up
+              </Icon>
+              <Slider
+                size="small"
+                max={100}
+                defaultValue={[volume]}
+                className="w-20"
+                disabled
+              />
+            </div>
           </div>
         </div>
       ) : (

@@ -7,12 +7,20 @@ import { formatTime } from "@/utils/format-time";
 const columns: ColumnDef<Song>[] = [
   {
     id: "index",
-    header: () => <div className="text-right">#</div>,
-    cell: ({ row }) => <div className="text-right">{row.index + 1}</div>,
+    header: () => (
+      <div className="inline-flex items-center justify-center text-center">
+        #
+      </div>
+    ),
+    cell: ({ row }) => (
+      <div className="flex items-center justify-center">{row.index + 1}</div>
+    ),
+    enableSorting: false,
   },
   {
     accessorKey: "title",
     header: "Title",
+    enableSorting: true,
     cell: ({ cell }) => (
       <div className="flex items-center gap-2">
         <div className="size-10">
@@ -46,6 +54,7 @@ const columns: ColumnDef<Song>[] = [
   {
     accessorKey: "albumName",
     header: "Album",
+    enableSorting: true,
     cell: ({ cell }) => {
       if (
         cell.getContext().row.original.album_id === null ||
@@ -69,14 +78,16 @@ const columns: ColumnDef<Song>[] = [
   {
     accessorKey: "release_date",
     header: "Release Date",
+    enableSorting: true,
     cell: ({ row }) => <div>{row.getValue("release_date")}</div>,
   },
   {
     accessorKey: "duration",
     header: () => <Icon size="sm">schedule</Icon>,
+    enableSorting: true,
     cell: ({ row }) => {
-      const duration = row.getValue("duration");
-      return <div>{formatTime(duration)}</div>;
+      const duration = row.getValue("duration") as string;
+      return <div>{formatTime(parseInt(duration))}</div>;
     },
   },
 ];

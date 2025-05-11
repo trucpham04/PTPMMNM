@@ -137,7 +137,7 @@ export default function PlaylistPage() {
       <div className="flex items-center gap-4 px-[max(2%,16px)]">
         <Button
           size="lg"
-          className="flex items-center gap-2 rounded-full"
+          className="flex cursor-pointer items-center gap-2 rounded-full"
           onClick={handlePlay}
           disabled={isLoading}
         >

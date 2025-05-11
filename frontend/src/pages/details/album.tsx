@@ -28,21 +28,18 @@ export default function AlbumPage() {
   } = usePlayer();
 
   useEffect(() => {
-    // Load album data when component mounts or albumId changes
     if (albumId > 0) {
       getAlbumSongs(albumId);
       getAlbumById(albumId);
     }
-  }, [albumId, getAlbumSongs, getAlbumById]); // Add dependencies to prevent unnecessary re-fetching
+  }, [albumId, getAlbumSongs, getAlbumById]);
 
-  // Memoize handlePlay to avoid recreating this function on every render
   const handlePlay = useCallback(() => {
     if (!albumSongs || albumSongs.length === 0) {
       console.warn("No songs available to play");
       return;
     }
     clearSongQueue();
-    // Check if we're already playing from this album
     const isPlayingThisAlbum = albumSongs.some(
       (track) => track.id === currentSong?.id,
     );
@@ -52,21 +49,18 @@ export default function AlbumPage() {
     if (isPlayingThisAlbum) {
       togglePlay();
     } else {
-      // Make sure the first track has an audio_file property
       const firstTrack = albumSongs[0];
       if (!firstTrack.audio_file) {
         console.warn("First track has no audio file:", firstTrack);
         return;
       }
 
-      // Play the first track
       play(firstTrack);
 
-      // Add remaining songs to queue
       if (albumSongs.length > 1) {
         albumSongs
           .slice(1)
-          .filter((track) => track.audio_file) // Only add tracks with audio files
+          .filter((track) => track.audio_file)
           .forEach((track) => {
             addSongToQueue(track);
           });
@@ -129,13 +123,13 @@ export default function AlbumPage() {
         title={album?.title}
         author_name={album?.artist?.name}
         author_type="artist"
-        author_id={album?.artist_id}
+        author_id={album?.artist?.id}
       />
 
       <div className="flex items-center gap-4 px-[max(2%,16px)]">
         <Button
           size="lg"
-          className="flex items-center gap-2 rounded-full"
+          className="flex cursor-pointer items-center gap-2 rounded-full"
           onClick={handlePlay}
           disabled={isLoading}
         >
@@ -144,9 +138,8 @@ export default function AlbumPage() {
           </Icon>
           {isLoading ? "Loading..." : isAlbumPlaying ? "Pause" : "Play"}
         </Button>
-
         {/* Add the album action button */}
-        <AlbumAction album={album} />
+        {album && <AlbumAction album={album} />}
       </div>
 
       <div className="px-[max(2%,16px)] pb-16">
