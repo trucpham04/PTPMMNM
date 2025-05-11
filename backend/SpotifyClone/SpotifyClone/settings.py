@@ -52,6 +52,9 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'rest_framework.authtoken',
     'chat',
+    'ai_assistant',
+    'channels',
+    'supportchat',
 ]
 
 # Đặt AUTH_USER_MODEL bên ngoài danh sách INSTALLED_APPS
@@ -71,6 +74,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",     # React dev server
     "http://127.0.0.1:3000",
+    "http://localhost:5173",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -99,7 +103,7 @@ WSGI_APPLICATION = 'SpotifyClone.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-""" 
+ 
 DATABASES = {
 
     'default': {
@@ -110,20 +114,21 @@ DATABASES = {
         'HOST': 'db',  # Use the service name in Docker
         'PORT': '3306', # Standard MySQL port inside Docker
     }
-} """
+} 
 
+
+""" 
 DATABASES = {
-
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'spotifyclone1',
+        'NAME': 'spotifyclonefinal',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',  # Use the service name in Docker
         'PORT': '3310', # Standard MySQL port inside Docker
     }
 }
-
+ """
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -212,3 +217,12 @@ LOGGING = {
     },
 }
  """
+ASGI_APPLICATION = 'SpotifyClone.asgi.application'
+
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}   
+

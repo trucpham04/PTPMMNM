@@ -12,8 +12,7 @@ class Artist(models.Model):
     genres = models.ManyToManyField(Genre, related_name='artists')
     slug = models.SlugField(max_length=255, blank=True)
 
-    
-    def save(self, *args, **kwargs):
+"""     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
@@ -25,7 +24,7 @@ class Artist(models.Model):
         indexes = [
             models.Index(fields=['name']),
             models.Index(fields=['slug']),
-        ]
+        ] """
 
 # Artist Follow Model
 class ArtistFollow(models.Model):
