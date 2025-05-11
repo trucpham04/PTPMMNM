@@ -103,7 +103,7 @@ WSGI_APPLICATION = 'SpotifyClone.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-""" 
+ 
 DATABASES = {
 
     'default': {
@@ -114,10 +114,11 @@ DATABASES = {
         'HOST': 'db',  # Use the service name in Docker
         'PORT': '3306', # Standard MySQL port inside Docker
     }
-} """
+} 
 
+
+""" 
 DATABASES = {
-
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'spotifyclonefinal',
@@ -127,7 +128,7 @@ DATABASES = {
         'PORT': '3310', # Standard MySQL port inside Docker
     }
 }
-
+ """
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
