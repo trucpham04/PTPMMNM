@@ -369,7 +369,7 @@ export default function AppFooter({ className }: { className?: string }) {
                   <div
                     className={`max-w-[75%] rounded-lg px-4 py-2 text-sm ${
                       msg.sender === "user"
-                        ? "bg-blue-500 text-white"
+                        ? "bg-[#1DB954] text-white"
                         : "border border-gray-200 bg-white text-gray-800 shadow-sm"
                     }`}
                   >
@@ -377,12 +377,12 @@ export default function AppFooter({ className }: { className?: string }) {
                     {msg.songs ? (
                       <div className="space-y-1">
                         <div className="font-medium">Found songs:</div>
-                        <ul className="list-inside list-disc">
+                        <ul className="list-inside list-disc list-none">
                           {msg.songs.map((song: any) => (
                             <li
                               key={song.id}
                               onClick={() => handleNavigateToSong(song.id)}
-                              className="cursor-pointer text-blue-500 hover:underline"
+                              className="cursor-pointer font-medium text-[#1DB954]"
                             >
                               {song.title}
                             </li>

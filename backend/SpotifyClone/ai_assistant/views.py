@@ -1,17 +1,18 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.db.models import Q
-from music.models import Song
+from music.models import Song, Album, Artist, Genre
 from music.serializers.song_serializer import SongSerializer
+from music.serializers.album_serializer import AlbumSerializer
+from music.serializers.artist_serializer import ArtistSerializer
+from music.serializers.genre_serializer import GenreSerializer
 import requests
 import json
 import re
 
-# --- CONFIG ---
-GEMINI_API_KEY = "AIzaSyAMltKo-U-DQtZekd4bkOB1_YT1GZwXnJs"  # Nên đưa vào biến môi trường
+GEMINI_API_KEY = "AIzaSyAMltKo-U-DQtZekd4bkOB1_YT1GZwXnJs"
 GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
 
-# --- FUNCTION ---
 def gemini_chat(prompt: str):
     headers = {"Content-Type": "application/json"}
     data = {
@@ -26,17 +27,15 @@ def gemini_chat(prompt: str):
     except Exception as e:
         return {"error": str(e)}
 
-# --- VIEW ---
 @api_view(["POST"])
 def ai_chat_song(request):
     user_input = request.data.get("prompt")
     if not user_input:
         return Response({"error": "Prompt is required"}, status=400)
 
-    # Bước 1: Phân tích mục đích
     intent_prompt = (
         f"Hãy phân tích mục đích của người dùng qua đoạn sau:\n\"{user_input}\"\n"
-        f"Trả lời dưới dạng JSON với 2 trường: 'intent' (vd: title_search, artist_info, genre_info, ...) "
+        f"Trả lời dưới dạng JSON với 2 trường: 'intent' (vd: title_search, artist_info, genre_info, album_info, ...) "
         f"và 'keywords' (danh sách từ khóa chính).\n"
         f"Ví dụ: {{\"intent\": \"artist_info\", \"keywords\": [\"Taylor Swift\"]}}"
     )
@@ -60,7 +59,7 @@ def ai_chat_song(request):
 
     kw = keywords[0]
 
-    # Bước 2: Nếu là intent mô tả (ví dụ artist_info) thì gọi lại Gemini để sinh đoạn văn
+    # Bước 2: Nếu là intent mô tả (ví dụ artist_info, genre_info, album_info) thì gọi lại Gemini để sinh đoạn văn
     if intent in ["artist_info", "genre_info", "album_info"]:
         info_prompt = f"Bạn hãy giới thiệu ngắn gọn về {kw} dưới dạng đoạn văn thân thiện với người dùng."
         info_response = gemini_chat(info_prompt)
@@ -74,7 +73,15 @@ def ai_chat_song(request):
         except:
             return Response({"error": "Phân tích phản hồi mô tả thất bại."}, status=500)
 
-    # Bước 3: Nếu là intent tìm bài hát, truy vấn DB
+    # Bước 3: Tìm album của nghệ sĩ
+    if intent == "album_search":
+        artist = Artist.objects.filter(name__icontains=kw).first()
+        if artist:
+            albums = Album.objects.filter(artist=artist)
+            return Response({"type": "albums", "albums": AlbumSerializer(albums, many=True).data})
+        return Response({"error": "Không tìm thấy nghệ sĩ."})
+
+    # Bước 4: Tìm bài hát hoặc thể loại
     queryset = Song.objects.none()
     if intent == "title_search":
         queryset = Song.objects.filter(title__icontains=kw)
@@ -91,4 +98,26 @@ def ai_chat_song(request):
     elif intent == "genre_search":
         queryset = Song.objects.filter(genres__name__icontains=kw).distinct()
 
-    return Response({"type": "songs", "songs": SongSerializer(queryset, many=True).data})
+    if queryset.exists():
+        return Response({"type": "songs", "songs": SongSerializer(queryset, many=True).data})
+
+    # Trả về thông tin về nghệ sĩ, album, thể loại
+    if intent == "artist_info":
+        artist = Artist.objects.filter(name__icontains=kw).first()
+        if artist:
+            return Response({"type": "artist", "artist": ArtistSerializer(artist).data})
+        return Response({"error": "Không tìm thấy nghệ sĩ."})
+
+    elif intent == "album_info":
+        album = Album.objects.filter(title__icontains=kw).first()
+        if album:
+            return Response({"type": "album", "album": AlbumSerializer(album).data})
+        return Response({"error": "Không tìm thấy album."})
+
+    elif intent == "genre_info":
+        genre = Genre.objects.filter(name__icontains=kw).first()
+        if genre:
+            return Response({"type": "genre", "genre": GenreSerializer(genre).data})
+        return Response({"error": "Không tìm thấy thể loại."})
+
+    return Response({"error": "Không thể xử lý yêu cầu."})

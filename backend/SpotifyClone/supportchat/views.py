@@ -7,7 +7,6 @@ from .serializers import GlobalMessageSerializer
 @api_view(["GET"])
 def global_chat_history(request):
     try:
-        # Lấy tối đa 100 tin nhắn, sắp xếp theo thời gian
         messages = GlobalMessage.objects.order_by("timestamp")[:100]
         
         if not messages:
