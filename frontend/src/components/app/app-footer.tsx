@@ -1,5 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
+import { FaComment, FaTimes, FaPaperPlane } from "react-icons/fa";
+
 import {
   setCurrentSong,
   togglePlayPause,
@@ -26,7 +28,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Song } from "@/types/music";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import PrivateChatBox from "../supportchat/PrivateChatBox";
+import GlobalChatBox from "../supportchat/GlobalChatBox";
 
 export default function AppFooter({ className }: { className?: string }) {
   const dispatch = useDispatch<AppDispatch>();
@@ -331,18 +333,18 @@ export default function AppFooter({ className }: { className?: string }) {
   return (
     <>
       <div>
-        <PrivateChatBox />
+        <GlobalChatBox />
         {/* AI Chat Section */}
         <button
           onClick={toggleAiChat}
-          className="bg-primary text-primary-foreground fixed right-10 bottom-60 flex size-12 cursor-pointer items-center justify-center rounded-full"
+          className="fixed right-10 bottom-25 flex size-12 transform cursor-pointer items-center justify-center rounded-full bg-[#1DB954] text-white transition-all duration-300 hover:scale-110 hover:bg-[#1A9B44] hover:shadow-lg"
         >
           {/* Thay thế bằng icon AI */}
           <Icon>robot</Icon>
         </button>
 
         {aiChatOpen && (
-          <div className="fixed right-4 bottom-60 w-80 overflow-hidden rounded-lg bg-green-700">
+          <div className="fixed right-10 bottom-20 z-999 w-80 overflow-hidden rounded-lg bg-green-700">
             {/* Chat header */}
             <div className="flex items-center justify-between bg-green-500 p-2 font-medium text-white">
               <div className="flex items-center">
@@ -413,9 +415,9 @@ export default function AppFooter({ className }: { className?: string }) {
                 />
                 <button
                   onClick={handleAiSendMessage}
-                  className="flex items-center justify-center rounded-full bg-blue-500 p-2 text-white transition duration-200"
+                  className="flex items-center justify-center rounded-full bg-[#1DB954] p-2 text-white transition duration-200"
                 >
-                  <Icon className="text-lg">send</Icon>
+                  <FaPaperPlane />
                 </button>
               </div>
               {errorMessage && (
@@ -426,15 +428,15 @@ export default function AppFooter({ className }: { className?: string }) {
             </div>
           </div>
         )}
-
+        {/* --------------------------------------------------------------------------- */}
         {/* Chat Section */}
-        <button
+        {/* <button
           onClick={toggleChat}
           className="bg-primary text-primary-foreground fixed right-4 bottom-25 flex size-12 cursor-pointer items-center justify-center rounded-full"
         >
           <Icon>chat</Icon>
         </button>
-
+ */}
         {chatOpen && (
           <div className="fixed right-4 bottom-24 w-80 overflow-hidden rounded-lg bg-blue-700">
             {/* Chat header */}

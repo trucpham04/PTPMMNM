@@ -52,9 +52,9 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'rest_framework.authtoken',
     'chat',
-    'supportchat',
     'ai_assistant',
     'channels',
+    'supportchat',
 ]
 
 # Đặt AUTH_USER_MODEL bên ngoài danh sách INSTALLED_APPS
@@ -120,7 +120,7 @@ DATABASES = {
 
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'spotifyclone1',
+        'NAME': 'spotifyclonefinal',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',  # Use the service name in Docker
@@ -218,9 +218,10 @@ LOGGING = {
  """
 ASGI_APPLICATION = 'SpotifyClone.asgi.application'
 
+
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
     },
-}
+}   
 

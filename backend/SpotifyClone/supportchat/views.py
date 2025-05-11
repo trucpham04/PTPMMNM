@@ -1,45 +1,20 @@
-import json
-from channels.generic.websocket import AsyncWebsocketConsumer
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from .models import GlobalMessage
+from .serializers import GlobalMessageSerializer
 
-class ChatConsumer(AsyncWebsocketConsumer):
-    async def connect(self):
-        self.room_name = self.scope['url_route']['kwargs']['room_name']
-        self.room_group_name = f"chat_{self.room_name}"
+@api_view(["GET"])
+def global_chat_history(request):
+    try:
+        # Lấy tối đa 100 tin nhắn, sắp xếp theo thời gian
+        messages = GlobalMessage.objects.order_by("timestamp")[:100]
+        
+        if not messages:
+            return Response([], status=200)
 
-        # Join room group
-        await self.channel_layer.group_add(
-            self.room_group_name,
-            self.channel_name
-        )
+        serializer = GlobalMessageSerializer(messages, many=True)
 
-        await self.accept()
-
-    async def disconnect(self, close_code):
-        # Leave room group
-        await self.channel_layer.group_discard(
-            self.room_group_name,
-            self.channel_name
-        )
-
-    # Receive message from WebSocket
-    async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-
-        # Send message to room group
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'message': message
-            }
-        )
-
-    # Receive message from room group
-    async def chat_message(self, event):
-        message = event['message']
-
-        # Send message to WebSocket
-        await self.send(text_data=json.dumps({
-            'message': message
-        }))
+        return Response(serializer.data, status=200)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)

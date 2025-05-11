@@ -25,4 +25,5 @@ urlpatterns = [
     path('api/', include('favorite.urls')),
     path('api/', include('chat.urls')),
     path("api/ai-chat-song/", include("ai_assistant.urls")),
+     path("api/", include("supportchat.urls")),
 ]
