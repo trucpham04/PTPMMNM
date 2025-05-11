@@ -19,7 +19,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed }) => {
   const navigate = useNavigate();
   const [selectedItem, setSelectedItem] = useState<string>("artist"); // mặc định chọn "artist" luôn
   const { user, logout } = useAuth();
-  const handleMenuClick = (item: string) => {
+  /*   console.log("user:", user);
+   */ const handleMenuClick = (item: string) => {
     console.log("is submit", item);
     setSelectedItem(item);
     navigate(`/admin/${item.toLowerCase()}`);
