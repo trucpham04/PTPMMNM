@@ -13,18 +13,25 @@ class Album(models.Model):
     description = models.TextField(null=True, blank=True)
     slug = models.SlugField(max_length=255, blank=True)
     
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title)
-        super().save(*args, **kwargs)
-    
-    def __str__(self):
-        return f"{self.title} - {self.artist.name}"
-    
     class Meta:
         unique_together = ('title', 'artist')
-        indexes = [
+
+
+
+
+
+        
+        """ indexes = [
             models.Index(fields=['title']),
             models.Index(fields=['release_date']),
             models.Index(fields=['slug']),
-        ]
+        ] """
+
+
+        """ def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs) 
+    
+    def __str__(self):
+        return f"{self.title} - {self.artist.name}" """

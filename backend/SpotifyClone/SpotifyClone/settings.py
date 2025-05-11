@@ -52,6 +52,9 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'rest_framework.authtoken',
     'chat',
+    'supportchat',
+    'ai_assistant',
+    'channels',
 ]
 
 # Đặt AUTH_USER_MODEL bên ngoài danh sách INSTALLED_APPS
@@ -71,6 +74,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",     # React dev server
     "http://127.0.0.1:3000",
+    "http://localhost:5173",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -212,3 +216,11 @@ LOGGING = {
     },
 }
  """
+ASGI_APPLICATION = 'SpotifyClone.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
+
