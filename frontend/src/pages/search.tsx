@@ -70,6 +70,18 @@ export default function SearchPage() {
             </CardContent>
           </Card>
         )}
+
+        {/* No results found message */}
+        {query.trim() &&
+          albumResults.length === 0 &&
+          artistResults.length === 0 &&
+          smartSearchResults.length === 0 &&
+          songResults.length === 0 &&
+          !loading && (
+            <div className="text-muted-foreground py-12 text-center text-lg">
+              No results found.
+            </div>
+          )}
       </div>
     </>
   );

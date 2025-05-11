@@ -2,6 +2,7 @@ import Routes from "@/routes/index_routes";
 import { useAuth } from "./contexts/authContext";
 import { useEffect } from "react";
 import { useUser } from "./hooks";
+import { Toaster } from "@/components/ui/sonner";
 
 function App() {
   const { setUser } = useAuth();
@@ -18,6 +19,7 @@ function App() {
   return (
     <>
       <Routes />
+      <Toaster />
     </>
   );
 }
