@@ -1,5 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
+import { FaComment, FaTimes, FaPaperPlane } from "react-icons/fa";
+
 import {
   setCurrentSong,
   togglePlayPause,
@@ -24,6 +26,9 @@ import { useFavorite } from "@/hooks";
 import { useAuth } from "@/contexts/authContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Song } from "@/types/music";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import GlobalChatBox from "../supportchat/GlobalChatBox";
 
 export default function AppFooter({ className }: { className?: string }) {
   const dispatch = useDispatch<AppDispatch>();
@@ -265,76 +270,234 @@ export default function AppFooter({ className }: { className?: string }) {
     setUserInput("");
     firstSong = 0;
   };
+
+  /* Chat AI */
+  const [aiMessages, setAiMessages] = useState<any[]>([]); // State riêng cho chat AI
+  const [aiUserInput, setAiUserInput] = useState(""); // Input của người dùng trong chat AI
+  const [aiChatOpen, setAiChatOpen] = useState(false); // Trạng thái mở/đóng chat AI
+  const [errorMessageAI, setErrorMessageAI] = useState(""); // Thông báo lỗi khi có sự cố
+
+  const navigate = useNavigate(); // Hook để điều hướng
+
+  const toggleAiChat = () => setAiChatOpen(!aiChatOpen); // Mở/đóng chat AI
+
+  // Hàm gửi tin nhắn và nhận phản hồi từ AI
+  const handleAiSendMessage = async () => {
+    if (!aiUserInput.trim()) return;
+
+    setAiMessages((prevMessages) => [
+      ...prevMessages,
+      { text: aiUserInput, sender: "user" },
+    ]);
+    setAiUserInput(""); // Reset input
+
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/ai-chat-song/",
+        { prompt: aiUserInput },
+      );
+
+      const data = response.data;
+      if (data.type === "info") {
+        setAiMessages((prev) => [
+          ...prev,
+          { textInfo: data.text, sender: "ai" }, // Thêm textInfo cho thông tin nghệ sĩ
+        ]);
+      } else if (data.songs && data.songs.length) {
+        setAiMessages((prev) => [
+          ...prev,
+          {
+            songs: data.songs, // Truyền danh sách bài hát và hỗ trợ link
+            sender: "ai",
+          },
+        ]);
+      } else {
+        setAiMessages((prev) => [
+          ...prev,
+          { text: "No songs found.", sender: "ai" },
+        ]);
+      }
+    } catch (error) {
+      setAiMessages((prev) => [
+        ...prev,
+        { text: "Error while fetching data from AI.", sender: "ai" },
+      ]);
+    }
+  };
+
+  // Hàm điều hướng đến trang phát bài hát
+  const handleNavigateToSong = (songId: number) => {
+    navigate(`/song/${songId}`);
+  };
+
   return (
     <>
-      {/* Chat Section */}
-      <button
-        onClick={toggleChat}
-        className="bg-primary text-primary-foreground fixed right-4 bottom-25 flex size-12 cursor-pointer items-center justify-center rounded-full"
-      >
-        <Icon>chat</Icon>
-      </button>
+      <div>
+        <GlobalChatBox />
+        {/* AI Chat Section */}
+        <button
+          onClick={toggleAiChat}
+          className="fixed right-10 bottom-25 flex size-12 transform cursor-pointer items-center justify-center rounded-full bg-[#1DB954] text-white transition-all duration-300 hover:scale-110 hover:bg-[#1A9B44] hover:shadow-lg"
+        >
+          {/* Thay thế bằng icon AI */}
+          <Icon>robot</Icon>
+        </button>
 
-      {chatOpen && (
-        <div className="fixed right-4 bottom-24 w-80 overflow-hidden rounded-lg bg-blue-700">
-          {/* Chat header */}
-          <div className="flex items-center justify-between bg-blue-500 p-2 font-medium text-white">
-            <div className="flex items-center">
-              <Icon className="mr-2 text-white">chat</Icon>
-              <span className="font-semibold">Chat with us</span>
+        {aiChatOpen && (
+          <div className="fixed right-10 bottom-20 z-999 w-80 overflow-hidden rounded-lg bg-green-700">
+            {/* Chat header */}
+            <div className="flex items-center justify-between bg-green-500 p-2 font-medium text-white">
+              <div className="flex items-center">
+                <Icon className="mr-2 text-white">chat</Icon>
+                <span className="font-semibold">Chat with AI</span>
+              </div>
+              <button
+                onClick={toggleAiChat}
+                className="cursor-pointer text-white hover:text-gray-200"
+              >
+                <Icon>close</Icon>
+              </button>
             </div>
-            <button
-              onClick={toggleChat}
-              className="cursor-pointer text-white hover:text-gray-200"
-            >
-              <Icon>close</Icon>
-            </button>
-          </div>
 
-          {/* Chat messages */}
-          <div className="flex h-70 flex-col space-y-2 overflow-y-auto bg-gray-50 p-3">
-            {Array.isArray(messages) &&
-              messages.map((msg, index) => (
+            {/* Chat messages */}
+            <div className="flex h-70 flex-col space-y-2 overflow-y-auto bg-gray-50 p-3">
+              {aiMessages.map((msg, index) => (
                 <div
                   key={index}
                   className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[75%] rounded-lg px-4 py-2 text-sm ${msg.sender === "user" ? "bg-blue-500 text-white" : "border border-gray-200 bg-white text-gray-800 shadow-sm"}`}
+                    className={`max-w-[75%] rounded-lg px-4 py-2 text-sm ${
+                      msg.sender === "user"
+                        ? "bg-[#1DB954] text-white"
+                        : "border border-gray-200 bg-white text-gray-800 shadow-sm"
+                    }`}
                   >
-                    {msg.text}
+                    {/* Hiển thị thông tin bài hát nếu có */}
+                    {msg.songs ? (
+                      <div className="space-y-1">
+                        <div className="font-medium">Found songs:</div>
+                        <ul className="list-inside list-disc list-none">
+                          {msg.songs.map((song: any) => (
+                            <li
+                              key={song.id}
+                              onClick={() => handleNavigateToSong(song.id)}
+                              className="cursor-pointer font-medium text-[#1DB954]"
+                            >
+                              {song.title}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : msg.textInfo ? (
+                      // Hiển thị thông tin về nghệ sĩ, nếu có
+                      <div className="font-medium">{msg.textInfo}</div>
+                    ) : (
+                      // Hiển thị text thông thường
+                      <div>{msg.text}</div>
+                    )}
                   </div>
                 </div>
               ))}
-          </div>
+            </div>
 
-          {/* Chat input */}
-          <div className="border-t border-gray-300 bg-white p-3">
-            <div className="flex items-center gap-2 text-sm">
-              <input
-                type="text"
-                value={userInput}
-                onFocus={() => setErrorMessage("")}
-                onChange={(e) => setUserInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-                placeholder="Nhập tin nhắn..."
-                className="flex-1 rounded-full border border-gray-300 bg-white p-2 px-4 text-gray-800 transition duration-200 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
+            {/* Chat input */}
+            <div className="border-t border-gray-300 bg-white p-3">
+              <div className="flex items-center gap-2 text-sm">
+                <input
+                  type="text"
+                  value={aiUserInput}
+                  onFocus={() => setErrorMessage("")}
+                  onChange={(e) => setAiUserInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleAiSendMessage()}
+                  placeholder="Nhập tin nhắn AI..."
+                  className="flex-1 rounded-full border border-gray-300 bg-white p-2 px-4 text-gray-800 transition duration-200 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+                <button
+                  onClick={handleAiSendMessage}
+                  className="flex items-center justify-center rounded-full bg-[#1DB954] p-2 text-white transition duration-200"
+                >
+                  <FaPaperPlane />
+                </button>
+              </div>
+              {errorMessage && (
+                <div className="mt-2 text-xs font-medium text-red-600">
+                  {errorMessage}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        {/* --------------------------------------------------------------------------- */}
+        {/* Chat Section */}
+        {/* <button
+          onClick={toggleChat}
+          className="bg-primary text-primary-foreground fixed right-4 bottom-25 flex size-12 cursor-pointer items-center justify-center rounded-full"
+        >
+          <Icon>chat</Icon>
+        </button>
+ */}
+        {chatOpen && (
+          <div className="fixed right-4 bottom-24 w-80 overflow-hidden rounded-lg bg-blue-700">
+            {/* Chat header */}
+            <div className="flex items-center justify-between bg-blue-500 p-2 font-medium text-white">
+              <div className="flex items-center">
+                <Icon className="mr-2 text-white">chat</Icon>
+                <span className="font-semibold">Chat with us</span>
+              </div>
               <button
-                onClick={handleSendMessage}
-                className="flex items-center justify-center rounded-full bg-blue-500 p-2 text-white transition duration-200"
+                onClick={toggleChat}
+                className="cursor-pointer text-white hover:text-gray-200"
               >
-                <Icon className="text-lg">send</Icon>
+                <Icon>close</Icon>
               </button>
             </div>
-            {errorMessage && (
-              <div className="mt-2 text-xs font-medium text-red-600">
-                {errorMessage}
+
+            {/* Chat messages */}
+            <div className="flex h-70 flex-col space-y-2 overflow-y-auto bg-gray-50 p-3">
+              {Array.isArray(messages) &&
+                messages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
+                  >
+                    <div
+                      className={`max-w-[75%] rounded-lg px-4 py-2 text-sm ${msg.sender === "user" ? "bg-blue-500 text-white" : "border border-gray-200 bg-white text-gray-800 shadow-sm"}`}
+                    >
+                      {msg.text}
+                    </div>
+                  </div>
+                ))}
+            </div>
+
+            {/* Chat input */}
+            <div className="border-t border-gray-300 bg-white p-3">
+              <div className="flex items-center gap-2 text-sm">
+                <input
+                  type="text"
+                  value={userInput}
+                  onFocus={() => setErrorMessage("")}
+                  onChange={(e) => setUserInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                  placeholder="Nhập tin nhắn..."
+                  className="flex-1 rounded-full border border-gray-300 bg-white p-2 px-4 text-gray-800 transition duration-200 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+                <button
+                  onClick={handleSendMessage}
+                  className="flex items-center justify-center rounded-full bg-blue-500 p-2 text-white transition duration-200"
+                >
+                  <Icon className="text-lg">send</Icon>
+                </button>
               </div>
-            )}
+              {errorMessage && (
+                <div className="mt-2 text-xs font-medium text-red-600">
+                  {errorMessage}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {!currentSong ? (
         <div
