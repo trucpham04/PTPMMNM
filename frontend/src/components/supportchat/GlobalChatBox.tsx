@@ -24,7 +24,7 @@ const GlobalChatBox = () => {
     const fetchChatHistory = async () => {
       try {
         const res = await fetch(
-          "http://localhost:8000/api/global-chat-history/",
+          "http://127.0.0.1:8000/api/global-chat-history/",
         );
         if (!res.ok) throw new Error("Không thể tải lịch sử chat");
         const data = await res.json();
@@ -42,7 +42,7 @@ const GlobalChatBox = () => {
   useEffect(() => {
     if (!isOpen || !user) return;
 
-    const socket = new WebSocket(`ws://localhost:8001/ws/chat/${roomName}/`);
+    const socket = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${roomName}/`);
     socketRef.current = socket;
 
     socket.onopen = () => console.log("WebSocket connected");

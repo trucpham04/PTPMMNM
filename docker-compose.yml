@@ -19,18 +19,6 @@ services:
     networks:
       - app-network
     restart: unless-stopped
-    # Use a script to wait for the database before starting
-    command: >
-      sh -c "
-        echo 'Waiting for MySQL to be ready...'
-        while ! nc -z db 3306; do
-          sleep 1
-        done
-        echo 'MySQL is ready!'
-        python manage.py makemigrations
-        python manage.py migrate
-        python manage.py runserver 0.0.0.0:8000
-      "
 
   frontend:
     build:
@@ -40,13 +28,10 @@ services:
       - "3000:5173"
     volumes:
       - ./frontend/src:/app/src
-    environment:
-      - REACT_APP_API_URL=http://localhost:8000
     depends_on:
       - backend
     networks:
       - app-network
-        # Add restart policy to retry if it fails initially
 
   db:
     image: mysql:lts
@@ -56,7 +41,7 @@ services:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=spotifyclone
     ports:
-      - "3310:3306" # Map host port 3310 to container port 3306
+      - "3310:3306"
     networks:
       - app-network
 

@@ -12,8 +12,6 @@ class ApiClient {
   private baseURL: string;
 
   constructor() {
-    // this.baseURL =
-    //   process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
     this.baseURL = "http://127.0.0.1:8000/api";
     this.instance = axios.create({
       baseURL: this.baseURL,
