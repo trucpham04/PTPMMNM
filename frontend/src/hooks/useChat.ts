@@ -14,7 +14,7 @@ export default function useChat(
 
   useEffect(() => {
     socketRef.current = new WebSocket(
-      `ws://localhost:8000/ws/chat/${otherUsername}/`,
+      `ws://127.0.0.1:8000/ws/chat/${otherUsername}/`,
     );
 
     socketRef.current.onmessage = (e: MessageEvent) => {
